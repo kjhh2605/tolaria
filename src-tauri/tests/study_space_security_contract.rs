@@ -61,9 +61,24 @@ fn study_space_safe_reservation_metadata_remains_available_after_redaction() {
         .get("reservation")
         .expect("sanitized fixture keeps reservation metadata");
 
-    assert_eq!(reservation.get("area").and_then(Value::as_str), Some("coding_lounge"));
-    assert_eq!(reservation.get("room").and_then(Value::as_str), Some("103호"));
-    assert_eq!(reservation.get("date").and_then(Value::as_str), Some("2026-05-27"));
-    assert_eq!(reservation.get("startTime").and_then(Value::as_str), Some("13:00"));
-    assert_eq!(reservation.get("endTime").and_then(Value::as_str), Some("15:00"));
+    assert_eq!(
+        reservation.get("area").and_then(Value::as_str),
+        Some("coding_lounge")
+    );
+    assert_eq!(
+        reservation.get("room").and_then(Value::as_str),
+        Some("103호")
+    );
+    assert_eq!(
+        reservation.get("date").and_then(Value::as_str),
+        Some("2026-05-27")
+    );
+    assert_eq!(
+        reservation.get("startTime").and_then(Value::as_str),
+        Some("13:00")
+    );
+    assert_eq!(
+        reservation.get("endTime").and_then(Value::as_str),
+        Some("15:00")
+    );
 }
