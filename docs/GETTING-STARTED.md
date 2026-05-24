@@ -331,7 +331,8 @@ hs-hub/
 | `src/components/StudySpaceReservationPage.tsx` | Korean-first reservation page: search filters, member rows, availability table, confirmation dialog, success artifacts. |
 | `src/lib/studySpaceReservation.ts` | Renderer command wrapper and mock fallback for native reservation commands. |
 | `src/lib/studySpaceReservationArtifacts.ts` | Sanitized Markdown reservation-note and `.ics` calendar export generation. |
-| `src-tauri/resources/study-space-hs-mcp-bridge.py` | Python stdin/stdout bridge that imports `hs_mcp`, uses its keyring-backed facility session, checks availability, creates confirmed reservations, and verifies my-reservation history. |
+| `src-tauri/resources/study-space-hs-mcp-bridge.py` | Python stdin/stdout bridge that imports bundled `hs_mcp`, uses its keyring-backed facility session, checks availability, creates confirmed reservations, and verifies my-reservation history. |
+| `scripts/bundle-study-space-mcp.mjs` | Build-time bundler for the pinned Hs-MCP Python runtime copied into `src-tauri/resources/study-space-python/` before Tauri packaging. |
 
 ### AI
 
@@ -484,9 +485,10 @@ BASE_URL="http://localhost:5173" npx playwright test tests/smoke/<slug>.spec.ts
 
 1. Keep live bookings behind the explicit confirmation dialog and pass `confirm: true` only from that dialog path.
 2. Keep credentials in the OS keychain/native adapter boundary. The renderer may collect student id/password for the login action, but the password must be used only for immediate Hs-MCP login and must not be stored in settings, notes, logs, localStorage, calendar exports, or tests.
-3. Ensure the app process can run Python with the `hs-mcp` package installed, or return a Korean `Hs-MCP 실행 환경` error without attempting a reservation.
-4. When changing post-success artifacts, update `src/lib/studySpaceReservationArtifacts.test.ts` and run `node scripts/study-space-secret-scan.mjs`.
-5. Reservation notes must be created through the active-vault Tauri write boundary and stored under `reservations/`; calendar integration remains an explicit local `.ics` download unless a future ADR approves calendar-account integration.
+3. Keep `pnpm bundle-study-space-mcp` in the Tauri build path so packaged apps include the pinned Hs-MCP runtime under `study-space-python/`; the app process still needs Python 3.11+ available as `python3` or `HS_HUB_STUDY_SPACE_PYTHON`. If either runtime piece is unavailable, return a Korean `Hs-MCP 실행 환경` error without attempting a reservation.
+4. 코딩라운지 세미나실, 상상파크 플러스 소모임실, 상상베이스, 학술정보관 그룹스터디실은 팀원 학번/이름 rows를 요구하지 않는다. 상상파크 플러스 소모임실은 학교 폼의 추가 항목 `addItem1`/`addItem2`/`addItem3`에 대응하는 소속, 사용인원, 사용목적을 수집하고, 상상베이스는 `addItem1`/`addItem2`에 대응하는 전체이용자 성명/학번과 총 인원수를 수집한다. 학술정보관 그룹스터디실은 공간명에 따라 `addItem1`/`addItem2`를 다르게 채운다: 그룹스터디실은 동반 이용자 학번/이름과 총 인원수, 회의실/코워킹룸은 예약사유와 총 인원수.
+5. When changing post-success artifacts, update `src/lib/studySpaceReservationArtifacts.test.ts` and run `node scripts/study-space-secret-scan.mjs`.
+6. Reservation notes must be created through the active-vault Tauri write boundary and stored under `reservations/`; calendar integration remains an explicit local `.ics` download unless a future ADR approves calendar-account integration.
 
 ### Work with external MCP setup
 

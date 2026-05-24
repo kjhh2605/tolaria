@@ -2,7 +2,7 @@ use chrono::{NaiveDate, NaiveTime};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 const PATH_REDACTION: &str = "[redacted-path]";
@@ -146,9 +146,19 @@ pub struct StudySpaceAvailabilityRequest {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+pub struct StudySpaceAvailabilitySlot {
+    pub start_time: String,
+    pub end_time: String,
+    pub available: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct StudySpaceAvailability {
     pub room: StudySpaceRoom,
     pub available: bool,
+    pub slots: Vec<StudySpaceAvailabilitySlot>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason_code: Option<StudySpaceErrorCode>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -168,6 +178,21 @@ pub struct StudySpaceAvailabilityResponse {
 pub struct StudySpaceReservationMember {
     pub name: String,
     pub student_number: String,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+pub struct StudySpaceReservationUsageInfo {
+    #[serde(default)]
+    pub affiliation: Option<String>,
+    pub attendee_count: u16,
+    #[serde(default)]
+    pub purpose: Option<String>,
+    #[serde(default)]
+    pub all_users: Option<String>,
+    #[serde(default)]
+    pub companion_users: Option<String>,
+    #[serde(default)]
+    pub reservation_reason: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
@@ -193,6 +218,8 @@ pub struct StudySpaceCreateReservationRequest {
     pub room_id: String,
     #[serde(default)]
     pub members: Vec<StudySpaceReservationMember>,
+    #[serde(default)]
+    pub usage_info: Option<StudySpaceReservationUsageInfo>,
     #[serde(default)]
     pub dry_run: Option<bool>,
     #[serde(default)]
@@ -364,15 +391,22 @@ impl StudySpaceReservationAdapter {
                 "예약할 학습공간을 선택해 주세요.",
             ));
         }
-        if request
-            .members
-            .iter()
-            .any(|member| member.name.trim().is_empty() || member.student_number.trim().is_empty())
+        if requires_member_details(&request.availability.area)
+            && request.members.iter().any(|member| {
+                member.name.trim().is_empty() || member.student_number.trim().is_empty()
+            })
         {
             return StudySpaceCommandResult::err(StudySpaceCommandError::new(
                 StudySpaceErrorCode::MemberInfoRequired,
                 "팀원 이름과 학번을 모두 입력해 주세요.",
             ));
+        }
+        if let Err(error) = validate_usage_info(
+            &request.availability.area,
+            &request.room_id,
+            request.usage_info.as_ref(),
+        ) {
+            return StudySpaceCommandResult::err(error);
         }
 
         let dry_run = request.dry_run.unwrap_or(true);
@@ -400,6 +434,7 @@ impl StudySpaceReservationAdapter {
             "dry_run": dry_run,
             "confirm": request.confirm.unwrap_or(false),
             "members": request.members.clone(),
+            "usage_info": request.usage_info.clone(),
         })) {
             Ok(response) if response.get("ok").and_then(Value::as_bool) == Some(true) => {
                 StudySpaceCommandResult::ok(reservation_result_from_bridge(&request, &response))
@@ -469,16 +504,10 @@ pub fn study_space_areas() -> Vec<StudySpaceArea> {
             note: Some("세미나실/IB 공간".to_string()),
         },
         StudySpaceArea {
-            key: "industry_academic_seminar".to_string(),
-            label: "산학협력 세미나실".to_string(),
-            supported: false,
-            note: Some("현재 자동 예약 연동 준비 중".to_string()),
-        },
-        StudySpaceArea {
             key: "library_group_study".to_string(),
             label: "학술정보관 그룹스터디실".to_string(),
-            supported: false,
-            note: Some("현재 자동 예약 연동 준비 중".to_string()),
+            supported: true,
+            note: Some("그룹스터디실/회의실/코워킹룸".to_string()),
         },
     ]
 }
@@ -497,9 +526,59 @@ pub fn study_space_rooms() -> Vec<StudySpaceRoom> {
 
     let other_supported = [
         StudySpaceRoom {
-            id: "sangsang_park_plus_small_room".to_string(),
+            id: "sangsang_park_plus_critical_thinking".to_string(),
             area: "sangsang_park_plus".to_string(),
-            name: "상상파크 플러스 소모임실".to_string(),
+            name: "소모임실 Critical Thinking".to_string(),
+            location: "상상파크 플러스".to_string(),
+            min_capacity: 1,
+            max_capacity: 6,
+            operating_hours: "09:00-21:00".to_string(),
+            supported: true,
+        },
+        StudySpaceRoom {
+            id: "sangsang_park_plus_creativity".to_string(),
+            area: "sangsang_park_plus".to_string(),
+            name: "소모임실 Creativity".to_string(),
+            location: "상상파크 플러스".to_string(),
+            min_capacity: 1,
+            max_capacity: 6,
+            operating_hours: "09:00-21:00".to_string(),
+            supported: true,
+        },
+        StudySpaceRoom {
+            id: "sangsang_park_plus_convergence".to_string(),
+            area: "sangsang_park_plus".to_string(),
+            name: "소모임실 Convergence".to_string(),
+            location: "상상파크 플러스".to_string(),
+            min_capacity: 1,
+            max_capacity: 6,
+            operating_hours: "09:00-21:00".to_string(),
+            supported: true,
+        },
+        StudySpaceRoom {
+            id: "sangsang_park_plus_communication".to_string(),
+            area: "sangsang_park_plus".to_string(),
+            name: "소모임실 Communication".to_string(),
+            location: "상상파크 플러스".to_string(),
+            min_capacity: 1,
+            max_capacity: 6,
+            operating_hours: "09:00-21:00".to_string(),
+            supported: true,
+        },
+        StudySpaceRoom {
+            id: "sangsang_park_plus_collaboration".to_string(),
+            area: "sangsang_park_plus".to_string(),
+            name: "소모임실 Collaboration".to_string(),
+            location: "상상파크 플러스".to_string(),
+            min_capacity: 1,
+            max_capacity: 6,
+            operating_hours: "09:00-21:00".to_string(),
+            supported: true,
+        },
+        StudySpaceRoom {
+            id: "sangsang_park_plus_challenge".to_string(),
+            area: "sangsang_park_plus".to_string(),
+            name: "소모임실 Challenge".to_string(),
             location: "상상파크 플러스".to_string(),
             min_capacity: 1,
             max_capacity: 6,
@@ -516,6 +595,76 @@ pub fn study_space_rooms() -> Vec<StudySpaceRoom> {
             operating_hours: "09:00-21:00".to_string(),
             supported: true,
         },
+        StudySpaceRoom {
+            id: "library_meeting_5f_sangsang_commons".to_string(),
+            area: "library_group_study".to_string(),
+            name: "회의실(5F상상커먼스)".to_string(),
+            location: "학술정보관".to_string(),
+            min_capacity: 1,
+            max_capacity: 12,
+            operating_hours: "09:00-21:00".to_string(),
+            supported: true,
+        },
+        StudySpaceRoom {
+            id: "library_coworking_3f_creative_reading".to_string(),
+            area: "library_group_study".to_string(),
+            name: "코워킹룸(3F창의열람실)".to_string(),
+            location: "학술정보관".to_string(),
+            min_capacity: 1,
+            max_capacity: 12,
+            operating_hours: "09:00-21:00".to_string(),
+            supported: true,
+        },
+        StudySpaceRoom {
+            id: "library_group_study_6f".to_string(),
+            area: "library_group_study".to_string(),
+            name: "그룹스터디실(6F)".to_string(),
+            location: "학술정보관".to_string(),
+            min_capacity: 1,
+            max_capacity: 8,
+            operating_hours: "09:00-21:00".to_string(),
+            supported: true,
+        },
+        StudySpaceRoom {
+            id: "library_group_study_5f".to_string(),
+            area: "library_group_study".to_string(),
+            name: "그룹스터디실(5F)".to_string(),
+            location: "학술정보관".to_string(),
+            min_capacity: 1,
+            max_capacity: 8,
+            operating_hours: "09:00-21:00".to_string(),
+            supported: true,
+        },
+        StudySpaceRoom {
+            id: "library_group_study_4f".to_string(),
+            area: "library_group_study".to_string(),
+            name: "그룹스터디실(4F)".to_string(),
+            location: "학술정보관".to_string(),
+            min_capacity: 1,
+            max_capacity: 8,
+            operating_hours: "09:00-21:00".to_string(),
+            supported: true,
+        },
+        StudySpaceRoom {
+            id: "library_group_study_3f_2".to_string(),
+            area: "library_group_study".to_string(),
+            name: "그룹스터디실(3F-2)".to_string(),
+            location: "학술정보관".to_string(),
+            min_capacity: 1,
+            max_capacity: 8,
+            operating_hours: "09:00-21:00".to_string(),
+            supported: true,
+        },
+        StudySpaceRoom {
+            id: "library_group_study_3f_1".to_string(),
+            area: "library_group_study".to_string(),
+            name: "그룹스터디실(3F-1)".to_string(),
+            location: "학술정보관".to_string(),
+            min_capacity: 1,
+            max_capacity: 8,
+            operating_hours: "09:00-21:00".to_string(),
+            supported: true,
+        },
     ];
 
     coding_lounge.chain(other_supported).collect()
@@ -528,7 +677,7 @@ pub fn map_adapter_error(raw_code: Option<&str>, raw_message: &str) -> StudySpac
         .to_ascii_uppercase()
         .as_str()
     {
-        "AUTH_REQUIRED" => StudySpaceErrorCode::AuthRequired,
+        "AUTH_REQUIRED" | "LOGIN_REQUIRED" => StudySpaceErrorCode::AuthRequired,
         "AUTH_FAILED" => StudySpaceErrorCode::AuthFailed,
         "KEYCHAIN_UNAVAILABLE" => StudySpaceErrorCode::KeychainUnavailable,
         "UNSUPPORTED_AREA" => StudySpaceErrorCode::UnsupportedArea,
@@ -537,7 +686,7 @@ pub fn map_adapter_error(raw_code: Option<&str>, raw_message: &str) -> StudySpac
         "CAPACITY_TOO_LOW" => StudySpaceErrorCode::CapacityTooLow,
         "CAPACITY_TOO_HIGH" => StudySpaceErrorCode::CapacityTooHigh,
         "MEMBER_INFO_REQUIRED" => StudySpaceErrorCode::MemberInfoRequired,
-        "UNAVAILABLE" => StudySpaceErrorCode::Unavailable,
+        "UNAVAILABLE" | "SPACE_NOT_FOUND" => StudySpaceErrorCode::Unavailable,
         "DUPLICATE_RESERVATION" => StudySpaceErrorCode::DuplicateReservation,
         "CONFIRM_REQUIRED" => StudySpaceErrorCode::ConfirmRequired,
         "RESERVATION_NOT_VERIFIED" => StudySpaceErrorCode::ReservationNotVerified,
@@ -614,6 +763,96 @@ fn parse_time(value: &str) -> Result<NaiveTime, StudySpaceCommandError> {
     })
 }
 
+fn requires_member_details(area: &str) -> bool {
+    !matches!(area, "coding_lounge" | "sangsang_park_plus")
+}
+
+fn requires_usage_details(area: &str) -> bool {
+    matches!(
+        area,
+        "sangsang_park_plus" | "sangsang_base" | "library_group_study"
+    )
+}
+
+fn library_room_requires_reason(room_id: &str) -> bool {
+    matches!(
+        room_id,
+        "library_meeting_5f_sangsang_commons" | "library_coworking_3f_creative_reading"
+    )
+}
+
+fn validate_usage_info(
+    area: &str,
+    room_id: &str,
+    usage_info: Option<&StudySpaceReservationUsageInfo>,
+) -> Result<(), StudySpaceCommandError> {
+    if !requires_usage_details(area) {
+        return Ok(());
+    }
+    let Some(usage_info) = usage_info else {
+        let message = if area == "sangsang_base" {
+            "전체이용자 성명/학번과 총 인원수를 입력해 주세요."
+        } else if area == "library_group_study" && library_room_requires_reason(room_id) {
+            "예약사유와 총 인원수를 입력해 주세요."
+        } else if area == "library_group_study" {
+            "동반 이용자 학번/이름과 총 인원수를 입력해 주세요."
+        } else {
+            "소속, 사용인원, 사용목적을 모두 입력해 주세요."
+        };
+        return Err(StudySpaceCommandError::new(
+            StudySpaceErrorCode::MemberInfoRequired,
+            message,
+        ));
+    };
+    if area == "sangsang_base" {
+        let all_users = usage_info.all_users.as_deref().unwrap_or_default().trim();
+        if all_users.is_empty() || usage_info.attendee_count == 0 {
+            return Err(StudySpaceCommandError::new(
+                StudySpaceErrorCode::MemberInfoRequired,
+                "전체이용자 성명/학번과 총 인원수를 입력해 주세요.",
+            ));
+        }
+        return Ok(());
+    }
+    if area == "library_group_study" {
+        if library_room_requires_reason(room_id) {
+            let reason = usage_info
+                .reservation_reason
+                .as_deref()
+                .unwrap_or_default()
+                .trim();
+            if reason.is_empty() || usage_info.attendee_count == 0 {
+                return Err(StudySpaceCommandError::new(
+                    StudySpaceErrorCode::MemberInfoRequired,
+                    "예약사유와 총 인원수를 입력해 주세요.",
+                ));
+            }
+            return Ok(());
+        }
+        let companion_users = usage_info
+            .companion_users
+            .as_deref()
+            .unwrap_or_default()
+            .trim();
+        if companion_users.is_empty() || usage_info.attendee_count == 0 {
+            return Err(StudySpaceCommandError::new(
+                StudySpaceErrorCode::MemberInfoRequired,
+                "동반 이용자 학번/이름과 총 인원수를 입력해 주세요.",
+            ));
+        }
+        return Ok(());
+    }
+    let affiliation = usage_info.affiliation.as_deref().unwrap_or_default().trim();
+    let purpose = usage_info.purpose.as_deref().unwrap_or_default().trim();
+    if affiliation.is_empty() || purpose.is_empty() || usage_info.attendee_count == 0 {
+        return Err(StudySpaceCommandError::new(
+            StudySpaceErrorCode::MemberInfoRequired,
+            "소속, 사용인원, 사용목적을 모두 입력해 주세요.",
+        ));
+    }
+    Ok(())
+}
+
 fn validate_supported_area(area: &str) -> Result<(), StudySpaceCommandError> {
     let normalized_area = area.trim();
     study_space_areas()
@@ -638,18 +877,9 @@ fn validate_supported_area(area: &str) -> Result<(), StudySpaceCommandError> {
 }
 
 fn hs_mcp_space_name_for_room_id(room_id: &str) -> Option<String> {
-    let area = if room_id.starts_with("coding_lounge_") {
-        "coding_lounge"
-    } else if room_id == "sangsang_park_plus_small_room" {
-        "sangsang_park_plus"
-    } else if room_id == "sangsang_base_seminar" {
-        "sangsang_base"
-    } else {
-        return None;
-    };
     study_space_rooms()
         .into_iter()
-        .find(|room| room.id == room_id && room.area == area)
+        .find(|room| room.id == room_id)
         .map(|room| {
             if room.area == "coding_lounge" {
                 room.name.replace("코딩라운지", "세미나실")
@@ -679,6 +909,11 @@ fn room_from_hs_mcp_space(area: &str, space: &Value) -> Option<StudySpaceRoom> {
             .ok()
             .map(|room| format!("coding_lounge_{room}"))
             .unwrap_or_else(|| format!("coding_lounge_{id}"))
+    } else if let Some(catalog_room) = study_space_rooms()
+        .into_iter()
+        .find(|room| room.area == area && room.name == display_name)
+    {
+        catalog_room.id
     } else if area == "sangsang_park_plus" {
         format!("sangsang_park_plus_{}", id.replace(' ', "_"))
     } else {
@@ -724,6 +959,68 @@ fn default_operating_hours(area: &str) -> &'static str {
     }
 }
 
+fn slot_statuses_from_availability(
+    availability: Option<&Value>,
+    fallback_available: bool,
+    fallback_reason: Option<&str>,
+) -> Vec<StudySpaceAvailabilitySlot> {
+    let Some(availability) = availability else {
+        return Vec::new();
+    };
+    let requested_slots = availability
+        .get("requested_slots")
+        .and_then(Value::as_array)
+        .map(|slots| {
+            slots
+                .iter()
+                .filter_map(Value::as_str)
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default();
+    if requested_slots.is_empty() {
+        return Vec::new();
+    }
+    let busy_slots = availability
+        .get("busy_slots")
+        .and_then(Value::as_array)
+        .map(|slots| {
+            slots
+                .iter()
+                .filter_map(Value::as_str)
+                .collect::<std::collections::HashSet<_>>()
+        })
+        .unwrap_or_default();
+    requested_slots
+        .into_iter()
+        .map(|slot| {
+            let available = if busy_slots.is_empty() {
+                fallback_available
+            } else {
+                !busy_slots.contains(slot.as_str())
+            };
+            StudySpaceAvailabilitySlot {
+                end_time: slot_end_time(&slot),
+                start_time: slot,
+                available,
+                reason: if available {
+                    None
+                } else {
+                    Some(fallback_reason.unwrap_or("예약됨").to_string())
+                },
+            }
+        })
+        .collect()
+}
+
+fn slot_end_time(slot: &str) -> String {
+    NaiveTime::parse_from_str(slot, "%H:%M")
+        .ok()
+        .map(|time| time.overflowing_add_signed(chrono::Duration::hours(1)).0)
+        .map(|time| time.format("%H:%M").to_string())
+        .unwrap_or_else(|| slot.to_string())
+}
+
 fn availability_response_from_bridge(
     request: &StudySpaceAvailabilityRequest,
     response: &Value,
@@ -736,7 +1033,7 @@ fn availability_response_from_bridge(
                 let room = room_from_hs_mcp_space(&request.area, space)?;
                 let check = item.get("check")?;
                 let availability = check.get("availability");
-                let available = availability
+                let raw_available = availability
                     .and_then(|value| value.get("available"))
                     .and_then(Value::as_bool)
                     .unwrap_or(false);
@@ -751,9 +1048,17 @@ fn availability_response_from_bridge(
                             .and_then(Value::as_str)
                             .map(ToString::to_string)
                     });
+                let slots =
+                    slot_statuses_from_availability(availability, raw_available, reason.as_deref());
+                let available = if slots.is_empty() {
+                    raw_available
+                } else {
+                    slots.iter().all(|slot| slot.available)
+                };
                 Some(StudySpaceAvailability {
                     room,
                     available,
+                    slots,
                     reason_code: if available {
                         None
                     } else {
@@ -796,7 +1101,7 @@ fn availability_response_from_bridge(
             supported: true,
         });
     let availability = response.get("availability");
-    let available = availability
+    let raw_available = availability
         .and_then(|value| value.get("available"))
         .and_then(Value::as_bool)
         .unwrap_or(false);
@@ -805,18 +1110,29 @@ fn availability_response_from_bridge(
         date: request.date.clone(),
         start_time: request.start_time.clone(),
         end_time: request.end_time.clone(),
-        results: vec![StudySpaceAvailability {
-            room,
-            available,
-            reason_code: if available {
-                None
-            } else {
-                Some(StudySpaceErrorCode::Unavailable)
-            },
-            reason: availability
+        results: vec![{
+            let reason = availability
                 .and_then(|value| value.get("message"))
                 .and_then(Value::as_str)
-                .map(ToString::to_string),
+                .map(ToString::to_string);
+            let slots =
+                slot_statuses_from_availability(availability, raw_available, reason.as_deref());
+            let available = if slots.is_empty() {
+                raw_available
+            } else {
+                slots.iter().all(|slot| slot.available)
+            };
+            StudySpaceAvailability {
+                room,
+                available,
+                slots,
+                reason_code: if available {
+                    None
+                } else {
+                    Some(StudySpaceErrorCode::Unavailable)
+                },
+                reason,
+            }
         }],
     }
 }
@@ -905,19 +1221,32 @@ fn call_hs_mcp_bridge(input: Value) -> Result<Value, StudySpaceCommandError> {
     })?;
     let python =
         std::env::var("HS_HUB_STUDY_SPACE_PYTHON").unwrap_or_else(|_| "python3".to_string());
-    let mut child = Command::new(python)
-        .arg(bridge_path)
+    let mut command = Command::new(python);
+    command
+        .arg(&bridge_path)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
-        .spawn()
-        .map_err(|error| {
-            StudySpaceCommandError::with_details(
-                StudySpaceErrorCode::SchoolSystemError,
-                "Hs-MCP 브리지를 실행하지 못했습니다.",
-                error.to_string(),
-            )
-        })?;
+        .env("PYTHONDONTWRITEBYTECODE", "1");
+    if let Some(python_path) = hs_mcp_python_path(&bridge_path) {
+        let paths = std::env::var_os("PYTHONPATH")
+            .map(|existing| {
+                let mut paths = std::env::split_paths(&existing).collect::<Vec<_>>();
+                paths.insert(0, python_path.clone());
+                paths
+            })
+            .unwrap_or_else(|| vec![python_path]);
+        if let Ok(joined) = std::env::join_paths(paths) {
+            command.env("PYTHONPATH", joined);
+        }
+    }
+    let mut child = command.spawn().map_err(|error| {
+        StudySpaceCommandError::with_details(
+            StudySpaceErrorCode::SchoolSystemError,
+            "Hs-MCP 브리지를 실행하지 못했습니다.",
+            error.to_string(),
+        )
+    })?;
     if let Some(stdin) = child.stdin.as_mut() {
         let payload = serde_json::to_vec(&input).map_err(|error| {
             StudySpaceCommandError::with_details(
@@ -963,17 +1292,44 @@ fn hs_mcp_bridge_path() -> Option<PathBuf> {
             return Some(candidate);
         }
     }
-    let candidates = [
-        PathBuf::from("src-tauri/resources/study-space-hs-mcp-bridge.py"),
-        PathBuf::from("resources/study-space-hs-mcp-bridge.py"),
-        std::env::current_exe()
-            .ok()
-            .and_then(|path| {
-                path.parent()
-                    .map(|parent| parent.join("study-space-hs-mcp-bridge.py"))
-            })
-            .unwrap_or_default(),
+    first_existing_path(study_space_resource_candidates(
+        "study-space-hs-mcp-bridge.py",
+    ))
+}
+
+fn hs_mcp_python_path(bridge_path: &Path) -> Option<PathBuf> {
+    if let Ok(path) = std::env::var("HS_HUB_STUDY_SPACE_PYTHONPATH") {
+        let candidate = PathBuf::from(path);
+        if candidate.join("hs_mcp").is_dir() {
+            return Some(candidate);
+        }
+    }
+
+    let mut candidates = study_space_resource_candidates("study-space-python");
+    if let Some(parent) = bridge_path.parent() {
+        candidates.insert(0, parent.join("study-space-python"));
+    }
+    candidates
+        .into_iter()
+        .find(|path| path.join("hs_mcp").is_dir())
+}
+
+fn study_space_resource_candidates(resource_name: &str) -> Vec<PathBuf> {
+    let mut candidates = vec![
+        PathBuf::from("src-tauri/resources").join(resource_name),
+        PathBuf::from("resources").join(resource_name),
     ];
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(parent) = exe.parent() {
+            candidates.push(parent.join(resource_name));
+            candidates.push(parent.join("resources").join(resource_name));
+            candidates.push(parent.join("..").join("Resources").join(resource_name));
+        }
+    }
+    candidates
+}
+
+fn first_existing_path(candidates: Vec<PathBuf>) -> Option<PathBuf> {
     candidates.into_iter().find(|path| path.exists())
 }
 
@@ -1095,6 +1451,39 @@ mod tests {
         }
     }
 
+    fn valid_create_request() -> StudySpaceCreateReservationRequest {
+        StudySpaceCreateReservationRequest {
+            availability: valid_request(),
+            room_id: "coding_lounge_103".to_string(),
+            members: Vec::new(),
+            usage_info: None,
+            dry_run: Some(false),
+            confirm: Some(false),
+        }
+    }
+
+    #[test]
+    fn study_space_resource_candidates_cover_dev_and_packaged_layouts() {
+        let candidates = study_space_resource_candidates("study-space-python");
+        assert!(candidates
+            .iter()
+            .any(|path| path == &PathBuf::from("src-tauri/resources/study-space-python")));
+        assert!(candidates
+            .iter()
+            .any(|path| path.ends_with(Path::new("Resources/study-space-python"))));
+    }
+
+    #[test]
+    fn hs_mcp_python_path_uses_bridge_sibling_runtime() {
+        let temp = tempfile::tempdir().unwrap();
+        let bridge = temp.path().join("study-space-hs-mcp-bridge.py");
+        let runtime = temp.path().join("study-space-python");
+        std::fs::create_dir_all(runtime.join("hs_mcp")).unwrap();
+        std::fs::write(&bridge, "").unwrap();
+
+        assert_eq!(hs_mcp_python_path(&bridge), Some(runtime));
+    }
+
     #[test]
     fn status_returns_no_secret_fields_and_supported_catalog() {
         let status = StudySpaceReservationAdapter::status();
@@ -1112,7 +1501,7 @@ mod tests {
         assert!(status
             .supported_areas
             .iter()
-            .any(|area| area.key == "library_group_study" && !area.supported));
+            .any(|area| area.key == "library_group_study" && area.supported));
         let serialized = serde_json::to_string(&status).unwrap();
         assert!(!serialized.contains("password"));
         assert!(!serialized.contains("token"));
@@ -1120,13 +1509,14 @@ mod tests {
     }
 
     #[test]
-    fn list_spaces_rejects_unsupported_area() {
+    fn list_spaces_includes_library_group_study_rooms() {
         let result = StudySpaceReservationAdapter::list_spaces("library_group_study".to_string());
-        assert!(!result.ok);
-        assert_eq!(
-            result.error.unwrap().code,
-            StudySpaceErrorCode::UnsupportedArea
-        );
+        assert!(result.ok);
+        let rooms = result.data.unwrap();
+        assert!(rooms.iter().any(|room| room.id == "library_group_study_6f"));
+        assert!(rooms
+            .iter()
+            .any(|room| room.id == "library_coworking_3f_creative_reading"));
     }
 
     #[test]
@@ -1154,22 +1544,210 @@ mod tests {
     }
 
     #[test]
-    fn actual_reservation_requires_confirm_true() {
-        let request = StudySpaceCreateReservationRequest {
-            availability: valid_request(),
-            room_id: "coding_lounge_103".to_string(),
-            members: vec![StudySpaceReservationMember {
-                name: "홍길동".to_string(),
-                student_number: "2299999".to_string(),
-            }],
-            dry_run: Some(false),
-            confirm: Some(false),
+    fn availability_mapping_preserves_per_hour_busy_slots() {
+        let request = StudySpaceAvailabilityRequest {
+            room_id: None,
+            ..valid_request()
         };
-        let result = StudySpaceReservationAdapter::create_reservation(request);
+        let response = json!({
+            "ok": true,
+            "results": [{
+                "space": { "space_id": "103", "name": "세미나실 103호", "capacity": 8 },
+                "check": {
+                    "ok": true,
+                    "availability": {
+                        "available": true,
+                        "requested_slots": ["13:00", "14:00"],
+                        "busy_slots": ["14:00"],
+                        "free_slots": ["13:00"],
+                        "message": "요청 시간대가 이미 예약되어 있습니다."
+                    }
+                }
+            }]
+        });
+
+        let mapped = availability_response_from_bridge(&request, &response);
+
+        assert_eq!(mapped.results[0].room.id, "coding_lounge_103");
+        assert!(!mapped.results[0].available);
+        assert_eq!(mapped.results[0].slots.len(), 2);
+        assert!(mapped.results[0].slots[0].available);
+        assert!(!mapped.results[0].slots[1].available);
+        assert_eq!(mapped.results[0].slots[1].start_time, "14:00");
+        assert_eq!(mapped.results[0].slots[1].end_time, "15:00");
+    }
+
+    #[test]
+    fn actual_reservation_requires_confirm_true_without_members_for_coding_lounge() {
+        let result = StudySpaceReservationAdapter::create_reservation(valid_create_request());
         assert!(!result.ok);
         assert_eq!(
             result.error.unwrap().code,
             StudySpaceErrorCode::ConfirmRequired
+        );
+    }
+
+    #[test]
+    fn sangsang_park_plus_requires_usage_details_but_not_members() {
+        let mut request = valid_create_request();
+        request.availability.area = "sangsang_park_plus".to_string();
+        request.availability.room_id = Some("sangsang_park_plus_critical_thinking".to_string());
+        request.room_id = "sangsang_park_plus_critical_thinking".to_string();
+
+        let result = StudySpaceReservationAdapter::create_reservation(request);
+
+        assert!(!result.ok);
+        let error = result.error.unwrap();
+        assert_eq!(error.code, StudySpaceErrorCode::MemberInfoRequired);
+        assert!(error.message.contains("소속"));
+    }
+
+    #[test]
+    fn sangsang_park_plus_accepts_usage_details_and_empty_members_until_confirm_gate() {
+        let mut request = valid_create_request();
+        request.availability.area = "sangsang_park_plus".to_string();
+        request.availability.room_id = Some("sangsang_park_plus_critical_thinking".to_string());
+        request.room_id = "sangsang_park_plus_critical_thinking".to_string();
+        request.usage_info = Some(StudySpaceReservationUsageInfo {
+            affiliation: Some("컴퓨터공학부".to_string()),
+            attendee_count: 2,
+            purpose: Some("팀 프로젝트 회의".to_string()),
+            all_users: None,
+            companion_users: None,
+            reservation_reason: None,
+        });
+
+        let result = StudySpaceReservationAdapter::create_reservation(request);
+
+        assert!(!result.ok);
+        assert_eq!(
+            result.error.unwrap().code,
+            StudySpaceErrorCode::ConfirmRequired
+        );
+    }
+
+    #[test]
+    fn sangsang_base_requires_all_users_but_not_members() {
+        let mut request = valid_create_request();
+        request.availability.area = "sangsang_base".to_string();
+        request.availability.room_id = Some("sangsang_base_seminar".to_string());
+        request.room_id = "sangsang_base_seminar".to_string();
+
+        let result = StudySpaceReservationAdapter::create_reservation(request);
+
+        assert!(!result.ok);
+        let error = result.error.unwrap();
+        assert_eq!(error.code, StudySpaceErrorCode::MemberInfoRequired);
+        assert!(error.message.contains("전체이용자"));
+    }
+
+    #[test]
+    fn sangsang_base_accepts_all_users_until_confirm_gate() {
+        let mut request = valid_create_request();
+        request.availability.area = "sangsang_base".to_string();
+        request.availability.room_id = Some("sangsang_base_seminar".to_string());
+        request.room_id = "sangsang_base_seminar".to_string();
+        request.usage_info = Some(StudySpaceReservationUsageInfo {
+            affiliation: None,
+            attendee_count: 2,
+            purpose: None,
+            all_users: Some("김한성 2170001, 이상상 2170002".to_string()),
+            companion_users: None,
+            reservation_reason: None,
+        });
+
+        let result = StudySpaceReservationAdapter::create_reservation(request);
+
+        assert!(!result.ok);
+        assert_eq!(
+            result.error.unwrap().code,
+            StudySpaceErrorCode::ConfirmRequired
+        );
+    }
+
+    #[test]
+    fn library_group_study_requires_companion_users_for_group_rooms() {
+        let mut request = valid_create_request();
+        request.availability.area = "library_group_study".to_string();
+        request.availability.room_id = Some("library_group_study_6f".to_string());
+        request.room_id = "library_group_study_6f".to_string();
+
+        let result = StudySpaceReservationAdapter::create_reservation(request);
+
+        assert!(!result.ok);
+        let error = result.error.unwrap();
+        assert_eq!(error.code, StudySpaceErrorCode::MemberInfoRequired);
+        assert!(error.message.contains("동반 이용자"));
+    }
+
+    #[test]
+    fn library_group_study_accepts_companion_users_until_confirm_gate() {
+        let mut request = valid_create_request();
+        request.availability.area = "library_group_study".to_string();
+        request.availability.room_id = Some("library_group_study_6f".to_string());
+        request.room_id = "library_group_study_6f".to_string();
+        request.usage_info = Some(StudySpaceReservationUsageInfo {
+            affiliation: None,
+            attendee_count: 2,
+            purpose: None,
+            all_users: None,
+            companion_users: Some("23홍길동, 24김한성".to_string()),
+            reservation_reason: None,
+        });
+
+        let result = StudySpaceReservationAdapter::create_reservation(request);
+
+        assert!(!result.ok);
+        assert_eq!(
+            result.error.unwrap().code,
+            StudySpaceErrorCode::ConfirmRequired
+        );
+    }
+
+    #[test]
+    fn library_coworking_requires_reservation_reason() {
+        let mut request = valid_create_request();
+        request.availability.area = "library_group_study".to_string();
+        request.availability.room_id = Some("library_coworking_3f_creative_reading".to_string());
+        request.room_id = "library_coworking_3f_creative_reading".to_string();
+
+        let result = StudySpaceReservationAdapter::create_reservation(request);
+
+        assert!(!result.ok);
+        let error = result.error.unwrap();
+        assert_eq!(error.code, StudySpaceErrorCode::MemberInfoRequired);
+        assert!(error.message.contains("예약사유"));
+    }
+
+    #[test]
+    fn library_coworking_accepts_reservation_reason_until_confirm_gate() {
+        let mut request = valid_create_request();
+        request.availability.area = "library_group_study".to_string();
+        request.availability.room_id = Some("library_coworking_3f_creative_reading".to_string());
+        request.room_id = "library_coworking_3f_creative_reading".to_string();
+        request.usage_info = Some(StudySpaceReservationUsageInfo {
+            affiliation: None,
+            attendee_count: 2,
+            purpose: None,
+            all_users: None,
+            companion_users: None,
+            reservation_reason: Some("팀 프로젝트 회의".to_string()),
+        });
+
+        let result = StudySpaceReservationAdapter::create_reservation(request);
+
+        assert!(!result.ok);
+        assert_eq!(
+            result.error.unwrap().code,
+            StudySpaceErrorCode::ConfirmRequired
+        );
+    }
+
+    #[test]
+    fn sangsang_live_room_ids_map_back_to_hs_mcp_space_names() {
+        assert_eq!(
+            hs_mcp_space_name_for_room_id("sangsang_park_plus_critical_thinking"),
+            Some("소모임실 Critical Thinking".to_string())
         );
     }
 
@@ -1188,6 +1766,16 @@ mod tests {
         assert!(!output.contains("fixture-session"));
         assert!(!output.contains("fixture-token"));
         assert!(!output.contains("2299999"));
+    }
+
+    #[test]
+    fn hs_mcp_login_required_maps_to_auth_required() {
+        let error = map_adapter_error(
+            Some("LOGIN_REQUIRED"),
+            "로그인이 필요합니다. `hs-mcp login`을 먼저 실행하세요.",
+        );
+        assert_eq!(error.code, StudySpaceErrorCode::AuthRequired);
+        assert_eq!(error.message, "한성대 학습공간 예약 로그인이 필요합니다.");
     }
 
     #[test]

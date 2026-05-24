@@ -158,7 +158,7 @@ interface VaultEntry {
 
 Hansung study-space bookings are persisted as ordinary Markdown notes only after a successful reservation. HS-Hub writes them under `reservations/` in the active vault through the same disk-first note creation boundary used by normal notes. The generated frontmatter uses `type: Reservation` plus scalar booking metadata such as `reservation_id`, `space`, `date`, `start_time`, `end_time`, and `verified`.
 
-Reservation notes are user-owned vault documents: they can be searched, edited, committed, and linked like any other note. They are not an authentication store. Do not add passwords, school session tokens, cookies, raw MCP requests/responses, or other credential material to reservation notes, calendar exports, frontmatter, settings, or localStorage. Calendar export is a separate explicit `.ics` file generated from the same sanitized booking summary.
+Reservation notes are user-owned vault documents: they can be searched, edited, committed, and linked like any other note. They are not an authentication store. Do not add passwords, school session tokens, cookies, raw MCP requests/responses, or other credential material to reservation notes, calendar exports, frontmatter, settings, or localStorage. Calendar export is a separate explicit `.ics` file generated from the same sanitized booking summary. For spaces that do not require team-member rows, the note records that team-member information is absent rather than inventing placeholder people.
 
 ### WorkspaceIdentity
 

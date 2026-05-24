@@ -81,9 +81,17 @@ export interface StudySpaceAvailabilityRequest {
   room_id?: string | null
 }
 
+export interface StudySpaceAvailabilitySlot {
+  start_time: string
+  end_time: string
+  available: boolean
+  reason?: string
+}
+
 export interface StudySpaceAvailability {
   room: StudySpaceRoom
   available: boolean
+  slots: StudySpaceAvailabilitySlot[]
   reason_code?: StudySpaceErrorCode
   reason?: string
 }
@@ -101,9 +109,19 @@ export interface StudySpaceReservationMember {
   student_number: string
 }
 
+export interface StudySpaceReservationUsageInfo {
+  affiliation?: string
+  attendee_count: number
+  purpose?: string
+  all_users?: string
+  companion_users?: string
+  reservation_reason?: string
+}
+
 export interface StudySpaceCreateReservationRequest extends StudySpaceAvailabilityRequest {
   room_id: string
   members: StudySpaceReservationMember[]
+  usage_info?: StudySpaceReservationUsageInfo | null
   dry_run?: boolean | null
   confirm?: boolean | null
 }

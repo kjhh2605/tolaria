@@ -178,3 +178,4 @@ proposed → active → superseded
 | [0124](0124-retire-codescene-codacy-gates.md) | Retire CodeScene and Codacy quality gates | active |
 | [0125](0125-hansung-study-space-reservation-artifacts.md) | Hansung study-space reservation artifacts | active |
 | [0126](0126-hs-mcp-python-bridge-for-study-space.md) | Hs-MCP Python bridge for study-space reservations | active |
+| [0127](0127-bundled-hs-mcp-study-space-runtime.md) | Bundled Hs-MCP study-space runtime | active |

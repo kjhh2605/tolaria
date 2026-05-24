@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   CalendarBlank,
   CheckCircle,
@@ -35,13 +35,13 @@ import {
   clearStudySpaceSession,
   createStudySpaceReservation,
   getStudySpaceStatus,
-  listStudySpaceRooms,
   saveStudySpaceCredentials,
   type StudySpaceArea,
   type StudySpaceAvailability,
   type StudySpaceAvailabilityRequest,
   type StudySpaceCredentialState,
   type StudySpaceReservationMember,
+  type StudySpaceReservationUsageInfo,
   type StudySpaceReservationResult,
   type StudySpaceRoom,
 } from '../lib/studySpaceReservation'
@@ -91,6 +91,26 @@ function statusLabel(state: StudySpaceCredentialState, locale: AppLocale): strin
   return translate(locale, 'studySpace.status.missing')
 }
 
+function requiresMemberDetails(area: string): boolean {
+  return area !== 'coding_lounge' && area !== 'sangsang_park_plus' && area !== 'sangsang_base' && area !== 'library_group_study'
+}
+
+function requiresUsageDetails(area: string): boolean {
+  return area === 'sangsang_park_plus'
+}
+
+function requiresBaseUsageDetails(area: string): boolean {
+  return area === 'sangsang_base'
+}
+
+function requiresLibraryUsageDetails(area: string): boolean {
+  return area === 'library_group_study'
+}
+
+function libraryRoomRequiresReason(room: StudySpaceRoom): boolean {
+  return room.id === 'library_meeting_5f_sangsang_commons' || room.id === 'library_coworking_3f_creative_reading'
+}
+
 function ensureMemberCount(members: StudySpaceReservationMember[], count: number): StudySpaceReservationMember[] {
   const target = Math.max(1, Math.min(12, count))
   const next = members.slice(0, target)
@@ -106,6 +126,17 @@ function roomMatchesCapacity(room: StudySpaceRoom, minCapacity: number | null, m
 
 function roomAvailabilityKey(room: StudySpaceRoom): string {
   return `${room.area}:${room.id}`
+}
+
+function slotLabel(startTime: string, endTime: string): string {
+  return `${startTime}–${endTime}`
+}
+
+function availabilityStatusText(state: StudySpaceAvailability | undefined, locale: AppLocale): string {
+  if (!state) return translate(locale, 'studySpace.results.notChecked')
+  return state.available
+    ? translate(locale, 'studySpace.results.available')
+    : state.reason ?? translate(locale, 'studySpace.results.unavailable')
 }
 
 function requestFromState({
@@ -173,9 +204,15 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
   const [maxCapacity, setMaxCapacity] = useState<number | null>(null)
   const [rooms, setRooms] = useState<StudySpaceRoom[]>([])
   const [availability, setAvailability] = useState<Map<string, StudySpaceAvailability>>(new Map())
+  const [hasCheckedAvailability, setHasCheckedAvailability] = useState(false)
+  const [expandedRoomIds, setExpandedRoomIds] = useState<Set<string>>(new Set())
   const [members, setMembers] = useState<StudySpaceReservationMember[]>(() => ensureMemberCount([], DEFAULT_HEADCOUNT))
+  const [usageAffiliation, setUsageAffiliation] = useState('')
+  const [usagePurpose, setUsagePurpose] = useState('')
+  const [baseAllUsers, setBaseAllUsers] = useState('')
+  const [libraryCompanionUsers, setLibraryCompanionUsers] = useState('')
+  const [libraryReservationReason, setLibraryReservationReason] = useState('')
   const [loadingStatus, setLoadingStatus] = useState(true)
-  const [loadingRooms, setLoadingRooms] = useState(false)
   const [checking, setChecking] = useState(false)
   const [reservingRoom, setReservingRoom] = useState<StudySpaceRoom | null>(null)
   const [reservationBusy, setReservationBusy] = useState(false)
@@ -186,6 +223,10 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
 
   const selectedArea = areas.find((candidate) => candidate.key === area)
   const selectedDate = parseIsoDate(date)
+  const memberDetailsRequired = requiresMemberDetails(area)
+  const usageDetailsRequired = requiresUsageDetails(area)
+  const baseUsageDetailsRequired = requiresBaseUsageDetails(area)
+  const libraryUsageDetailsRequired = requiresLibraryUsageDetails(area)
 
   const filteredRooms = useMemo(() => (
     rooms.filter((room) => roomMatchesCapacity(room, minCapacity, maxCapacity))
@@ -219,30 +260,15 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
   }, []) // eslint-disable-line react-hooks/exhaustive-deps -- initial adapter status only
 
   useEffect(() => {
-    let cancelled = false
-    setLoadingRooms(true)
-    setErrorMessage(null)
-    listStudySpaceRooms(area)
-      .then((nextRooms) => {
-        if (cancelled) return
-        setRooms(nextRooms)
-        setAvailability(new Map())
-      })
-      .catch((error) => {
-        if (cancelled) return
-        setRooms([])
-        setAvailability(new Map())
-        setErrorMessage(error instanceof Error ? error.message : String(error))
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingRooms(false)
-      })
-    return () => { cancelled = true }
-  }, [area])
-
-  useEffect(() => {
     setMembers((current) => ensureMemberCount(current, headcount))
   }, [headcount])
+
+  useEffect(() => {
+    setRooms([])
+    setAvailability(new Map())
+    setHasCheckedAvailability(false)
+    setExpandedRoomIds(new Set())
+  }, [area, date, endTime, headcount, maxCapacity, minCapacity, startTime])
 
   const handleHeadcountChange = useCallback((value: string) => {
     const parsed = Number.parseInt(value, 10)
@@ -310,6 +336,18 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
     roomId,
   }), [area, date, endTime, headcount, maxCapacity, minCapacity, startTime])
 
+  const toggleRoomSlots = useCallback((roomId: string) => {
+    setExpandedRoomIds((current) => {
+      const next = new Set(current)
+      if (next.has(roomId)) {
+        next.delete(roomId)
+      } else {
+        next.add(roomId)
+      }
+      return next
+    })
+  }, [])
+
   const handleCheckAvailability = useCallback(async () => {
     setChecking(true)
     setErrorMessage(null)
@@ -317,8 +355,11 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
     setSuccessArtifact(null)
     try {
       const response = await checkStudySpaceAvailability(buildRequest())
+      setRooms(response.results.map((result) => result.room))
       setAvailability(new Map(response.results.map((result) => [roomAvailabilityKey(result.room), result])))
-      if (response.results.every((result) => !result.available)) {
+      setExpandedRoomIds(new Set())
+      setHasCheckedAvailability(true)
+      if (response.results.length > 0 && response.results.every((result) => !result.available)) {
         setErrorMessage(translate(locale, 'studySpace.availability.none'))
       }
     } catch (error) {
@@ -330,11 +371,43 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
 
   const handleReserve = useCallback(async () => {
     if (!reservingRoom) return
-    if (completeMembers.length < headcount) {
+    if (memberDetailsRequired && completeMembers.length < headcount) {
       setErrorMessage(translate(locale, 'studySpace.error.membersIncomplete'))
       setReservingRoom(null)
       return
     }
+    if (usageDetailsRequired && (!usageAffiliation.trim() || !usagePurpose.trim() || headcount < 1)) {
+      setErrorMessage(translate(locale, 'studySpace.error.usageDetailsIncomplete'))
+      setReservingRoom(null)
+      return
+    }
+    if (baseUsageDetailsRequired && (!baseAllUsers.trim() || headcount < 1)) {
+      setErrorMessage(translate(locale, 'studySpace.error.baseUsageDetailsIncomplete'))
+      setReservingRoom(null)
+      return
+    }
+    const libraryReasonRequired = libraryUsageDetailsRequired && libraryRoomRequiresReason(reservingRoom)
+    if (libraryReasonRequired && (!libraryReservationReason.trim() || headcount < 1)) {
+      setErrorMessage(translate(locale, 'studySpace.error.libraryReasonDetailsIncomplete'))
+      setReservingRoom(null)
+      return
+    }
+    if (libraryUsageDetailsRequired && !libraryReasonRequired && (!libraryCompanionUsers.trim() || headcount < 1)) {
+      setErrorMessage(translate(locale, 'studySpace.error.libraryCompanionDetailsIncomplete'))
+      setReservingRoom(null)
+      return
+    }
+
+    const requestMembers = memberDetailsRequired ? completeMembers : []
+    const usageInfo: StudySpaceReservationUsageInfo | null = usageDetailsRequired
+      ? { affiliation: usageAffiliation.trim(), attendee_count: headcount, purpose: usagePurpose.trim() }
+      : baseUsageDetailsRequired
+        ? { all_users: baseAllUsers.trim(), attendee_count: headcount }
+        : libraryUsageDetailsRequired
+          ? libraryReasonRequired
+            ? { reservation_reason: libraryReservationReason.trim(), attendee_count: headcount }
+            : { companion_users: libraryCompanionUsers.trim(), attendee_count: headcount }
+          : null
 
     setReservationBusy(true)
     setErrorMessage(null)
@@ -343,12 +416,13 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
       const result = await createStudySpaceReservation({
         ...buildRequest(selectedRoom.id),
         room_id: selectedRoom.id,
-        members: completeMembers,
+        members: requestMembers,
+        usage_info: usageInfo,
         dry_run: false,
         confirm: true,
       })
       setSuccess(result)
-      setSuccessArtifact({ result, room: selectedRoom, members: completeMembers })
+      setSuccessArtifact({ result, room: selectedRoom, members: requestMembers })
       onToast?.(translate(locale, 'studySpace.success.toast'))
       setReservingRoom(null)
     } catch (error) {
@@ -357,7 +431,7 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
     } finally {
       setReservationBusy(false)
     }
-  }, [buildRequest, completeMembers, headcount, locale, onToast, reservingRoom])
+  }, [baseAllUsers, baseUsageDetailsRequired, buildRequest, completeMembers, headcount, libraryCompanionUsers, libraryReservationReason, libraryUsageDetailsRequired, locale, memberDetailsRequired, onToast, reservingRoom, usageAffiliation, usageDetailsRequired, usagePurpose])
 
   const handleCreateReservationNote = useCallback(async () => {
     if (!successArtifact || !onCreateReservationNote) return
@@ -519,7 +593,7 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
                 </label>
               </div>
 
-              <Button type="button" className="w-full" onClick={handleCheckAvailability} disabled={checking || loadingRooms}>
+              <Button type="button" className="w-full" onClick={handleCheckAvailability} disabled={checking}>
                 <Clock size={16} />
                 {checking ? translate(locale, 'studySpace.action.checking') : translate(locale, 'studySpace.action.check')}
               </Button>
@@ -527,33 +601,141 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
           </Card>
 
           <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>{translate(locale, 'studySpace.members.title')}</CardTitle>
-                <CardDescription>{translate(locale, 'studySpace.members.description')}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {members.map((member, index) => (
-                  <div key={index} className="grid gap-2 rounded-xl border bg-background p-3 md:grid-cols-[1fr_1fr_auto] md:items-end">
-                    <label className="grid gap-1 text-sm font-medium">
-                      {translate(locale, 'studySpace.field.studentNumber')}
-                      <Input value={member.student_number} onChange={(event) => handleMemberChange(index, 'student_number', event.target.value)} placeholder="2170000" />
-                    </label>
-                    <label className="grid gap-1 text-sm font-medium">
-                      {translate(locale, 'studySpace.field.memberName')}
-                      <Input value={member.name} onChange={(event) => handleMemberChange(index, 'name', event.target.value)} placeholder={translate(locale, 'studySpace.placeholder.memberName')} />
-                    </label>
-                    <Button type="button" variant="ghost" size="icon" aria-label={translate(locale, 'studySpace.action.removeMember')} onClick={() => handleRemoveMember(index)} disabled={members.length <= 1}>
-                      <Trash size={16} />
-                    </Button>
-                  </div>
-                ))}
-                <Button type="button" variant="outline" onClick={handleAddMember} disabled={members.length >= 12}>
-                  <Plus size={16} />
-                  {translate(locale, 'studySpace.action.addMember')}
-                </Button>
-              </CardContent>
-            </Card>
+            {memberDetailsRequired && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{translate(locale, 'studySpace.members.title')}</CardTitle>
+                  <CardDescription>{translate(locale, 'studySpace.members.description')}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {members.map((member, index) => (
+                    <div key={index} className="grid gap-2 rounded-xl border bg-background p-3 md:grid-cols-[1fr_1fr_auto] md:items-end">
+                      <label className="grid gap-1 text-sm font-medium">
+                        {translate(locale, 'studySpace.field.studentNumber')}
+                        <Input value={member.student_number} onChange={(event) => handleMemberChange(index, 'student_number', event.target.value)} placeholder="2170000" />
+                      </label>
+                      <label className="grid gap-1 text-sm font-medium">
+                        {translate(locale, 'studySpace.field.memberName')}
+                        <Input value={member.name} onChange={(event) => handleMemberChange(index, 'name', event.target.value)} placeholder={translate(locale, 'studySpace.placeholder.memberName')} />
+                      </label>
+                      <Button type="button" variant="ghost" size="icon" aria-label={translate(locale, 'studySpace.action.removeMember')} onClick={() => handleRemoveMember(index)} disabled={members.length <= 1}>
+                        <Trash size={16} />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button type="button" variant="outline" onClick={handleAddMember} disabled={members.length >= 12}>
+                    <Plus size={16} />
+                    {translate(locale, 'studySpace.action.addMember')}
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {usageDetailsRequired && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{translate(locale, 'studySpace.usage.title')}</CardTitle>
+                  <CardDescription>{translate(locale, 'studySpace.usage.description')}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <label className="grid gap-2 text-sm font-medium">
+                    {translate(locale, 'studySpace.field.affiliation')}
+                    <Input
+                      value={usageAffiliation}
+                      onChange={(event) => setUsageAffiliation(event.target.value)}
+                      placeholder={translate(locale, 'studySpace.placeholder.affiliation')}
+                    />
+                  </label>
+                  <label className="grid gap-2 text-sm font-medium">
+                    {translate(locale, 'studySpace.field.attendeeCount')}
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      value={String(headcount)}
+                      onChange={(event) => handleHeadcountChange(event.target.value)}
+                      aria-label={translate(locale, 'studySpace.field.attendeeCount')}
+                    />
+                  </label>
+                  <label className="grid gap-2 text-sm font-medium">
+                    {translate(locale, 'studySpace.field.purpose')}
+                    <Input
+                      value={usagePurpose}
+                      onChange={(event) => setUsagePurpose(event.target.value)}
+                      placeholder={translate(locale, 'studySpace.placeholder.purpose')}
+                    />
+                  </label>
+                </CardContent>
+              </Card>
+            )}
+
+            {baseUsageDetailsRequired && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{translate(locale, 'studySpace.baseUsage.title')}</CardTitle>
+                  <CardDescription>{translate(locale, 'studySpace.baseUsage.description')}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <label className="grid gap-2 text-sm font-medium">
+                    {translate(locale, 'studySpace.field.allUsers')}
+                    <Input
+                      value={baseAllUsers}
+                      onChange={(event) => setBaseAllUsers(event.target.value)}
+                      placeholder={translate(locale, 'studySpace.placeholder.allUsers')}
+                    />
+                  </label>
+                  <label className="grid gap-2 text-sm font-medium">
+                    {translate(locale, 'studySpace.field.totalAttendeeCount')}
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      value={String(headcount)}
+                      onChange={(event) => handleHeadcountChange(event.target.value)}
+                      aria-label={translate(locale, 'studySpace.field.totalAttendeeCount')}
+                    />
+                  </label>
+                </CardContent>
+              </Card>
+            )}
+
+            {libraryUsageDetailsRequired && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{translate(locale, 'studySpace.libraryUsage.title')}</CardTitle>
+                  <CardDescription>{translate(locale, 'studySpace.libraryUsage.description')}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <label className="grid gap-2 text-sm font-medium">
+                    {translate(locale, 'studySpace.field.companionUsers')}
+                    <Input
+                      value={libraryCompanionUsers}
+                      onChange={(event) => setLibraryCompanionUsers(event.target.value)}
+                      placeholder={translate(locale, 'studySpace.placeholder.companionUsers')}
+                    />
+                  </label>
+                  <label className="grid gap-2 text-sm font-medium">
+                    {translate(locale, 'studySpace.field.reservationReason')}
+                    <Input
+                      value={libraryReservationReason}
+                      onChange={(event) => setLibraryReservationReason(event.target.value)}
+                      placeholder={translate(locale, 'studySpace.placeholder.reservationReason')}
+                    />
+                  </label>
+                  <label className="grid gap-2 text-sm font-medium">
+                    {translate(locale, 'studySpace.field.totalAttendeeCount')}
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      value={String(headcount)}
+                      onChange={(event) => handleHeadcountChange(event.target.value)}
+                      aria-label={translate(locale, 'studySpace.field.totalAttendeeCount')}
+                    />
+                  </label>
+                </CardContent>
+              </Card>
+            )}
 
             <Card>
               <CardHeader>
@@ -602,32 +784,56 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
                       </tr>
                     </thead>
                     <tbody>
-                      {loadingRooms ? (
+                      {checking ? (
                         <tr><td className="px-3 py-8 text-center text-muted-foreground" colSpan={5}>{translate(locale, 'studySpace.results.loading')}</td></tr>
+                      ) : !hasCheckedAvailability ? (
+                        <tr><td className="px-3 py-8 text-center text-muted-foreground" colSpan={5}>{translate(locale, 'studySpace.results.notCheckedPrompt')}</td></tr>
                       ) : filteredRooms.length === 0 ? (
                         <tr><td className="px-3 py-8 text-center text-muted-foreground" colSpan={5}>{translate(locale, 'studySpace.results.empty')}</td></tr>
                       ) : filteredRooms.map((room) => {
                         const state = availability.get(roomAvailabilityKey(room))
-                        const unavailable = state?.available === false || !room.supported
+                        const unavailable = !state?.available || !room.supported
+                        const expanded = expandedRoomIds.has(room.id)
                         return (
-                          <tr key={room.id} className="border-t">
-                            <td className="px-3 py-3">
-                              <div className="font-medium text-foreground">{room.name}</div>
-                              <div className="text-xs text-muted-foreground">{room.location}</div>
-                            </td>
-                            <td className="px-3 py-3">{room.min_capacity}–{room.max_capacity}{translate(locale, 'studySpace.unit.people')}</td>
-                            <td className="px-3 py-3">{room.operating_hours}</td>
-                            <td className="px-3 py-3">
-                              <Badge variant={state?.available ? 'default' : 'secondary'}>
-                                {state ? (state.available ? translate(locale, 'studySpace.results.available') : state.reason ?? translate(locale, 'studySpace.results.unavailable')) : translate(locale, 'studySpace.results.notChecked')}
-                              </Badge>
-                            </td>
-                            <td className="px-3 py-3 text-right">
-                              <Button type="button" size="sm" onClick={() => setReservingRoom(room)} disabled={unavailable}>
-                                {translate(locale, 'studySpace.action.reserve')}
-                              </Button>
-                            </td>
-                          </tr>
+                          <Fragment key={room.id}>
+                            <tr className="border-t">
+                              <td className="px-3 py-3">
+                                <div className="font-medium text-foreground">{room.name}</div>
+                                <div className="text-xs text-muted-foreground">{room.location}</div>
+                              </td>
+                              <td className="px-3 py-3">{room.min_capacity}–{room.max_capacity}{translate(locale, 'studySpace.unit.people')}</td>
+                              <td className="px-3 py-3">{room.operating_hours}</td>
+                              <td className="px-3 py-3">
+                                <Badge variant={state?.available ? 'default' : 'secondary'}>
+                                  {availabilityStatusText(state, locale)}
+                                </Badge>
+                              </td>
+                              <td className="px-3 py-3 text-right">
+                                <div className="flex justify-end gap-2">
+                                  <Button type="button" size="sm" variant="outline" onClick={() => toggleRoomSlots(room.id)} disabled={!state?.slots?.length}>
+                                    {expanded ? translate(locale, 'studySpace.results.hideSlots') : translate(locale, 'studySpace.results.showSlots')}
+                                  </Button>
+                                  <Button type="button" size="sm" onClick={() => setReservingRoom(room)} disabled={unavailable}>
+                                    {translate(locale, 'studySpace.action.reserve')}
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                            {expanded && state?.slots?.length ? (
+                              <tr className="border-t bg-muted/20">
+                                <td className="px-3 py-3 text-xs text-muted-foreground" colSpan={5}>
+                                  <div className="mb-2 font-medium text-foreground">{translate(locale, 'studySpace.results.slotHistory')}</div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {state.slots.map((slot) => (
+                                      <Badge key={`${room.id}:${slot.start_time}`} variant={slot.available ? 'outline' : 'secondary'}>
+                                        {slotLabel(slot.start_time, slot.end_time)} · {slot.available ? translate(locale, 'studySpace.results.available') : slot.reason ?? translate(locale, 'studySpace.results.reserved')}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </td>
+                              </tr>
+                            ) : null}
+                          </Fragment>
                         )
                       })}
                     </tbody>

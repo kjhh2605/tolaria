@@ -7,7 +7,7 @@
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5202",
     "beforeDevCommand": "pnpm dev",
-    "beforeBuildCommand": "pnpm build && pnpm bundle-mcp && pnpm agent-docs"
+    "beforeBuildCommand": "pnpm build && pnpm bundle-mcp && pnpm bundle-study-space-mcp && pnpm agent-docs"
   },
   "app": {
     "withGlobalTauri": true,
@@ -61,7 +61,8 @@
     "resources": {
       "resources/mcp-server/**/*": "mcp-server/",
       "resources/agent-docs/**/*": "agent-docs/",
-      "resources/study-space-hs-mcp-bridge.py": "study-space-hs-mcp-bridge.py"
+      "resources/study-space-hs-mcp-bridge.py": "study-space-hs-mcp-bridge.py",
+      "resources/study-space-python/**/*": "study-space-python/"
     },
     "icon": [
       "icons/32x32.png",

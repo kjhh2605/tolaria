@@ -75,3 +75,5 @@ SF-SYMBOLS-MIGRATION.md
 .env
 .env.local
 .env.*.local
+# Generated study-space Hs-MCP Python runtime (built by scripts/bundle-study-space-mcp.mjs)
+src-tauri/resources/study-space-python/

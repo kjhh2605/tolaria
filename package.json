@@ -23,7 +23,8 @@
     "playwright:regression": "playwright test tests/smoke/",
     "playwright:integration": "playwright test --config playwright.integration.config.ts",
     "test:coverage": "node scripts/run-vitest-coverage.mjs",
-    "prepare": "husky"
+    "prepare": "husky",
+    "bundle-study-space-mcp": "node scripts/bundle-study-space-mcp.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

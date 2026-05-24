@@ -15,7 +15,7 @@ function compactStudentNumber(value: string): string {
 }
 
 function formatMemberRows(members: StudySpaceReservationMember[]): string {
-  if (members.length === 0) return '| - | - |\n'
+  if (members.length === 0) return '| 팀원 정보 없음 | - |\n'
   return members
     .map((member) => `| ${escapeMarkdownCell(compactStudentNumber(member.student_number)) || '-'} | ${escapeMarkdownCell(member.name) || '-'} |`)
     .join('\n')
