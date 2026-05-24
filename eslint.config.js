@@ -15,6 +15,7 @@ export default defineConfig([
     'src-tauri/target/',
     'src-tauri/gen/',
     'tools/',
+    '.omx/',
   ]),
   {
     files: ['**/*.{ts,tsx}'],
