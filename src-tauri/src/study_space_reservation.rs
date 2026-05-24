@@ -344,20 +344,27 @@ fn resolve_hs_mcp_package_path() -> Option<ResolvedPackagePath> {
 }
 
 fn resolve_local_package_path() -> Option<ResolvedPackagePath> {
+    package_path_candidates()
+        .into_iter()
+        .find(|path| valid_package_path(path))
+        .map(|path| ResolvedPackagePath {
+            path,
+            source: "repo-local".into(),
+        })
+}
+
+fn package_path_candidates() -> Vec<PathBuf> {
+    let mut candidates = Vec::new();
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let repo_root = manifest_dir.parent()?;
-    [
-        repo_root.join("hs-mcp"),
-        repo_root.join("Hs-MCP"),
-        repo_root.join("vendor/hs-mcp"),
-        repo_root.join("vendor/Hs-MCP"),
-    ]
-    .into_iter()
-    .find(|path| valid_package_path(path))
-    .map(|path| ResolvedPackagePath {
-        path,
-        source: "repo-local".into(),
-    })
+    if let Some(repo_root) = manifest_dir.parent() {
+        candidates.extend([
+            repo_root.join("hs-mcp"),
+            repo_root.join("Hs-MCP"),
+            repo_root.join("vendor/hs-mcp"),
+            repo_root.join("vendor/Hs-MCP"),
+        ]);
+    }
+    candidates
 }
 
 fn valid_package_path(path: &Path) -> bool {
