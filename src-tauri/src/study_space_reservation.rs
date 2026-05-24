@@ -213,7 +213,8 @@ impl StudySpaceReservationAdapter {
     pub fn status() -> StudySpaceStatus {
         StudySpaceStatus {
             credential_state: StudySpaceCredentialState::Missing,
-            credential_message: "보안 저장소에 저장된 한성대 학습공간 예약 자격증명이 없습니다.".to_string(),
+            credential_message: "보안 저장소에 저장된 한성대 학습공간 예약 자격증명이 없습니다."
+                .to_string(),
             supported_areas: study_space_areas(),
             session_clear_available: true,
         }
@@ -253,9 +254,11 @@ impl StudySpaceReservationAdapter {
                 "예약할 학습공간을 선택해 주세요.",
             ));
         }
-        if request.members.iter().any(|member| {
-            member.name.trim().is_empty() || member.student_number.trim().is_empty()
-        }) {
+        if request
+            .members
+            .iter()
+            .any(|member| member.name.trim().is_empty() || member.student_number.trim().is_empty())
+        {
             return StudySpaceCommandResult::err(StudySpaceCommandError::new(
                 StudySpaceErrorCode::MemberInfoRequired,
                 "팀원 이름과 학번을 모두 입력해 주세요.",
@@ -364,7 +367,12 @@ pub fn study_space_rooms() -> Vec<StudySpaceRoom> {
 }
 
 pub fn map_adapter_error(raw_code: Option<&str>, raw_message: &str) -> StudySpaceCommandError {
-    let code = match raw_code.unwrap_or_default().trim().to_ascii_uppercase().as_str() {
+    let code = match raw_code
+        .unwrap_or_default()
+        .trim()
+        .to_ascii_uppercase()
+        .as_str()
+    {
         "AUTH_REQUIRED" => StudySpaceErrorCode::AuthRequired,
         "AUTH_FAILED" => StudySpaceErrorCode::AuthFailed,
         "KEYCHAIN_UNAVAILABLE" => StudySpaceErrorCode::KeychainUnavailable,
@@ -407,7 +415,9 @@ fn korean_error_message(code: &StudySpaceErrorCode) -> &'static str {
     }
 }
 
-fn validate_availability_request(request: &StudySpaceAvailabilityRequest) -> Result<(), StudySpaceCommandError> {
+fn validate_availability_request(
+    request: &StudySpaceAvailabilityRequest,
+) -> Result<(), StudySpaceCommandError> {
     validate_supported_area(&request.area)?;
     NaiveDate::parse_from_str(&request.date, "%Y-%m-%d").map_err(|_| {
         StudySpaceCommandError::new(
@@ -529,9 +539,17 @@ fn is_token_like(value: &str) -> bool {
 
 fn is_sensitive_assignment(value: &str) -> bool {
     let lower = value.to_ascii_lowercase();
-    ["password=", "passwd=", "token=", "secret=", "authorization=", "cookie=", "session="]
-        .iter()
-        .any(|prefix| lower.starts_with(prefix))
+    [
+        "password=",
+        "passwd=",
+        "token=",
+        "secret=",
+        "authorization=",
+        "cookie=",
+        "session=",
+    ]
+    .iter()
+    .any(|prefix| lower.starts_with(prefix))
 }
 
 fn is_student_id_like(value: &str) -> bool {
@@ -564,8 +582,14 @@ mod tests {
     fn status_returns_no_secret_fields_and_supported_catalog() {
         let status = StudySpaceReservationAdapter::status();
         assert_eq!(status.credential_state, StudySpaceCredentialState::Missing);
-        assert!(status.supported_areas.iter().any(|area| area.key == "coding_lounge" && area.supported));
-        assert!(status.supported_areas.iter().any(|area| area.key == "library_group_study" && !area.supported));
+        assert!(status
+            .supported_areas
+            .iter()
+            .any(|area| area.key == "coding_lounge" && area.supported));
+        assert!(status
+            .supported_areas
+            .iter()
+            .any(|area| area.key == "library_group_study" && !area.supported));
         let serialized = serde_json::to_string(&status).unwrap();
         assert!(!serialized.contains("password"));
         assert!(!serialized.contains("token"));
@@ -576,22 +600,34 @@ mod tests {
     fn list_spaces_rejects_unsupported_area() {
         let result = StudySpaceReservationAdapter::list_spaces("library_group_study".to_string());
         assert!(!result.ok);
-        assert_eq!(result.error.unwrap().code, StudySpaceErrorCode::UnsupportedArea);
+        assert_eq!(
+            result.error.unwrap().code,
+            StudySpaceErrorCode::UnsupportedArea
+        );
     }
 
     #[test]
     fn availability_request_rejects_invalid_date_time_and_capacity() {
         let mut request = valid_request();
         request.date = "2026/05/27".to_string();
-        assert_eq!(validate_availability_request(&request).unwrap_err().code, StudySpaceErrorCode::InvalidDate);
+        assert_eq!(
+            validate_availability_request(&request).unwrap_err().code,
+            StudySpaceErrorCode::InvalidDate
+        );
 
         let mut request = valid_request();
         request.end_time = "13:00".to_string();
-        assert_eq!(validate_availability_request(&request).unwrap_err().code, StudySpaceErrorCode::InvalidTimeRange);
+        assert_eq!(
+            validate_availability_request(&request).unwrap_err().code,
+            StudySpaceErrorCode::InvalidTimeRange
+        );
 
         let mut request = valid_request();
         request.headcount = 9;
-        assert_eq!(validate_availability_request(&request).unwrap_err().code, StudySpaceErrorCode::CapacityTooHigh);
+        assert_eq!(
+            validate_availability_request(&request).unwrap_err().code,
+            StudySpaceErrorCode::CapacityTooHigh
+        );
     }
 
     #[test]
@@ -608,12 +644,16 @@ mod tests {
         };
         let result = StudySpaceReservationAdapter::create_reservation(request);
         assert!(!result.ok);
-        assert_eq!(result.error.unwrap().code, StudySpaceErrorCode::ConfirmRequired);
+        assert_eq!(
+            result.error.unwrap().code,
+            StudySpaceErrorCode::ConfirmRequired
+        );
     }
 
     #[test]
     fn redaction_removes_paths_tokens_passwords_sessions_and_student_ids() {
-        let input = "failed /Users/demo/secret.txt password=hunter2 session=abc123 token=sk-live 2299999";
+        let input =
+            "failed /Users/demo/secret.txt password=hunter2 session=abc123 token=sk-live 2299999";
         let output = sanitize_adapter_text(input);
         assert!(output.contains(PATH_REDACTION));
         assert!(output.contains(TOKEN_REDACTION));

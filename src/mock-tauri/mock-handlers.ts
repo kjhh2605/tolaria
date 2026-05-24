@@ -495,6 +495,61 @@ export const mockHandlers: Record<string, (args: any) => any> = {
     const filename = args.source_path.split('/').pop() ?? 'image.png'
     return `${vault}/attachments/${Date.now()}-${filename}`
   },
+
+  study_space_status: () => ({
+    ok: true,
+    data: {
+      credential_state: 'missing',
+      credential_message: '보안 저장소에 저장된 한성대 학습공간 예약 자격증명이 없습니다.',
+      supported_areas: [
+        { key: 'coding_lounge', label: '코딩라운지 세미나실', supported: true, note: '101–113호' },
+        { key: 'sangsang_park_plus', label: '상상파크 플러스 소모임실', supported: true, note: '최대 3시간 정책' },
+        { key: 'sangsang_base', label: '상상베이스', supported: true, note: '세미나실/IB 공간' },
+        { key: 'industry_academic_seminar', label: '산학협력 세미나실', supported: false, note: '현재 자동 예약 연동 준비 중' },
+        { key: 'library_group_study', label: '학술정보관 그룹스터디실', supported: false, note: '현재 자동 예약 연동 준비 중' },
+      ],
+      session_clear_available: true,
+    },
+  }),
+  study_space_list_spaces: (args: { area: string }) => {
+    if (args.area !== 'coding_lounge') {
+      return { ok: false, error: { code: 'UNSUPPORTED_AREA', message: '현재 자동 예약 연동이 지원되지 않는 공간입니다.' } }
+    }
+    return {
+      ok: true,
+      data: Array.from({ length: 13 }, (_, index) => {
+        const room = 101 + index
+        return {
+          id: `coding_lounge_${room}`,
+          area: 'coding_lounge',
+          name: `코딩라운지 ${room}호`,
+          location: '코딩라운지',
+          min_capacity: 1,
+          max_capacity: 8,
+          operating_hours: '09:00-22:00',
+          supported: true,
+        }
+      }),
+    }
+  },
+  study_space_check_availability: () => ({
+    ok: false,
+    error: { code: 'SCHOOL_SYSTEM_ERROR', message: '학습공간 예약 어댑터가 아직 Hs-MCP 실행 경로에 연결되지 않았습니다.' },
+  }),
+  study_space_create_reservation: (args: { request: { dry_run?: boolean | null; confirm?: boolean | null } }) => {
+    if (args.request?.dry_run === false && args.request?.confirm !== true) {
+      return { ok: false, error: { code: 'CONFIRM_REQUIRED', message: '실제 예약 전 확인이 필요합니다.' } }
+    }
+    return { ok: false, error: { code: 'SCHOOL_SYSTEM_ERROR', message: '학습공간 예약 어댑터가 아직 Hs-MCP 실행 경로에 연결되지 않았습니다.' } }
+  },
+  study_space_list_my_reservations: () => ({
+    ok: false,
+    error: { code: 'SCHOOL_SYSTEM_ERROR', message: '학습공간 예약 어댑터가 아직 Hs-MCP 실행 경로에 연결되지 않았습니다.' },
+  }),
+  study_space_clear_session: () => ({
+    ok: true,
+    data: { cleared: false, message: '삭제할 임시 학습공간 예약 세션이 없습니다.' },
+  }),
   get_settings: () => ({ ...mockSettings }),
   save_settings: (args: { settings: Settings }) => {
     const s = args.settings
