@@ -1,5 +1,9 @@
 use chrono::{NaiveDate, NaiveTime};
 use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
+use std::io::Write;
+use std::path::PathBuf;
+use std::process::{Command, Stdio};
 
 const PATH_REDACTION: &str = "[redacted-path]";
 const TOKEN_REDACTION: &str = "[redacted-token]";
@@ -167,6 +171,22 @@ pub struct StudySpaceReservationMember {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+pub struct StudySpaceCredentialLoginRequest {
+    pub student_id: String,
+    pub password: String,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+pub struct StudySpaceCredentialLoginResult {
+    pub credential_state: StudySpaceCredentialState,
+    pub message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub student_id_masked: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct StudySpaceCreateReservationRequest {
     #[serde(flatten)]
     pub availability: StudySpaceAvailabilityRequest,
@@ -211,12 +231,89 @@ pub struct StudySpaceReservationAdapter;
 
 impl StudySpaceReservationAdapter {
     pub fn status() -> StudySpaceStatus {
-        StudySpaceStatus {
-            credential_state: StudySpaceCredentialState::Missing,
-            credential_message: "보안 저장소에 저장된 한성대 학습공간 예약 자격증명이 없습니다."
-                .to_string(),
-            supported_areas: study_space_areas(),
-            session_clear_available: true,
+        match call_hs_mcp_bridge(json!({ "op": "status" })) {
+            Ok(response) if response.get("ok").and_then(Value::as_bool) == Some(true) => {
+                let logged_in = response
+                    .get("logged_in")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false);
+                StudySpaceStatus {
+                    credential_state: if logged_in {
+                        StudySpaceCredentialState::Ready
+                    } else {
+                        StudySpaceCredentialState::Missing
+                    },
+                    credential_message: if logged_in {
+                        let masked = response
+                            .get("student_id_masked")
+                            .and_then(Value::as_str)
+                            .unwrap_or("");
+                        if masked.is_empty() {
+                            "한성대 학습공간 예약 세션이 보안 저장소에 저장되어 있습니다."
+                                .to_string()
+                        } else {
+                            format!("한성대 학습공간 예약 세션이 준비되었습니다. ({masked})")
+                        }
+                    } else {
+                        "보안 저장소에 저장된 한성대 학습공간 예약 세션이 없습니다.".to_string()
+                    },
+                    supported_areas: study_space_areas(),
+                    session_clear_available: true,
+                }
+            }
+            Ok(response) => {
+                let error = bridge_response_error(&response);
+                StudySpaceStatus {
+                    credential_state: credential_state_for_error(&error.code),
+                    credential_message: error.message,
+                    supported_areas: study_space_areas(),
+                    session_clear_available: true,
+                }
+            }
+            Err(error) => StudySpaceStatus {
+                credential_state: credential_state_for_error(&error.code),
+                credential_message: error.message,
+                supported_areas: study_space_areas(),
+                session_clear_available: true,
+            },
+        }
+    }
+
+    pub fn save_credentials(
+        request: StudySpaceCredentialLoginRequest,
+    ) -> StudySpaceCommandResult<StudySpaceCredentialLoginResult> {
+        if request.student_id.trim().is_empty() || request.password.is_empty() {
+            return StudySpaceCommandResult::err(StudySpaceCommandError::new(
+                StudySpaceErrorCode::AuthRequired,
+                "학번과 비밀번호를 입력해 주세요.",
+            ));
+        }
+        match call_hs_mcp_bridge(json!({
+            "op": "login",
+            "student_id": request.student_id,
+            "password": request.password,
+        })) {
+            Ok(response) if response.get("ok").and_then(Value::as_bool) == Some(true) => {
+                StudySpaceCommandResult::ok(StudySpaceCredentialLoginResult {
+                    credential_state: StudySpaceCredentialState::Ready,
+                    message: response
+                        .get("message")
+                        .and_then(Value::as_str)
+                        .unwrap_or("로그인 성공. 비밀번호는 저장하지 않았고 세션 쿠키만 OS 보안 저장소에 저장했습니다.")
+                        .to_string(),
+                    student_id_masked: response
+                        .get("student_id_masked")
+                        .and_then(Value::as_str)
+                        .map(ToString::to_string),
+                    name: response
+                        .get("name")
+                        .and_then(Value::as_str)
+                        .filter(|value| !value.is_empty())
+                        .map(ToString::to_string),
+                })
+            }
+            Ok(response) => StudySpaceCommandResult::err(bridge_response_error(&response)),
+            Err(error) => StudySpaceCommandResult::err(error),
         }
     }
 
@@ -239,7 +336,20 @@ impl StudySpaceReservationAdapter {
             return StudySpaceCommandResult::err(error);
         }
 
-        StudySpaceCommandResult::err(adapter_unavailable_error())
+        match call_hs_mcp_bridge(json!({
+            "op": "check_availability",
+            "area": request.area.clone(),
+            "date": request.date.clone(),
+            "start_time": request.start_time.clone(),
+            "end_time": request.end_time.clone(),
+            "space": request.room_id.as_deref().and_then(hs_mcp_space_name_for_room_id),
+        })) {
+            Ok(response) if response.get("ok").and_then(Value::as_bool) == Some(true) => {
+                StudySpaceCommandResult::ok(availability_response_from_bridge(&request, &response))
+            }
+            Ok(response) => StudySpaceCommandResult::err(bridge_response_error(&response)),
+            Err(error) => StudySpaceCommandResult::err(error),
+        }
     }
 
     pub fn create_reservation(
@@ -273,23 +383,68 @@ impl StudySpaceReservationAdapter {
             ));
         }
 
-        StudySpaceCommandResult::err(adapter_unavailable_error())
+        let Some(space_name) = hs_mcp_space_name_for_room_id(&request.room_id) else {
+            return StudySpaceCommandResult::err(StudySpaceCommandError::new(
+                StudySpaceErrorCode::Unavailable,
+                "예약할 학습공간을 찾지 못했습니다.",
+            ));
+        };
+
+        match call_hs_mcp_bridge(json!({
+            "op": "create_reservation",
+            "area": request.availability.area.clone(),
+            "space": space_name,
+            "date": request.availability.date.clone(),
+            "start_time": request.availability.start_time.clone(),
+            "end_time": request.availability.end_time.clone(),
+            "dry_run": dry_run,
+            "confirm": request.confirm.unwrap_or(false),
+            "members": request.members.clone(),
+        })) {
+            Ok(response) if response.get("ok").and_then(Value::as_bool) == Some(true) => {
+                StudySpaceCommandResult::ok(reservation_result_from_bridge(&request, &response))
+            }
+            Ok(response) => StudySpaceCommandResult::err(bridge_response_error(&response)),
+            Err(error) => StudySpaceCommandResult::err(error),
+        }
     }
 
     pub fn list_my_reservations(
         area: String,
     ) -> StudySpaceCommandResult<Vec<StudySpaceReservationSummary>> {
         match validate_supported_area(&area) {
-            Ok(_) => StudySpaceCommandResult::err(adapter_unavailable_error()),
+            Ok(_) => match call_hs_mcp_bridge(json!({
+                "op": "list_my_reservations",
+                "area": area,
+            })) {
+                Ok(response) if response.get("ok").and_then(Value::as_bool) == Some(true) => {
+                    StudySpaceCommandResult::ok(reservation_summaries_from_bridge(&response))
+                }
+                Ok(response) => StudySpaceCommandResult::err(bridge_response_error(&response)),
+                Err(error) => StudySpaceCommandResult::err(error),
+            },
             Err(error) => StudySpaceCommandResult::err(error),
         }
     }
 
     pub fn clear_session() -> StudySpaceCommandResult<StudySpaceClearSessionResult> {
-        StudySpaceCommandResult::ok(StudySpaceClearSessionResult {
-            cleared: false,
-            message: "삭제할 임시 학습공간 예약 세션이 없습니다.".to_string(),
-        })
+        match call_hs_mcp_bridge(json!({ "op": "clear_session" })) {
+            Ok(response) if response.get("ok").and_then(Value::as_bool) == Some(true) => {
+                StudySpaceCommandResult::ok(StudySpaceClearSessionResult {
+                    cleared: response
+                        .get("cleared")
+                        .and_then(Value::as_bool)
+                        .unwrap_or(true),
+                    message: response
+                        .get("message")
+                        .and_then(Value::as_str)
+                        .unwrap_or("저장된 학습공간 예약 세션을 삭제했습니다.")
+                        .to_string(),
+                })
+            }
+            Ok(response) => StudySpaceCommandResult::err(bridge_response_error(&response)),
+            Err(error) => StudySpaceCommandResult::err(error),
+        }
     }
 }
 
@@ -335,7 +490,7 @@ pub fn study_space_rooms() -> Vec<StudySpaceRoom> {
         name: format!("코딩라운지 {room}호"),
         location: "코딩라운지".to_string(),
         min_capacity: 1,
-        max_capacity: 8,
+        max_capacity: if room <= 105 { 12 } else { 8 },
         operating_hours: "09:00-22:00".to_string(),
         supported: true,
     });
@@ -482,11 +637,373 @@ fn validate_supported_area(area: &str) -> Result<(), StudySpaceCommandError> {
         })
 }
 
-fn adapter_unavailable_error() -> StudySpaceCommandError {
-    StudySpaceCommandError::new(
-        StudySpaceErrorCode::SchoolSystemError,
-        "학습공간 예약 어댑터가 아직 Hs-MCP 실행 경로에 연결되지 않았습니다.",
-    )
+fn hs_mcp_space_name_for_room_id(room_id: &str) -> Option<String> {
+    let area = if room_id.starts_with("coding_lounge_") {
+        "coding_lounge"
+    } else if room_id == "sangsang_park_plus_small_room" {
+        "sangsang_park_plus"
+    } else if room_id == "sangsang_base_seminar" {
+        "sangsang_base"
+    } else {
+        return None;
+    };
+    study_space_rooms()
+        .into_iter()
+        .find(|room| room.id == room_id && room.area == area)
+        .map(|room| {
+            if room.area == "coding_lounge" {
+                room.name.replace("코딩라운지", "세미나실")
+            } else {
+                room.name
+            }
+        })
+}
+
+fn room_from_hs_mcp_space(area: &str, space: &Value) -> Option<StudySpaceRoom> {
+    let raw_name = space.get("name").and_then(Value::as_str)?;
+    let id = space
+        .get("space_id")
+        .and_then(Value::as_str)
+        .unwrap_or(raw_name);
+    let display_name = if area == "coding_lounge" {
+        raw_name.replace("세미나실", "코딩라운지")
+    } else {
+        raw_name.to_string()
+    };
+    let local_id = if area == "coding_lounge" {
+        raw_name
+            .chars()
+            .filter(|ch| ch.is_ascii_digit())
+            .collect::<String>()
+            .parse::<u16>()
+            .ok()
+            .map(|room| format!("coding_lounge_{room}"))
+            .unwrap_or_else(|| format!("coding_lounge_{id}"))
+    } else if area == "sangsang_park_plus" {
+        format!("sangsang_park_plus_{}", id.replace(' ', "_"))
+    } else {
+        format!("sangsang_base_{}", id.replace(' ', "_"))
+    };
+    let capacity = space
+        .get("capacity")
+        .and_then(Value::as_u64)
+        .map(|value| value as u16);
+    Some(StudySpaceRoom {
+        id: local_id,
+        area: area.to_string(),
+        name: display_name,
+        location: area_label(area),
+        min_capacity: 1,
+        max_capacity: capacity.unwrap_or_else(|| default_max_capacity(area)),
+        operating_hours: default_operating_hours(area).to_string(),
+        supported: true,
+    })
+}
+
+fn area_label(area: &str) -> String {
+    study_space_areas()
+        .into_iter()
+        .find(|candidate| candidate.key == area)
+        .map(|candidate| candidate.label)
+        .unwrap_or_else(|| area.to_string())
+}
+
+fn default_max_capacity(area: &str) -> u16 {
+    match area {
+        "coding_lounge" => 8,
+        "sangsang_park_plus" => 6,
+        "sangsang_base" => 10,
+        _ => 8,
+    }
+}
+
+fn default_operating_hours(area: &str) -> &'static str {
+    match area {
+        "coding_lounge" => "09:00-22:00",
+        _ => "09:00-21:00",
+    }
+}
+
+fn availability_response_from_bridge(
+    request: &StudySpaceAvailabilityRequest,
+    response: &Value,
+) -> StudySpaceAvailabilityResponse {
+    if let Some(results) = response.get("results").and_then(Value::as_array) {
+        let mapped = results
+            .iter()
+            .filter_map(|item| {
+                let space = item.get("space")?;
+                let room = room_from_hs_mcp_space(&request.area, space)?;
+                let check = item.get("check")?;
+                let availability = check.get("availability");
+                let available = availability
+                    .and_then(|value| value.get("available"))
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false);
+                let reason = availability
+                    .and_then(|value| value.get("message"))
+                    .and_then(Value::as_str)
+                    .map(ToString::to_string)
+                    .or_else(|| {
+                        check
+                            .get("error")
+                            .and_then(|error| error.get("message"))
+                            .and_then(Value::as_str)
+                            .map(ToString::to_string)
+                    });
+                Some(StudySpaceAvailability {
+                    room,
+                    available,
+                    reason_code: if available {
+                        None
+                    } else {
+                        Some(StudySpaceErrorCode::Unavailable)
+                    },
+                    reason,
+                })
+            })
+            .collect();
+        return StudySpaceAvailabilityResponse {
+            area: request.area.clone(),
+            date: request.date.clone(),
+            start_time: request.start_time.clone(),
+            end_time: request.end_time.clone(),
+            results: mapped,
+        };
+    }
+
+    let room = request
+        .room_id
+        .as_deref()
+        .and_then(|room_id| {
+            study_space_rooms()
+                .into_iter()
+                .find(|room| room.id == room_id)
+        })
+        .or_else(|| {
+            study_space_rooms()
+                .into_iter()
+                .find(|room| room.area == request.area)
+        })
+        .unwrap_or_else(|| StudySpaceRoom {
+            id: "unknown".to_string(),
+            area: request.area.clone(),
+            name: "알 수 없는 공간".to_string(),
+            location: area_label(&request.area),
+            min_capacity: 1,
+            max_capacity: default_max_capacity(&request.area),
+            operating_hours: default_operating_hours(&request.area).to_string(),
+            supported: true,
+        });
+    let availability = response.get("availability");
+    let available = availability
+        .and_then(|value| value.get("available"))
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
+    StudySpaceAvailabilityResponse {
+        area: request.area.clone(),
+        date: request.date.clone(),
+        start_time: request.start_time.clone(),
+        end_time: request.end_time.clone(),
+        results: vec![StudySpaceAvailability {
+            room,
+            available,
+            reason_code: if available {
+                None
+            } else {
+                Some(StudySpaceErrorCode::Unavailable)
+            },
+            reason: availability
+                .and_then(|value| value.get("message"))
+                .and_then(Value::as_str)
+                .map(ToString::to_string),
+        }],
+    }
+}
+
+fn reservation_result_from_bridge(
+    request: &StudySpaceCreateReservationRequest,
+    response: &Value,
+) -> StudySpaceReservationResult {
+    let reservation = response.get("reservation");
+    StudySpaceReservationResult {
+        reservation_id: reservation
+            .and_then(|value| value.get("reservation_id"))
+            .and_then(Value::as_str)
+            .map(ToString::to_string),
+        verified: reservation.is_some(),
+        dry_run: response
+            .get("dry_run")
+            .and_then(Value::as_bool)
+            .unwrap_or_else(|| request.dry_run.unwrap_or(true)),
+        room_id: request.room_id.clone(),
+        area: request.availability.area.clone(),
+        date: request.availability.date.clone(),
+        start_time: request.availability.start_time.clone(),
+        end_time: request.availability.end_time.clone(),
+    }
+}
+
+fn reservation_summaries_from_bridge(response: &Value) -> Vec<StudySpaceReservationSummary> {
+    let area = response
+        .get("area")
+        .and_then(|area| area.get("key"))
+        .and_then(Value::as_str)
+        .unwrap_or("coding_lounge");
+    response
+        .get("reservations")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .map(|reservation| {
+            let time = reservation
+                .get("time")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
+            let (start_time, end_time) = reservation_time_range(time);
+            StudySpaceReservationSummary {
+                reservation_id: reservation
+                    .get("reservation_id")
+                    .and_then(Value::as_str)
+                    .map(ToString::to_string),
+                area: area.to_string(),
+                room_name: reservation
+                    .get("space")
+                    .and_then(Value::as_str)
+                    .unwrap_or("알 수 없는 공간")
+                    .replace("세미나실", "코딩라운지"),
+                date: reservation
+                    .get("date")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .to_string(),
+                start_time,
+                end_time,
+            }
+        })
+        .collect()
+}
+
+fn reservation_time_range(time: &str) -> (String, String) {
+    let mut slots = time.split(',').filter(|slot| !slot.is_empty());
+    let start = slots.next().unwrap_or("").to_string();
+    let last = slots.last().unwrap_or(start.as_str());
+    let end = NaiveTime::parse_from_str(last, "%H:%M")
+        .ok()
+        .map(|time| time.overflowing_add_signed(chrono::Duration::hours(1)).0)
+        .map(|time| time.format("%H:%M").to_string())
+        .unwrap_or_else(|| start.clone());
+    (start, end)
+}
+
+fn call_hs_mcp_bridge(input: Value) -> Result<Value, StudySpaceCommandError> {
+    let bridge_path = hs_mcp_bridge_path().ok_or_else(|| {
+        StudySpaceCommandError::new(
+            StudySpaceErrorCode::SchoolSystemError,
+            "Hs-MCP 브리지 파일을 찾지 못했습니다.",
+        )
+    })?;
+    let python =
+        std::env::var("HS_HUB_STUDY_SPACE_PYTHON").unwrap_or_else(|_| "python3".to_string());
+    let mut child = Command::new(python)
+        .arg(bridge_path)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .map_err(|error| {
+            StudySpaceCommandError::with_details(
+                StudySpaceErrorCode::SchoolSystemError,
+                "Hs-MCP 브리지를 실행하지 못했습니다.",
+                error.to_string(),
+            )
+        })?;
+    if let Some(stdin) = child.stdin.as_mut() {
+        let payload = serde_json::to_vec(&input).map_err(|error| {
+            StudySpaceCommandError::with_details(
+                StudySpaceErrorCode::SchoolSystemError,
+                "Hs-MCP 요청을 직렬화하지 못했습니다.",
+                error.to_string(),
+            )
+        })?;
+        stdin.write_all(&payload).map_err(|error| {
+            StudySpaceCommandError::with_details(
+                StudySpaceErrorCode::SchoolSystemError,
+                "Hs-MCP 브리지에 요청을 전달하지 못했습니다.",
+                error.to_string(),
+            )
+        })?;
+    }
+    let output = child.wait_with_output().map_err(|error| {
+        StudySpaceCommandError::with_details(
+            StudySpaceErrorCode::SchoolSystemError,
+            "Hs-MCP 브리지 응답을 읽지 못했습니다.",
+            error.to_string(),
+        )
+    })?;
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let response: Value = serde_json::from_str(stdout.trim()).map_err(|error| {
+        StudySpaceCommandError::with_details(
+            StudySpaceErrorCode::SchoolSystemError,
+            "Hs-MCP 브리지 응답 형식이 올바르지 않습니다.",
+            format!("{error} {}", String::from_utf8_lossy(&output.stderr)),
+        )
+    })?;
+    if output.status.success() {
+        Ok(response)
+    } else {
+        Err(bridge_response_error(&response))
+    }
+}
+
+fn hs_mcp_bridge_path() -> Option<PathBuf> {
+    if let Ok(path) = std::env::var("HS_HUB_STUDY_SPACE_BRIDGE") {
+        let candidate = PathBuf::from(path);
+        if candidate.exists() {
+            return Some(candidate);
+        }
+    }
+    let candidates = [
+        PathBuf::from("src-tauri/resources/study-space-hs-mcp-bridge.py"),
+        PathBuf::from("resources/study-space-hs-mcp-bridge.py"),
+        std::env::current_exe()
+            .ok()
+            .and_then(|path| {
+                path.parent()
+                    .map(|parent| parent.join("study-space-hs-mcp-bridge.py"))
+            })
+            .unwrap_or_default(),
+    ];
+    candidates.into_iter().find(|path| path.exists())
+}
+
+fn bridge_response_error(response: &Value) -> StudySpaceCommandError {
+    let error = response.get("error").unwrap_or(response);
+    let code = error
+        .get("code")
+        .and_then(Value::as_str)
+        .unwrap_or("UNKNOWN_ERROR");
+    let message = error
+        .get("message")
+        .and_then(Value::as_str)
+        .unwrap_or("Hs-MCP 브리지 오류가 발생했습니다.");
+    if code == "BRIDGE_UNAVAILABLE" {
+        return StudySpaceCommandError::with_details(
+            StudySpaceErrorCode::SchoolSystemError,
+            "Hs-MCP 실행 환경을 찾지 못했습니다. hs-mcp 패키지 설치 또는 앱 번들 구성을 확인하세요.",
+            message,
+        );
+    }
+    map_adapter_error(Some(code), message)
+}
+
+fn credential_state_for_error(code: &StudySpaceErrorCode) -> StudySpaceCredentialState {
+    match code {
+        StudySpaceErrorCode::AuthRequired => StudySpaceCredentialState::Missing,
+        StudySpaceErrorCode::AuthFailed => StudySpaceCredentialState::AuthFailed,
+        StudySpaceErrorCode::KeychainUnavailable => StudySpaceCredentialState::KeychainUnavailable,
+        _ => StudySpaceCredentialState::Missing,
+    }
 }
 
 pub fn sanitize_adapter_text(input: &str) -> String {
@@ -581,7 +1098,13 @@ mod tests {
     #[test]
     fn status_returns_no_secret_fields_and_supported_catalog() {
         let status = StudySpaceReservationAdapter::status();
-        assert_eq!(status.credential_state, StudySpaceCredentialState::Missing);
+        assert!(matches!(
+            status.credential_state,
+            StudySpaceCredentialState::Missing
+                | StudySpaceCredentialState::Ready
+                | StudySpaceCredentialState::AuthFailed
+                | StudySpaceCredentialState::KeychainUnavailable
+        ));
         assert!(status
             .supported_areas
             .iter()

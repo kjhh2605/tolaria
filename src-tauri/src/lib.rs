@@ -524,6 +524,7 @@ macro_rules! app_invoke_handler {
             commands::reinit_telemetry,
             commands::should_use_external_media_preview,
             commands::study_space_status,
+            commands::study_space_save_credentials,
             commands::study_space_list_spaces,
             commands::study_space_check_availability,
             commands::study_space_create_reservation,

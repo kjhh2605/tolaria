@@ -365,7 +365,7 @@ sequenceDiagram
     UI->>U: Offer local .ics download
 ```
 
-The native boundary is `src-tauri/src/study_space_reservation.rs`; the renderer wrapper is `src/lib/studySpaceReservation.ts`. The adapter contract follows the verified StudySpaceReservation MCP logic but normalizes errors into Korean UI-safe messages and requires `confirm=true` before any live booking command runs. Credentials are read from the OS keychain by the native/MCP boundary, not from React state or vault files, and transient school auth tokens are discarded after each reservation attempt.
+The native boundary is `src-tauri/src/study_space_reservation.rs`; the renderer wrapper is `src/lib/studySpaceReservation.ts`. The native layer invokes `src-tauri/resources/study-space-hs-mcp-bridge.py`, which imports the locally installed `hs_mcp` package and delegates to Hs-MCP `FacilityTools`. The adapter contract follows the verified StudySpaceReservation MCP logic but normalizes errors into Korean UI-safe messages and requires `confirm=true` before any live booking command runs. Credentials are sent only to the native login command; Hs-MCP stores facility session cookies in the OS credential store, while HS-Hub does not persist passwords in React state, vault files, settings, notes, logs, or calendar exports. For live booking verification, the bridge re-reads my reservations and selects the newest non-canceled matching reservation so stale canceled history cannot be reported as the newly created booking. See [ADR-0126](./adr/0126-hs-mcp-python-bridge-for-study-space.md).
 
 Completed bookings can produce two sanitized artifacts:
 

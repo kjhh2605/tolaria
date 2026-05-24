@@ -3,19 +3,25 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { StudySpaceReservationPage } from './StudySpaceReservationPage'
 import {
   checkStudySpaceAvailability,
+  clearStudySpaceSession,
   createStudySpaceReservation,
   getStudySpaceStatus,
   listStudySpaceRooms,
+  saveStudySpaceCredentials,
 } from '../lib/studySpaceReservation'
 
 vi.mock('../lib/studySpaceReservation', () => ({
   getStudySpaceStatus: vi.fn(),
+  saveStudySpaceCredentials: vi.fn(),
+  clearStudySpaceSession: vi.fn(),
   listStudySpaceRooms: vi.fn(),
   checkStudySpaceAvailability: vi.fn(),
   createStudySpaceReservation: vi.fn(),
 }))
 
 const mockStatus = vi.mocked(getStudySpaceStatus)
+const mockSaveCredentials = vi.mocked(saveStudySpaceCredentials)
+const mockClearSession = vi.mocked(clearStudySpaceSession)
 const mockRooms = vi.mocked(listStudySpaceRooms)
 const mockAvailability = vi.mocked(checkStudySpaceAvailability)
 const mockReservation = vi.mocked(createStudySpaceReservation)
@@ -62,6 +68,16 @@ beforeEach(() => {
     session_clear_available: true,
   })
   mockRooms.mockResolvedValue([room103])
+  mockSaveCredentials.mockResolvedValue({
+    credential_state: 'ready',
+    message: '로그인 성공. 비밀번호는 저장하지 않았고 세션 쿠키만 OS 보안 저장소에 저장했습니다.',
+    student_id_masked: '21***68',
+    name: '김한성',
+  })
+  mockClearSession.mockResolvedValue({
+    cleared: true,
+    message: '저장된 학습공간 예약 세션을 삭제했습니다.',
+  })
   mockAvailability.mockResolvedValue({
     area: 'coding_lounge',
     date: '2026-05-27',
@@ -111,6 +127,21 @@ describe('StudySpaceReservationPage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: '예약' }))
     expect(screen.getByRole('dialog')).toHaveTextContent('실제 예약 확인')
+  })
+
+  it('logs in through the secure reservation boundary without exposing the password in UI state', async () => {
+    render(<StudySpaceReservationPage locale="ko-KR" />)
+
+    fireEvent.change(screen.getByPlaceholderText('한성대 학번'), { target: { value: '2170001' } })
+    fireEvent.change(screen.getByPlaceholderText('한성대 비밀번호'), { target: { value: 'secret-pass' } })
+    fireEvent.click(screen.getByRole('button', { name: '보안 저장소에 로그인' }))
+
+    await waitFor(() => expect(mockSaveCredentials).toHaveBeenCalledWith({
+      student_id: '2170001',
+      password: 'secret-pass',
+    }))
+    expect(await screen.findByText('로그인 성공. 비밀번호는 저장하지 않았고 세션 쿠키만 OS 보안 저장소에 저장했습니다.')).toBeInTheDocument()
+    expect(screen.queryByDisplayValue('secret-pass')).not.toBeInTheDocument()
   })
 
   it('requires complete member information before confirming a live reservation', async () => {

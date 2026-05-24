@@ -32,9 +32,11 @@ import {
 } from '@/components/ui/select'
 import {
   checkStudySpaceAvailability,
+  clearStudySpaceSession,
   createStudySpaceReservation,
   getStudySpaceStatus,
   listStudySpaceRooms,
+  saveStudySpaceCredentials,
   type StudySpaceArea,
   type StudySpaceAvailability,
   type StudySpaceAvailabilityRequest,
@@ -159,6 +161,9 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
   const [areas, setAreas] = useState<StudySpaceArea[]>([])
   const [credentialState, setCredentialState] = useState<StudySpaceCredentialState>('missing')
   const [credentialMessage, setCredentialMessage] = useState('')
+  const [credentialStudentId, setCredentialStudentId] = useState('')
+  const [credentialPassword, setCredentialPassword] = useState('')
+  const [credentialBusy, setCredentialBusy] = useState(false)
   const [area, setArea] = useState(DEFAULT_AREA)
   const [date, setDate] = useState(todayIsoDate)
   const [startTime, setStartTime] = useState(DEFAULT_START_TIME)
@@ -259,6 +264,41 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
     setHeadcount((current) => Math.max(1, current - 1))
   }, [headcount])
 
+  const handleSaveCredentials = useCallback(async () => {
+    setCredentialBusy(true)
+    setErrorMessage(null)
+    try {
+      const result = await saveStudySpaceCredentials({
+        student_id: credentialStudentId,
+        password: credentialPassword,
+      })
+      setCredentialState(result.credential_state)
+      setCredentialMessage(result.message)
+      setCredentialPassword('')
+      onToast?.(result.message)
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : String(error))
+    } finally {
+      setCredentialBusy(false)
+    }
+  }, [credentialPassword, credentialStudentId, onToast])
+
+  const handleClearCredentials = useCallback(async () => {
+    setCredentialBusy(true)
+    setErrorMessage(null)
+    try {
+      const result = await clearStudySpaceSession()
+      setCredentialState('missing')
+      setCredentialMessage(result.message)
+      setCredentialPassword('')
+      onToast?.(result.message)
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : String(error))
+    } finally {
+      setCredentialBusy(false)
+    }
+  }, [onToast])
+
   const buildRequest = useCallback((roomId?: string | null) => requestFromState({
     area,
     date,
@@ -358,6 +398,36 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
             <div className="mt-1 max-w-xs text-xs leading-5 text-muted-foreground">
               {loadingStatus ? translate(locale, 'studySpace.status.loading') : credentialMessage}
             </div>
+            {credentialState !== 'ready' && (
+              <div className="mt-3 grid gap-2">
+                <Input
+                  value={credentialStudentId}
+                  onChange={(event) => setCredentialStudentId(event.target.value)}
+                  placeholder={translate(locale, 'studySpace.credential.studentId')}
+                  autoComplete="username"
+                />
+                <Input
+                  value={credentialPassword}
+                  onChange={(event) => setCredentialPassword(event.target.value)}
+                  placeholder={translate(locale, 'studySpace.credential.password')}
+                  type="password"
+                  autoComplete="current-password"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleSaveCredentials}
+                  disabled={credentialBusy || !credentialStudentId.trim() || !credentialPassword}
+                >
+                  {credentialBusy ? translate(locale, 'studySpace.credential.saving') : translate(locale, 'studySpace.credential.save')}
+                </Button>
+              </div>
+            )}
+            {credentialState === 'ready' && (
+              <Button type="button" size="sm" variant="outline" className="mt-3" onClick={handleClearCredentials} disabled={credentialBusy}>
+                {credentialBusy ? translate(locale, 'studySpace.credential.clearing') : translate(locale, 'studySpace.credential.clear')}
+              </Button>
+            )}
           </div>
         </section>
 

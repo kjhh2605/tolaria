@@ -708,5 +708,11 @@
   "studySpace.action.saveNote": "Save reservation note",
   "studySpace.action.savingNote": "Saving note…",
   "studySpace.action.downloadIcs": "Download .ics",
-  "studySpace.success.noteSaved": "Reservation note saved."
+  "studySpace.success.noteSaved": "Reservation note saved.",
+  "studySpace.credential.studentId": "Hansung student ID",
+  "studySpace.credential.password": "Hansung password",
+  "studySpace.credential.save": "Sign in to secure storage",
+  "studySpace.credential.saving": "Signing in…",
+  "studySpace.credential.clear": "Clear reservation session",
+  "studySpace.credential.clearing": "Clearing…"
 }

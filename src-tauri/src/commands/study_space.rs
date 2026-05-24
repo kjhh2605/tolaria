@@ -1,12 +1,20 @@
 use crate::study_space_reservation::{
     StudySpaceAvailabilityRequest, StudySpaceAvailabilityResponse, StudySpaceClearSessionResult,
-    StudySpaceCommandResult, StudySpaceCreateReservationRequest, StudySpaceReservationAdapter,
-    StudySpaceReservationResult, StudySpaceReservationSummary, StudySpaceRoom, StudySpaceStatus,
+    StudySpaceCommandResult, StudySpaceCreateReservationRequest, StudySpaceCredentialLoginRequest,
+    StudySpaceCredentialLoginResult, StudySpaceReservationAdapter, StudySpaceReservationResult,
+    StudySpaceReservationSummary, StudySpaceRoom, StudySpaceStatus,
 };
 
 #[tauri::command]
 pub fn study_space_status() -> StudySpaceCommandResult<StudySpaceStatus> {
     StudySpaceCommandResult::ok(StudySpaceReservationAdapter::status())
+}
+
+#[tauri::command]
+pub fn study_space_save_credentials(
+    request: StudySpaceCredentialLoginRequest,
+) -> StudySpaceCommandResult<StudySpaceCredentialLoginResult> {
+    StudySpaceReservationAdapter::save_credentials(request)
 }
 
 #[tauri::command]

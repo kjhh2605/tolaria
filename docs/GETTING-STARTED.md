@@ -306,7 +306,7 @@ hs-hub/
 | `src-tauri/src/frontmatter/ops.rs` | YAML manipulation — how properties are updated/deleted in files. |
 | `src-tauri/src/git/` | All git operations (clone, commit, pull, push, conflicts, pulse, add-remote). |
 | `src-tauri/src/search.rs` | Keyword search — scans vault files with walkdir. |
-| `src-tauri/src/study_space_reservation.rs` | Hansung study-space reservation command boundary, room catalog, request validation, Korean error normalization, and transient adapter contract. |
+| `src-tauri/src/study_space_reservation.rs` | Hansung study-space reservation command boundary, room catalog, request validation, Korean error normalization, and Hs-MCP bridge invocation. |
 | `src-tauri/src/ai_agents.rs` | CLI-agent request normalization, availability aggregation, adapter dispatch, and Claude event mapping. |
 | `src-tauri/src/cli_agent_runtime.rs` | Shared CLI-agent request shape, prompt wrapping, JSON subprocess lifecycle, version probing, and MCP path helpers. |
 | `src-tauri/src/claude_cli.rs`, `src-tauri/src/codex_cli.rs`, `src-tauri/src/opencode_cli.rs`, `src-tauri/src/pi_cli.rs`, `src-tauri/src/gemini_cli.rs`, `src-tauri/src/kiro_cli.rs` | Per-agent command, config, discovery, and event adapters. |
@@ -331,6 +331,7 @@ hs-hub/
 | `src/components/StudySpaceReservationPage.tsx` | Korean-first reservation page: search filters, member rows, availability table, confirmation dialog, success artifacts. |
 | `src/lib/studySpaceReservation.ts` | Renderer command wrapper and mock fallback for native reservation commands. |
 | `src/lib/studySpaceReservationArtifacts.ts` | Sanitized Markdown reservation-note and `.ics` calendar export generation. |
+| `src-tauri/resources/study-space-hs-mcp-bridge.py` | Python stdin/stdout bridge that imports `hs_mcp`, uses its keyring-backed facility session, checks availability, creates confirmed reservations, and verifies my-reservation history. |
 
 ### AI
 
@@ -482,9 +483,10 @@ BASE_URL="http://localhost:5173" npx playwright test tests/smoke/<slug>.spec.ts
 ### Work with Hansung study-space reservation
 
 1. Keep live bookings behind the explicit confirmation dialog and pass `confirm: true` only from that dialog path.
-2. Keep credentials in the OS keychain/native adapter boundary. React components, locale files, docs, tests, notes, and calendar exports must not contain real passwords, auth tokens, cookies, or raw MCP payloads.
-3. When changing post-success artifacts, update `src/lib/studySpaceReservationArtifacts.test.ts` and run `node scripts/study-space-secret-scan.mjs`.
-4. Reservation notes must be created through the active-vault Tauri write boundary and stored under `reservations/`; calendar integration remains an explicit local `.ics` download unless a future ADR approves calendar-account integration.
+2. Keep credentials in the OS keychain/native adapter boundary. The renderer may collect student id/password for the login action, but the password must be used only for immediate Hs-MCP login and must not be stored in settings, notes, logs, localStorage, calendar exports, or tests.
+3. Ensure the app process can run Python with the `hs-mcp` package installed, or return a Korean `Hs-MCP 실행 환경` error without attempting a reservation.
+4. When changing post-success artifacts, update `src/lib/studySpaceReservationArtifacts.test.ts` and run `node scripts/study-space-secret-scan.mjs`.
+5. Reservation notes must be created through the active-vault Tauri write boundary and stored under `reservations/`; calendar integration remains an explicit local `.ics` download unless a future ADR approves calendar-account integration.
 
 ### Work with external MCP setup
 

@@ -47,6 +47,18 @@ export interface StudySpaceStatus {
   session_clear_available: boolean
 }
 
+export interface StudySpaceCredentialLoginRequest {
+  student_id: string
+  password: string
+}
+
+export interface StudySpaceCredentialLoginResult {
+  credential_state: StudySpaceCredentialState
+  message: string
+  student_id_masked?: string
+  name?: string
+}
+
 export interface StudySpaceRoom {
   id: string
   area: string
@@ -158,6 +170,7 @@ export class StudySpaceReservationError extends Error {
 
 type StudySpaceCommand =
   | 'study_space_status'
+  | 'study_space_save_credentials'
   | 'study_space_list_spaces'
   | 'study_space_check_availability'
   | 'study_space_create_reservation'
@@ -176,6 +189,12 @@ async function callStudySpaceCommand<T>(command: StudySpaceCommand, args?: Recor
 
 export function getStudySpaceStatus(): Promise<StudySpaceStatus> {
   return callStudySpaceCommand('study_space_status')
+}
+
+export function saveStudySpaceCredentials(
+  request: StudySpaceCredentialLoginRequest,
+): Promise<StudySpaceCredentialLoginResult> {
+  return callStudySpaceCommand('study_space_save_credentials', { request })
 }
 
 export function listStudySpaceRooms(area: string): Promise<StudySpaceRoom[]> {

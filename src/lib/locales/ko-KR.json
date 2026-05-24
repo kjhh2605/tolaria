@@ -708,5 +708,11 @@
   "studySpace.action.saveNote": "예약 노트 저장",
   "studySpace.action.savingNote": "노트 저장 중…",
   "studySpace.action.downloadIcs": ".ics 다운로드",
-  "studySpace.success.noteSaved": "예약 노트를 저장했습니다."
+  "studySpace.success.noteSaved": "예약 노트를 저장했습니다.",
+  "studySpace.credential.studentId": "한성대 학번",
+  "studySpace.credential.password": "한성대 비밀번호",
+  "studySpace.credential.save": "보안 저장소에 로그인",
+  "studySpace.credential.saving": "로그인 중…",
+  "studySpace.credential.clear": "예약 세션 삭제",
+  "studySpace.credential.clearing": "삭제 중…"
 }

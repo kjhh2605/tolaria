@@ -511,6 +511,15 @@ export const mockHandlers: Record<string, (args: any) => any> = {
       session_clear_available: true,
     },
   }),
+  study_space_save_credentials: () => ({
+    ok: true,
+    data: {
+      credential_state: 'ready',
+      message: '로그인 성공. 비밀번호는 저장하지 않았고 세션 쿠키만 OS 보안 저장소에 저장했습니다.',
+      student_id_masked: '21***68',
+      name: '한성 사용자',
+    },
+  }),
   study_space_list_spaces: (args: { area: string }) => {
     if (args.area !== 'coding_lounge') {
       return { ok: false, error: { code: 'UNSUPPORTED_AREA', message: '현재 자동 예약 연동이 지원되지 않는 공간입니다.' } }
@@ -525,7 +534,7 @@ export const mockHandlers: Record<string, (args: any) => any> = {
           name: `코딩라운지 ${room}호`,
           location: '코딩라운지',
           min_capacity: 1,
-          max_capacity: 8,
+          max_capacity: room <= 105 ? 12 : 8,
           operating_hours: '09:00-22:00',
           supported: true,
         }
