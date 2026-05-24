@@ -18,7 +18,7 @@ function createEditorBlockId(): string {
   if (typeof randomUUID === 'function') return randomUUID.call(globalThis.crypto)
 
   fallbackBlockIdSequence += 1
-  return `tolaria-block-${fallbackBlockIdSequence}`
+  return `hs-hub-block-${fallbackBlockIdSequence}`
 }
 
 function isEditorBlockRecord(value: unknown): value is Record<string, unknown> {

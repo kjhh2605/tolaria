@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import type { DragEventHandler, PropsWithChildren, ReactNode } from 'react'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { TolariaSideMenu } from './tolariaBlockNoteSideMenu'
+import { HsHubSideMenu } from './hsHubBlockNoteSideMenu'
 
 type MockBlock = {
   children?: MockBlock[]
@@ -190,7 +190,7 @@ vi.mock('@blocknote/react', () => ({
 
 function renderSideMenuWithBlock(block: MockBlock | undefined) {
   sideMenuBlock = block
-  render(<TolariaSideMenu />)
+  render(<HsHubSideMenu />)
 }
 
 function rect(left: number, top: number, width: number, height: number) {
@@ -252,7 +252,7 @@ function renderPointerReorderFixture() {
   }
 }
 
-describe('TolariaSideMenu', () => {
+describe('HsHubSideMenu', () => {
   beforeEach(() => {
     const editorElement = document.createElement('div')
     editorElement.className = 'bn-editor'

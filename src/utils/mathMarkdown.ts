@@ -3,10 +3,10 @@ import katex from 'katex'
 export const MATH_INLINE_TYPE = 'mathInline'
 export const MATH_BLOCK_TYPE = 'mathBlock'
 
-const INLINE_TOKEN_PREFIX = '@@TOLARIA_MATH_INLINE:'
-const BLOCK_TOKEN_PREFIX = '@@TOLARIA_MATH_BLOCK:'
+const INLINE_TOKEN_PREFIX = '@@HS_HUB_MATH_INLINE:'
+const BLOCK_TOKEN_PREFIX = '@@HS_HUB_MATH_BLOCK:'
 const TOKEN_SUFFIX = '@@'
-const INLINE_TOKEN_RE = /@@TOLARIA_MATH_INLINE:([^@]+)@@/g
+const INLINE_TOKEN_RE = /@@HS_HUB_MATH_INLINE:([^@]+)@@/g
 const CODE_FENCE_PREFIXES = ['```', '~~~']
 const FINANCIAL_AMOUNT_PREFIX_RE = /^\d[\d,]*(?:\.\d+)?(?:[KMBT]|%)(?=[,\s.)])/i
 const PROSE_AFTER_AMOUNT_RE = /(?:,\s|\.\s|\s[a-z]{2,}\b)/i

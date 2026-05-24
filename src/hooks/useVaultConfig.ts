@@ -13,7 +13,7 @@ import {
 import { migrateLocalStorageToVaultConfig } from '../utils/configMigration'
 import { DEFAULT_AI_AGENT_PERMISSION_MODE } from '../lib/aiAgentPermissionMode'
 
-const STORAGE_PREFIX = 'laputa:vault-config:'
+const STORAGE_PREFIX = 'hs-hub:vault-config:'
 
 function storageKey(vaultPath: string): string {
   return `${STORAGE_PREFIX}${vaultPath}`

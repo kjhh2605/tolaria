@@ -307,7 +307,7 @@ filters:
     #[test]
     fn test_migrate_views_from_old_location() {
         let dir = tempfile::TempDir::new().unwrap();
-        let old_dir = dir.path().join(".laputa").join("views");
+        let old_dir = dir.path().join(".hs-hub").join("views");
         fs::create_dir_all(&old_dir).unwrap();
 
         let yaml = "name: Migrated\nfilters:\n  all:\n    - field: type\n      op: equals\n      value: Note\n";

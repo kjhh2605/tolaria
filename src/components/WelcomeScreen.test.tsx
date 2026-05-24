@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { beforeEach, describe, it, expect, vi } from 'vitest'
 import { WelcomeScreen } from './WelcomeScreen'
-import tolariaIcon from '@/assets/tolaria-icon.svg'
+import hsHubIcon from '@/assets/hs-hub-icon.svg'
 
 const dragRegionMouseDown = vi.fn()
 
@@ -11,7 +11,7 @@ vi.mock('../hooks/useDragRegion', () => ({
 
 const defaultProps = {
   mode: 'welcome' as const,
-  defaultVaultPath: '~/Documents/Laputa',
+  defaultVaultPath: '~/Documents/HS-Hub',
   onCreateVault: vi.fn(),
   onRetryCreateVault: vi.fn(),
   onCreateEmptyVault: vi.fn(),
@@ -30,15 +30,15 @@ describe('WelcomeScreen', () => {
   describe('welcome mode', () => {
     it('renders welcome title and subtitle', () => {
       render(<WelcomeScreen {...defaultProps} />)
-      expect(screen.getByText('Welcome to Tolaria')).toBeInTheDocument()
+      expect(screen.getByText('Welcome to HS-Hub')).toBeInTheDocument()
       expect(screen.getByText('Markdown knowledge management for the age of AI')).toBeInTheDocument()
     })
 
-    it('renders the local Tolaria branding icon', () => {
+    it('renders the local HS-Hub branding icon', () => {
       render(<WelcomeScreen {...defaultProps} />)
 
-      const brandIcon = screen.getByAltText('Tolaria icon')
-      expect(brandIcon).toHaveAttribute('src', tolariaIcon)
+      const brandIcon = screen.getByAltText('HS-Hub icon')
+      expect(brandIcon).toHaveAttribute('src', hsHubIcon)
     })
 
     it('shows the onboarding actions in the guided-first order', () => {
@@ -58,7 +58,7 @@ describe('WelcomeScreen', () => {
     it('shows the simplified template option description', () => {
       render(<WelcomeScreen {...defaultProps} />)
       expect(screen.getByText('Download the getting started vault')).toBeInTheDocument()
-      expect(screen.queryByText(/~\/Documents\/Laputa/)).not.toBeInTheDocument()
+      expect(screen.queryByText(/~\/Documents\/HS-Hub/)).not.toBeInTheDocument()
     })
 
     it('shows offline guidance and disables the template option when offline', () => {
@@ -166,7 +166,7 @@ describe('WelcomeScreen', () => {
 
     it('does not show path badge in welcome mode', () => {
       render(<WelcomeScreen {...defaultProps} />)
-      expect(screen.queryByText('~/Laputa')).not.toBeInTheDocument()
+      expect(screen.queryByText('~/HS-Hub')).not.toBeInTheDocument()
     })
   })
 
@@ -174,7 +174,7 @@ describe('WelcomeScreen', () => {
     const missingProps = {
       ...defaultProps,
       mode: 'vault-missing' as const,
-      missingPath: '~/Laputa',
+      missingPath: '~/HS-Hub',
     }
 
     it('renders vault not found title', () => {
@@ -185,7 +185,7 @@ describe('WelcomeScreen', () => {
 
     it('does not show the missing vault path in a badge', () => {
       render(<WelcomeScreen {...missingProps} />)
-      expect(screen.queryByText('~/Laputa')).not.toBeInTheDocument()
+      expect(screen.queryByText('~/HS-Hub')).not.toBeInTheDocument()
     })
 
     it('shows "Choose a different folder" instead of "Open existing vault"', () => {

@@ -4,8 +4,8 @@
  */
 
 export const MOCK_CONTENT: Record<string, string> = {
-  '/Users/luca/Laputa/26q1-laputa-app.md': `---
-title: Build Laputa App
+  '/Users/hansung/HS-Hub/26q1-hs-hub-project.md': `---
+title: Build HS-Hub Project
 type: Project
 status: Active
 owner: Luca Rossi
@@ -14,14 +14,14 @@ published: true
 archived: false
 tags: [Tauri, React, TypeScript, CodeMirror]
 tools: [Vite, Vitest, Playwright]
-url: https://github.com/lucaong/laputa-app
+url: https://github.com/lucaong/hs-hub-app
 belongs_to:
   - "[[q1-2026]]"
 related_to:
   - "[[software-development]]"
 ---
 
-# Build Laputa App
+# Build HS-Hub Project
 
 ## Text Formatting
 This paragraph has **bold text**, *italic text*, ***bold italic***, ~~strikethrough~~, and \`inline code\`. Here's a [regular link](https://example.com) and a wiki-link to [[Matteo Cellini]].
@@ -109,7 +109,7 @@ See [[Stock Screener — EMA200 Wick Bounce]] for the experiment approach.
 Contact [[Matteo Cellini]] for sponsorship data.
 Link to [[Grow Newsletter]] responsibility.
 Check [[Software Development]] for tech notes.
-See [[Laputa App Design Session]] event recap.
+See [[HS-Hub Design Session]] event recap.
 Read [[Write Weekly Essays]] procedure.
 Also see [[Non-Existent Note]] which is a broken link.
 
@@ -118,7 +118,7 @@ This is a normal paragraph with enough text to test line wrapping and spacing be
 
 And this is a second paragraph to verify inter-paragraph spacing is correct. Good typography requires consistent vertical rhythm throughout the document.
 `,
-  '/Users/luca/Laputa/grow-newsletter.md': `---
+  '/Users/hansung/HS-Hub/grow-newsletter.md': `---
 title: Grow Newsletter
 type: Responsibility
 status: Active
@@ -148,7 +148,7 @@ Build a sustainable audience through high-quality weekly essays on **engineering
 ## Notes
 The newsletter is the *engine* that drives everything else — sponsorships, consulting leads, and brand building.
 `,
-  '/Users/luca/Laputa/manage-sponsorships.md': `---
+  '/Users/hansung/HS-Hub/manage-sponsorships.md': `---
 title: Manage Sponsorships
 type: Responsibility
 status: Active
@@ -172,7 +172,7 @@ Revenue stream from newsletter sponsorships. [[Matteo Cellini]] handles day-to-d
 - Close rate
 - Repeat sponsor rate
 `,
-  '/Users/luca/Laputa/write-weekly-essays.md': `---
+  '/Users/hansung/HS-Hub/write-weekly-essays.md': `---
 title: Write Weekly Essays
 type: Procedure
 status: Active
@@ -216,7 +216,7 @@ belongs_to:
 2. Second ordered item — shorter
   1. Nested ordered item that also has quite a long description to verify that the indentation works correctly for nested numbered lists too
 `,
-  '/Users/luca/Laputa/run-sponsorships.md': `---
+  '/Users/hansung/HS-Hub/run-sponsorships.md': `---
 title: Run Sponsorships
 type: Procedure
 status: Active
@@ -238,7 +238,7 @@ belongs_to:
 - Proposal template: \`/templates/sponsorship-proposal.md\`
 - Report template: \`/templates/sponsorship-report.md\`
 `,
-  '/Users/luca/Laputa/stock-screener.md': `---
+  '/Users/hansung/HS-Hub/stock-screener.md': `---
 title: Stock Screener — EMA200 Wick Bounce
 type: Experiment
 status: Active
@@ -273,11 +273,11 @@ Stocks that wick below the 200-day EMA and close above it show a **statistically
 - [ ] Add RSI filter for oversold confirmation
 - [ ] Build automated alerts via Python script
 `,
-  '/Users/luca/Laputa/facebook-ads-strategy.md': `---
+  '/Users/hansung/HS-Hub/facebook-ads-strategy.md': `---
 title: Facebook Ads Strategy
 type: Note
 belongs_to:
-  - "[[26q1-laputa-app]]"
+  - "[[26q1-hs-hub-project]]"
 related_to:
   - "[[growth]]"
   - "[[ads]]"
@@ -298,11 +298,11 @@ related_to:
 1. Long-form vs short-form ad copy
 2. Testimonial vs data-driven creative
 `,
-  '/Users/luca/Laputa/budget-allocation.md': `---
+  '/Users/hansung/HS-Hub/budget-allocation.md': `---
 title: Budget Allocation
 type: Note
 belongs_to:
-  - "[[26q1-laputa-app]]"
+  - "[[26q1-hs-hub-project]]"
 ---
 
 # Budget Allocation
@@ -318,7 +318,7 @@ belongs_to:
 - Under budget on ads due to improved targeting efficiency
 - Consider reallocating savings to content production
 `,
-  '/Users/luca/Laputa/matteo-cellini.md': `---
+  '/Users/hansung/HS-Hub/matteo-cellini.md': `---
 title: Matteo Cellini
 type: Person
 aliases:
@@ -338,15 +338,15 @@ Sponsorship manager — handles all sponsor relationships, proposals, and report
 - [[Manage Sponsorships]]
 - [[Run Sponsorships]]
 `,
-  '/Users/luca/Laputa/2026-02-14-laputa-app-kickoff.md': `---
-title: Laputa App Design Session
+  '/Users/hansung/HS-Hub/2026-02-14-hs-hub-project-kickoff.md': `---
+title: HS-Hub Design Session
 type: Event
 related_to:
-  - "[[26q1-laputa-app]]"
+  - "[[26q1-hs-hub-project]]"
   - "[[matteo-cellini]]"
 ---
 
-# Laputa App Design Session
+# HS-Hub Design Session
 
 ## Date
 2026-02-14
@@ -366,7 +366,7 @@ related_to:
 - [x] Luca: set up Tauri v2 project scaffold
 - [ ] Matteo: test with real vault data
 `,
-  '/Users/luca/Laputa/software-development.md': `---
+  '/Users/hansung/HS-Hub/software-development.md': `---
 title: Software Development
 type: Topic
 aliases:
@@ -384,7 +384,7 @@ A broad topic covering everything from frontend to systems programming.
 - **AI/ML**: LLMs, agents, code generation
 - **Systems**: Rust, performance optimization
 `,
-  '/Users/luca/Laputa/trading.md': `---
+  '/Users/hansung/HS-Hub/trading.md': `---
 title: Trading
 type: Topic
 aliases:
@@ -401,7 +401,7 @@ aliases:
 ## Active Experiments
 - [[Stock Screener — EMA200 Wick Bounce]]
 `,
-  '/Users/luca/Laputa/on-writing-well.md': `---
+  '/Users/hansung/HS-Hub/on-writing-well.md': `---
 title: On Writing Well
 type: Essay
 Belongs to:
@@ -412,7 +412,7 @@ Belongs to:
 
 Good writing is lean and confident. Every sentence should serve a purpose.
 `,
-  '/Users/luca/Laputa/engineering-leadership-101.md': `---
+  '/Users/hansung/HS-Hub/engineering-leadership-101.md': `---
 title: Engineering Leadership 101
 type: Essay
 Belongs to:
@@ -425,7 +425,7 @@ Related to:
 
 The transition from IC to manager is the hardest career shift in engineering.
 `,
-  '/Users/luca/Laputa/ai-agents-primer.md': `---
+  '/Users/hansung/HS-Hub/ai-agents-primer.md': `---
 title: AI Agents Primer
 type: Essay
 Belongs to:
@@ -436,7 +436,7 @@ Belongs to:
 
 AI agents are autonomous systems that can plan, execute, and adapt to achieve goals.
 `,
-  '/Users/luca/Laputa/maria-bianchi.md': `---
+  '/Users/hansung/HS-Hub/maria-bianchi.md': `---
 title: Maria Bianchi
 type: Person
 aliases:
@@ -452,7 +452,7 @@ Product designer — leads UX research and design sprints for the app.
 - Email: maria@example.com
 - Slack: @maria
 `,
-  '/Users/luca/Laputa/marco-verdi.md': `---
+  '/Users/hansung/HS-Hub/marco-verdi.md': `---
 title: Marco Verdi
 type: Person
 aliases:
@@ -467,7 +467,7 @@ Frontend engineer — focuses on React performance and accessibility.
 ## Contact
 - Email: marco@example.com
 `,
-  '/Users/luca/Laputa/elena-russo.md': `---
+  '/Users/hansung/HS-Hub/elena-russo.md': `---
 title: Elena Russo
 type: Person
 aliases:
@@ -479,7 +479,7 @@ aliases:
 ## Role
 Content strategist — plans newsletter topics and manages the editorial calendar.
 `,
-  '/Users/luca/Laputa/project.md': `---
+  '/Users/hansung/HS-Hub/project.md': `---
 type: Type
 order: 0
 ---
@@ -493,7 +493,7 @@ A **time-bound initiative** that advances a [[responsibility|Responsibility]]. P
 - **Owner**: The person accountable
 - **Belongs to**: Usually a Quarter or Responsibility
 `,
-  '/Users/luca/Laputa/responsibility.md': `---
+  '/Users/hansung/HS-Hub/responsibility.md': `---
 type: Type
 order: 1
 ---
@@ -506,7 +506,7 @@ An **ongoing area of ownership** — something you're accountable for indefinite
 - **Status**: Active, Paused, Archived
 - **Owner**: The person accountable
 `,
-  '/Users/luca/Laputa/procedure.md': `---
+  '/Users/hansung/HS-Hub/procedure.md': `---
 type: Type
 order: 2
 ---
@@ -521,7 +521,7 @@ A **recurring process** tied to a [[responsibility|Responsibility]]. Procedures 
 - **Cadence**: Weekly, Monthly, Quarterly
 - **Belongs to**: A Responsibility
 `,
-  '/Users/luca/Laputa/experiment.md': `---
+  '/Users/hansung/HS-Hub/experiment.md': `---
 type: Type
 order: 3
 ---
@@ -534,7 +534,7 @@ A **hypothesis-driven investigation** with a clear test and measurable outcome. 
 - **Status**: Active, Done, Dropped
 - **Owner**: The person running the experiment
 `,
-  '/Users/luca/Laputa/person.md': `---
+  '/Users/hansung/HS-Hub/person.md': `---
 type: Type
 order: 4
 ---
@@ -546,7 +546,7 @@ A **person** you interact with — team members, collaborators, contacts. People
 ## Properties
 - **Aliases**: Alternative names for wikilink resolution
 `,
-  '/Users/luca/Laputa/event.md': `---
+  '/Users/hansung/HS-Hub/event.md': `---
 type: Type
 order: 5
 ---
@@ -558,7 +558,7 @@ A **point-in-time occurrence** — meetings, launches, milestones. Events are li
 ## Properties
 - **Related to**: Entities this event is about
 `,
-  '/Users/luca/Laputa/topic.md': `---
+  '/Users/hansung/HS-Hub/topic.md': `---
 type: Type
 order: 6
 ---
@@ -570,7 +570,7 @@ A **subject area** for categorization. Topics group related notes, projects, and
 ## Properties
 - **Aliases**: Alternative names
 `,
-  '/Users/luca/Laputa/essay.md': `---
+  '/Users/hansung/HS-Hub/essay.md': `---
 type: Type
 order: 7
 ---
@@ -582,7 +582,7 @@ A **published piece of writing** — newsletter essays, blog posts, articles. Es
 ## Properties
 - **Belongs to**: Usually a Responsibility
 `,
-  '/Users/luca/Laputa/note.md': `---
+  '/Users/hansung/HS-Hub/note.md': `---
 type: Type
 order: 8
 ---
@@ -594,7 +594,7 @@ A **general-purpose document** — research notes, meeting notes, strategy docs.
 ## Properties
 - **Belongs to**: A Project, Responsibility, or other parent
 `,
-  '/Users/luca/Laputa/recipe.md': `---
+  '/Users/hansung/HS-Hub/recipe.md': `---
 type: Type
 icon: cooking-pot
 color: orange
@@ -609,7 +609,7 @@ A **recipe** for cooking or baking. Recipes have ingredients, steps, and serving
 - **Prep Time**: Time to prepare
 - **Cook Time**: Time to cook
 `,
-  '/Users/luca/Laputa/book.md': `---
+  '/Users/hansung/HS-Hub/book.md': `---
 type: Type
 icon: book-open
 color: green
@@ -624,7 +624,7 @@ A **book** you're reading or have read. Track reading progress, notes, and key t
 - **Status**: Reading, Finished, Abandoned
 - **Rating**: 1-5 stars
 `,
-  '/Users/luca/Laputa/25q3-website-redesign.md': `---
+  '/Users/hansung/HS-Hub/25q3-website-redesign.md': `---
 title: Website Redesign
 type: Project
 status: Done
@@ -643,7 +643,7 @@ Completed redesign of the company website. Migrated from WordPress to Next.js wi
 - Organic traffic: +35% in 3 months
 - Bounce rate: 58% → 42%
 `,
-  '/Users/luca/Laputa/twitter-thread-experiment.md': `---
+  '/Users/hansung/HS-Hub/twitter-thread-experiment.md': `---
 title: Twitter Thread Growth Experiment
 type: Experiment
 status: Done
@@ -664,7 +664,7 @@ After 6 weeks, signups increased by only 12%. The additional threads had diminis
 ## Decision
 Reverted to 1 high-quality thread per week. Archived this experiment.
 `,
-  '/Users/luca/Laputa/pasta-carbonara.md': `---
+  '/Users/hansung/HS-Hub/pasta-carbonara.md': `---
 title: Pasta Carbonara
 type: Recipe
 servings: 4
@@ -683,7 +683,7 @@ Classic Roman pasta dish with eggs, pecorino, guanciale, and black pepper.
 - 100g Pecorino Romano
 - Black pepper
 `,
-  '/Users/luca/Laputa/designing-data-intensive-applications.md': `---
+  '/Users/hansung/HS-Hub/designing-data-intensive-applications.md': `---
 title: Designing Data-Intensive Applications
 type: Book
 author: Martin Kleppmann

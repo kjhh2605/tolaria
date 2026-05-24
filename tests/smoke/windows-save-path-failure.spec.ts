@@ -39,12 +39,12 @@ async function installFailOnceSaveMock(page: Page) {
     const handlers = window.__mockHandlers as Record<string, MockHandler>
     const originalSaveNoteContent = handlers.save_note_content
     let shouldFail = true
-    window.__laputaTest = {
-      ...window.__laputaTest,
+    window.__hsHubTest = {
+      ...window.__hsHubTest,
       saveAttempts: [],
     }
     handlers.save_note_content = (args?: Record<string, unknown>) => {
-      window.__laputaTest?.saveAttempts?.push(args)
+      window.__hsHubTest?.saveAttempts?.push(args)
       if (shouldFail) {
         shouldFail = false
         throw new Error('The filename, directory name, or volume label syntax is incorrect. (os error 123)')
@@ -76,7 +76,7 @@ test('failed Windows path saves show a recoverable toast and retry the draft', a
   await sendShortcut(page, 's', ['Control'])
   await expect(page.locator('.fixed.bottom-8')).toContainText('Saved', { timeout: 5_000 })
 
-  const saveAttempts = await page.evaluate(() => window.__laputaTest?.saveAttempts ?? [])
+  const saveAttempts = await page.evaluate(() => window.__hsHubTest?.saveAttempts ?? [])
   expect(saveAttempts).toHaveLength(2)
   expect(saveAttempts[1]).toEqual(expect.objectContaining({
     content: '# Retryable Windows Save\n\nDraft that must survive failure',

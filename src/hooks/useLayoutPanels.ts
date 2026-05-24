@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { APP_STORAGE_KEYS, LEGACY_APP_STORAGE_KEYS, getAppStorageItem } from '../constants/appStorage'
+import { APP_STORAGE_KEYS, getAppStorageItem } from '../constants/appStorage'
 
 export const COLUMN_MIN_WIDTHS = {
   sidebar: 220,
@@ -67,7 +67,6 @@ function loadPanelWidths(): PanelWidths {
 function savePanelWidths(widths: PanelWidths): void {
   try {
     localStorage.setItem(APP_STORAGE_KEYS.layoutPanels, JSON.stringify(widths))
-    localStorage.removeItem(LEGACY_APP_STORAGE_KEYS.layoutPanels)
   } catch {
     // Ignore unavailable or restricted localStorage implementations.
   }

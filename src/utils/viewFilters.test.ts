@@ -54,10 +54,10 @@ describe('evaluateView', () => {
   it('filters by relationship contains wikilink', () => {
     const view: ViewDefinition = {
       name: 'Related', icon: null, color: null, sort: null,
-      filters: { all: [{ field: 'Related to', op: 'contains', value: '[[laputa-app]]' }] },
+      filters: { all: [{ field: 'Related to', op: 'contains', value: '[[hs-hub-project]]' }] },
     }
     const entries = [
-      makeEntry({ title: 'Match', relationships: { 'Related to': ['[[laputa-app|Laputa App]]', '[[other]]'] } }),
+      makeEntry({ title: 'Match', relationships: { 'Related to': ['[[hs-hub-project|HS-Hub Project]]', '[[other]]'] } }),
       makeEntry({ title: 'No match', relationships: { 'Related to': ['[[something]]'] } }),
       makeEntry({ title: 'No rels', relationships: {} }),
     ]

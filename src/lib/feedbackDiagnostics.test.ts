@@ -15,7 +15,7 @@ describe('feedbackDiagnostics', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const stopCapture = startFeedbackDiagnosticsCapture()
 
-    console.error('Load failed for /Users/luca/Laputa/private.md with token ghp_super-secret-token')
+    console.error('Load failed for /Users/hansung/HS-Hub/private.md with token ghp_super-secret-token')
     console.warn('Retrying from C:\\Users\\luca\\Notes\\vault.md')
 
     const bundle = buildSanitizedDiagnosticBundle({
@@ -23,12 +23,12 @@ describe('feedbackDiagnostics', () => {
       releaseChannel: 'alpha',
     })
 
-    expect(bundle).toContain('Tolaria sanitized diagnostics')
+    expect(bundle).toContain('HS-Hub sanitized diagnostics')
     expect(bundle).toContain('Build: b281')
     expect(bundle).toContain('Release channel: alpha')
     expect(bundle).toContain('[error] Load failed for [redacted-path] with token [redacted-token]')
     expect(bundle).toContain('[warn] Retrying from [redacted-path]')
-    expect(bundle).not.toContain('/Users/luca/Laputa/private.md')
+    expect(bundle).not.toContain('/Users/hansung/HS-Hub/private.md')
     expect(bundle).not.toContain('ghp_super-secret-token')
     expect(bundle).not.toContain('C:\\Users\\luca\\Notes\\vault.md')
 

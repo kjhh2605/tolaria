@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use crate::ai_models::{normalize_ai_model_providers, AiModelProvider};
 
-const APP_CONFIG_DIR: &str = "dev.kjhh2605.hs-tolaria";
+const APP_CONFIG_DIR: &str = "dev.kjhh2605.hs-hub";
 const SUPPORTED_DEFAULT_AI_AGENTS: &[&str] =
     &["claude_code", "codex", "opencode", "pi", "gemini", "kiro"];
 pub const DEFAULT_HIDE_GITIGNORED_FILES: bool = true;
@@ -671,18 +671,18 @@ mod tests {
         assert!(result.is_ok());
         let path = result.unwrap();
         let path = path.to_str().unwrap();
-        assert!(path.contains("dev.kjhh2605.hs-tolaria"));
+        assert!(path.contains("dev.kjhh2605.hs-hub"));
     }
 
     #[test]
-    fn test_preferred_settings_path_uses_hs_tolaria_namespace() {
+    fn test_preferred_settings_path_uses_hs_hs_hub_namespace() {
         let result = preferred_app_config_path("settings.json");
         assert!(result.is_ok());
         assert!(result
             .unwrap()
             .to_str()
             .unwrap()
-            .contains("dev.kjhh2605.hs-tolaria"));
+            .contains("dev.kjhh2605.hs-hub"));
     }
 
     #[test]

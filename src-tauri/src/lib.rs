@@ -215,16 +215,23 @@ where
         return false;
     }
 
-    spawn_background_task("tolaria-startup-tasks", move || task(vault_path));
+    spawn_background_task("hs-hub-startup-tasks", move || task(vault_path));
     true
 }
 
 #[cfg(desktop)]
 fn spawn_startup_tasks() {
-    let Some(vault_path) = dirs::home_dir().map(|h| h.join("Laputa")) else {
-        return;
+    let vault_paths = match vault_list::load_vault_list() {
+        Ok(vault_list) => selected_mcp_bridge_vault_paths(&vault_list),
+        Err(error) => {
+            log::warn!("Failed to load startup vault list: {}", error);
+            Vec::new()
+        }
     };
-    spawn_startup_tasks_for_vault_with(vault_path, |path| run_startup_tasks_for_vault(&path));
+
+    for vault_path in vault_paths {
+        spawn_startup_tasks_for_vault_with(vault_path, |path| run_startup_tasks_for_vault(&path));
+    }
 }
 
 #[cfg(desktop)]
@@ -250,7 +257,7 @@ fn sync_ws_bridge_for_selected_vault(app_handle: &tauri::AppHandle) {
 #[cfg(desktop)]
 fn spawn_initial_ws_bridge_sync(app: &tauri::App) {
     let app_handle = app.handle().clone();
-    spawn_background_task("tolaria-ws-bridge-startup", move || {
+    spawn_background_task("hs-hub-ws-bridge-startup", move || {
         #[cfg(all(desktop, target_os = "linux"))]
         if linux_appimage::is_running() {
             let app_version = app_handle.package_info().version.to_string();

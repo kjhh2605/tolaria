@@ -96,7 +96,7 @@ import { trackEvent } from './lib/telemetry'
 import { areAiFeaturesEnabled } from './lib/aiFeatures'
 import { areGitFeaturesEnabled } from './lib/gitSettings'
 import { useAppCommandAiActions } from './hooks/useAppCommandAiActions'
-import { TOLARIA_DOCS_URL } from './constants/feedback'
+import { HS_HUB_DOCS_URL } from './constants/feedback'
 import { openExternalUrl } from './utils/url'
 import {
   buildVaultAiGuidanceRefreshKey,
@@ -252,7 +252,7 @@ function App() {
   const openFeedback = useCallback(() => setShowFeedback(true), [])
   const closeFeedback = useCallback(() => setShowFeedback(false), [])
   const openDocs = useCallback(() => {
-    void openExternalUrl(TOLARIA_DOCS_URL)
+    void openExternalUrl(HS_HUB_DOCS_URL)
   }, [])
   const networkStatus = useNetworkStatus()
   const { settings, loaded: settingsLoaded, saveSettings } = useSettings()
@@ -1109,15 +1109,15 @@ function App() {
   }, [loadModifiedFiles, notes.activeTabPath, notes.tabs, recordAutoGitActivity, resolvedPath])
 
   useEffect(() => {
-    window.__laputaTest = {
-      ...window.__laputaTest,
+    window.__hsHubTest = {
+      ...window.__hsHubTest,
       activeTabPath: notes.activeTabPath,
       seedAutoGitSavedChange,
     }
 
     return () => {
-      if (window.__laputaTest?.seedAutoGitSavedChange === seedAutoGitSavedChange) {
-        delete window.__laputaTest.seedAutoGitSavedChange
+      if (window.__hsHubTest?.seedAutoGitSavedChange === seedAutoGitSavedChange) {
+        delete window.__hsHubTest.seedAutoGitSavedChange
       }
     }
   }, [notes.activeTabPath, seedAutoGitSavedChange])
@@ -1367,7 +1367,7 @@ function App() {
     }
   }, [refreshVaultAiGuidance, resolvedPath, vault, setToastMessage])
 
-  const restoreVaultAiGuidance = useCallback(async (successToast: string | null = 'Tolaria AI guidance restored') => {
+  const restoreVaultAiGuidance = useCallback(async (successToast: string | null = 'HS-Hub AI guidance restored') => {
     if (!resolvedPath) return
     try {
       const tauriInvoke = isTauri() ? invoke : mockInvoke
@@ -1376,7 +1376,7 @@ function App() {
       await refreshVaultAiGuidance()
       if (successToast) setToastMessage(successToast)
     } catch (err) {
-      setToastMessage(`Failed to restore Tolaria AI guidance: ${err}`)
+      setToastMessage(`Failed to restore HS-Hub AI guidance: ${err}`)
     }
   }, [refreshVaultAiGuidance, resolvedPath, vault, setToastMessage])
 

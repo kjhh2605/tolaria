@@ -13,7 +13,7 @@
     "section": "start",
     "headings": [
       "What You Choose",
-      "What Tolaria Creates",
+      "What HS-Hub Creates",
       "First Commands To Try",
       "AI Setup Prompt"
     ]
@@ -31,7 +31,7 @@
     ]
   },
   {
-    "title": "Install Tolaria",
+    "title": "Install HS-Hub",
     "path": "pages/start/install.md",
     "url": "/start/install",
     "section": "start",
@@ -97,7 +97,7 @@
     "url": "/concepts/git",
     "section": "concepts",
     "headings": [
-      "What Tolaria Uses Git For",
+      "What HS-Hub Uses Git For",
       "History And Diffs",
       "Local Commits",
       "Remotes"
@@ -344,11 +344,8 @@
     "url": "/reference/contribute",
     "section": "reference",
     "headings": [
-      "Sponsor Or Support",
-      "Feature Requests",
-      "Discussions",
-      "Contribute Code",
-      "Report A Bug"
+      "Report an issue",
+      "Feature ideas"
     ]
   },
   {

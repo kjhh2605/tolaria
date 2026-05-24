@@ -1,8 +1,8 @@
 import type { NoteReference } from './ai-context'
 
-export const OPEN_AI_CHAT_EVENT = 'tolaria:open-ai-chat'
-export const AI_PROMPT_QUEUED_EVENT = 'tolaria:ai-prompt-queued'
-export const NEW_AI_CHAT_EVENT = 'tolaria:new-ai-chat'
+export const OPEN_AI_CHAT_EVENT = 'hs-hub:open-ai-chat'
+export const AI_PROMPT_QUEUED_EVENT = 'hs-hub:ai-prompt-queued'
+export const NEW_AI_CHAT_EVENT = 'hs-hub:new-ai-chat'
 
 export interface QueuedAiPrompt {
   id: number

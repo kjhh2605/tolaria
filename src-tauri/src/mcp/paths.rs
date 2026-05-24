@@ -28,15 +28,15 @@ fn runtime_resource_roots_for_env(
     }
     if let Some(appdir) = appdir {
         push_resource_root(&mut roots, appdir.join("usr"));
-        push_resource_root(&mut roots, appdir.join("usr/lib/tolaria"));
-        push_resource_root(&mut roots, appdir.join("usr/lib/Tolaria"));
+        push_resource_root(&mut roots, appdir.join("usr/lib/hs-hub"));
+        push_resource_root(&mut roots, appdir.join("usr/lib/HS-Hub"));
     }
     if let Some(exe_dir) = exe_dir {
         push_resource_root(&mut roots, exe_dir);
     }
     if let Some(local_app_data) = local_app_data {
-        push_resource_root(&mut roots, local_app_data.join("Tolaria"));
-        push_resource_root(&mut roots, local_app_data.join("tolaria"));
+        push_resource_root(&mut roots, local_app_data.join("HS-Hub"));
+        push_resource_root(&mut roots, local_app_data.join("hs-hub"));
     }
 
     roots
@@ -67,7 +67,7 @@ mod tests {
     #[test]
     fn includes_windows_install_locations() {
         let local_app_data = PathBuf::from(r"C:\Users\alex\AppData\Local");
-        let install_dir = local_app_data.join("Tolaria");
+        let install_dir = local_app_data.join("HS-Hub");
         let roots = runtime_resource_roots_for_env(
             None,
             None,
@@ -76,7 +76,7 @@ mod tests {
         );
 
         assert_eq!(roots.iter().filter(|root| *root == &install_dir).count(), 1);
-        assert!(roots.contains(&local_app_data.join("tolaria")));
+        assert!(roots.contains(&local_app_data.join("hs-hub")));
 
         let candidates =
             super::super::mcp_server_dir_candidates(Path::new("/repo/mcp-server"), &roots);

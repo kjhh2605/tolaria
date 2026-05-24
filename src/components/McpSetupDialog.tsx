@@ -199,7 +199,7 @@ export function McpSetupDialog({
             {t('mcp.setup.runtimeRequirement')}
           </p>
           <p>
-            {t('mcp.setup.writeEntryDescription', { entry: 'tolaria' })}
+            {t('mcp.setup.writeEntryDescription', { entry: 'hs-hub' })}
           </p>
           <div className="rounded-md border border-border bg-muted/30 px-3 py-3 font-mono text-xs text-foreground">
             <div>~/.claude.json</div>

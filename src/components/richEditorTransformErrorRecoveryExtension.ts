@@ -2,7 +2,7 @@ import { createExtension } from '@blocknote/core'
 import { trackEvent } from '../lib/telemetry'
 import { repairMalformedEditorBlocks } from '../hooks/editorBlockRepair'
 
-const DISPATCH_RECOVERY_STATE_KEY = '__tolariaRichEditorTransformErrorRecovery'
+const DISPATCH_RECOVERY_STATE_KEY = '__hsHubRichEditorTransformErrorRecovery'
 
 type RichEditorDispatch = (transaction: unknown) => unknown
 type RecoverEditorDocument = () => void

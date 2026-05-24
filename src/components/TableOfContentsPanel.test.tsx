@@ -30,12 +30,12 @@ describe('TableOfContentsPanel', () => {
 
   it('does not duplicate the note title when the first markdown H1 matches it', () => {
     const toc = buildTableOfContentsFromMarkdown(
-      'Introducing Tolaria',
-      '# Introducing Tolaria\n\n## Tolaria + Refactoring\n\n## Principles',
+      'Introducing HS-Hub',
+      '# Introducing HS-Hub\n\n## HS-Hub Principles\n\n## Principles',
     )
 
-    expect(toc.title).toBe('Introducing Tolaria')
-    expect(toc.children.map((item) => item.title)).toEqual(['Tolaria + Refactoring', 'Principles'])
+    expect(toc.title).toBe('Introducing HS-Hub')
+    expect(toc.children.map((item) => item.title)).toEqual(['HS-Hub Principles', 'Principles'])
   })
 
   it('keeps navigation ids after removing a duplicate markdown title H1', async () => {
@@ -44,21 +44,21 @@ describe('TableOfContentsPanel', () => {
       <TableOfContentsPanel
         editor={{
           document: [
-            { id: 'title-block', type: 'heading', props: { level: 1 }, content: [{ type: 'text', text: 'Introducing Tolaria' }] },
-            { id: 'section-block', type: 'heading', props: { level: 2 }, content: [{ type: 'text', text: 'Tolaria + Refactoring' }] },
+            { id: 'title-block', type: 'heading', props: { level: 1 }, content: [{ type: 'text', text: 'Introducing HS-Hub' }] },
+            { id: 'section-block', type: 'heading', props: { level: 2 }, content: [{ type: 'text', text: 'HS-Hub Principles' }] },
           ],
           setTextCursorPosition,
         }}
-        entry={{ ...entry, title: 'Introducing Tolaria' } as VaultEntry}
-        sourceContent={'# Introducing Tolaria\n\n## Tolaria + Refactoring'}
+        entry={{ ...entry, title: 'Introducing HS-Hub' } as VaultEntry}
+        sourceContent={'# Introducing HS-Hub\n\n## HS-Hub Principles'}
         onClose={vi.fn()}
       />,
     )
 
-    fireEvent.click(await screen.findByRole('button', { name: /Introducing Tolaria/ }))
+    fireEvent.click(await screen.findByRole('button', { name: /Introducing HS-Hub/ }))
     expect(setTextCursorPosition).toHaveBeenCalledWith('title-block', 'start')
 
-    fireEvent.click(await screen.findByRole('button', { name: /Tolaria \+ Refactoring/ }))
+    fireEvent.click(await screen.findByRole('button', { name: /HS-Hub Principles/ }))
     expect(setTextCursorPosition).toHaveBeenCalledWith('section-block', 'start')
   })
 

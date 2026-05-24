@@ -110,36 +110,36 @@ describe('useZoom', () => {
     expect(result.current.zoomLevel).toBe(100)
   })
 
-  it('dispatches laputa-zoom-change event on zoomIn', () => {
+  it('dispatches hs-hub:zoom-change event on zoomIn', () => {
     const handler = vi.fn()
-    window.addEventListener('laputa-zoom-change', handler)
+    window.addEventListener('hs-hub:zoom-change', handler)
     const { result } = renderHook(() => useZoom())
     handler.mockClear() // clear any init-phase dispatches
     act(() => result.current.zoomIn())
     expect(handler).toHaveBeenCalled()
-    window.removeEventListener('laputa-zoom-change', handler)
+    window.removeEventListener('hs-hub:zoom-change', handler)
   })
 
-  it('dispatches laputa-zoom-change event on zoomOut', () => {
+  it('dispatches hs-hub:zoom-change event on zoomOut', () => {
     const handler = vi.fn()
-    window.addEventListener('laputa-zoom-change', handler)
+    window.addEventListener('hs-hub:zoom-change', handler)
     const { result } = renderHook(() => useZoom())
     handler.mockClear()
     act(() => result.current.zoomOut())
     expect(handler).toHaveBeenCalled()
-    window.removeEventListener('laputa-zoom-change', handler)
+    window.removeEventListener('hs-hub:zoom-change', handler)
   })
 
-  it('dispatches laputa-zoom-change event on zoomReset', () => {
+  it('dispatches hs-hub:zoom-change event on zoomReset', () => {
     resetVaultConfigStore()
     bindVaultConfigStore({ ...DEFAULT_VC, zoom: 1.2 }, vi.fn())
     const handler = vi.fn()
-    window.addEventListener('laputa-zoom-change', handler)
+    window.addEventListener('hs-hub:zoom-change', handler)
     const { result } = renderHook(() => useZoom())
     handler.mockClear()
     act(() => result.current.zoomReset())
     expect(handler).toHaveBeenCalled()
-    window.removeEventListener('laputa-zoom-change', handler)
+    window.removeEventListener('hs-hub:zoom-change', handler)
   })
 
   it('applies CSS zoom synchronously during initialization', () => {

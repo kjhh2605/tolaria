@@ -32,7 +32,7 @@ describe('MermaidDiagram', () => {
       expect(screen.getByTestId('mermaid-diagram-viewport').querySelector('svg')).not.toBeNull()
     })
     expect(mermaidMock.render).toHaveBeenCalledWith(
-      expect.stringMatching(/^tolaria-mermaid-/),
+      expect.stringMatching(/^hs-hub-mermaid-/),
       'flowchart LR\nA --> B',
       expect.any(HTMLElement),
     )

@@ -12,8 +12,8 @@ describe('index startup script', () => {
   it('does not ship a visible boot diagnostics element by default', () => {
     const indexHtml = readFileSync(`${process.cwd()}/index.html`, 'utf8')
 
-    expect(indexHtml).not.toContain('Tolaria boot: HTML parsed')
-    expect(indexHtml).not.toContain('<pre id="tolaria-boot-diagnostics"')
+    expect(indexHtml).not.toContain('HS-Hub boot: HTML parsed')
+    expect(indexHtml).not.toContain('<pre id="hs-hub-boot-diagnostics"')
   })
 
   it('does not show the boot overlay for ResizeObserver loop notifications', () => {

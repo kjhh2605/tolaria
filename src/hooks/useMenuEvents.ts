@@ -120,14 +120,14 @@ function useTestMenuCommandBridge(handlersRef: { current: MenuEventHandlers }) {
       dispatchMenuEvent(id, handlersRef.current)
     }
 
-    window.__laputaTest = {
-      ...window.__laputaTest,
+    window.__hsHubTest = {
+      ...window.__hsHubTest,
       dispatchBrowserMenuCommand: bridge,
     }
 
     return () => {
-      if (window.__laputaTest?.dispatchBrowserMenuCommand === bridge) {
-        delete window.__laputaTest.dispatchBrowserMenuCommand
+      if (window.__hsHubTest?.dispatchBrowserMenuCommand === bridge) {
+        delete window.__hsHubTest.dispatchBrowserMenuCommand
       }
     }
   }, [handlersRef])

@@ -136,7 +136,7 @@ function unavailableBodyInstruction(activeEntry: VaultEntry): string {
 
 function truncatedBodyInstruction(path: string, omittedChars: number): string {
   return [
-    '[Active note body truncated by Tolaria to keep CLI agent context within provider limits.',
+    '[Active note body truncated by HS-Hub to keep CLI agent context within provider limits.',
     `Omitted approximately ${omittedChars} characters from the middle.`,
     `Use get_note("${path}") to read the full note before making content-sensitive edits or summaries.]`,
   ].join(' ')
@@ -248,7 +248,7 @@ export function buildContextSnapshot(params: ContextSnapshotParams): string {
   const snapshot = contextSnapshot(params)
 
   const preamble = [
-    'You are an AI assistant integrated into Tolaria, a personal knowledge management app.',
+    'You are an AI assistant integrated into HS-Hub, a personal knowledge management app.',
     'The user is viewing a specific note. Use the structured context below to answer questions accurately.',
     'You can also use MCP tools to search, read, create, or edit notes in the vault.',
     'If the body field is empty or truncated, use get_note to read the full note from disk before content-sensitive edits or summaries.',
@@ -264,7 +264,7 @@ export function buildContextualPrompt(
   linkedEntries: VaultEntry[],
 ): string {
   const parts: string[] = [
-    'You are an AI assistant integrated into Tolaria, a personal knowledge management app.',
+    'You are an AI assistant integrated into HS-Hub, a personal knowledge management app.',
     'The user is viewing a specific note. Use the note and its linked context to answer questions accurately.',
     'You can also use MCP tools to search, read, create, or edit notes in the vault.',
     '',

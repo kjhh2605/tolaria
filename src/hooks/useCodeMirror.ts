@@ -274,10 +274,10 @@ export function useCodeMirror(
     // ResizeObserver doesn't fire for ancestor zoom changes. Force a re-measure
     // so cursor placement stays accurate at any zoom level.
     const handleZoomChange = () => { view.requestMeasure() }
-    window.addEventListener('laputa-zoom-change', handleZoomChange)
+    window.addEventListener('hs-hub:zoom-change', handleZoomChange)
 
     return () => {
-      window.removeEventListener('laputa-zoom-change', handleZoomChange)
+      window.removeEventListener('hs-hub:zoom-change', handleZoomChange)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (parent as any).__cmView
       view.destroy()

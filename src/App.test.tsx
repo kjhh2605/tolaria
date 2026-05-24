@@ -418,9 +418,9 @@ vi.mock('@blocknote/mantine', () => ({
 
 vi.mock('@blocknote/mantine/style.css', () => ({}))
 
-vi.mock('./components/tolariaEditorFormatting', () => ({
-  TolariaFormattingToolbar: () => null,
-  TolariaFormattingToolbarController: () => null,
+vi.mock('./components/hsHubEditorFormatting', () => ({
+  HsHubFormattingToolbar: () => null,
+  HsHubFormattingToolbarController: () => null,
 }))
 
 import App from './App'
@@ -428,8 +428,8 @@ import { TooltipProvider } from './components/ui/tooltip'
 import { isTauri } from './mock-tauri'
 import { streamAiAgent } from './utils/streamAiAgent'
 
-const AI_AGENTS_ONBOARDING_DISMISSED_STORAGE_NAME = 'tolaria:ai-agents-onboarding-dismissed'
-const CLAUDE_CODE_ONBOARDING_DISMISSED_STORAGE_NAME = 'tolaria:claude-code-onboarding-dismissed'
+const AI_AGENTS_ONBOARDING_DISMISSED_STORAGE_NAME = 'hs-hub:ai-agents-onboarding-dismissed'
+const CLAUDE_CODE_ONBOARDING_DISMISSED_STORAGE_NAME = 'hs-hub:claude-code-onboarding-dismissed'
 const SLOW_APP_READY_TIMEOUT_MS = 10_000
 
 function render(ui: ReactElement, options?: Parameters<typeof testingLibraryRender>[1]) {
@@ -562,7 +562,7 @@ describe('App', () => {
     expect(reloadVaultEntry).toHaveBeenCalledWith({ path: '/vault/project/test.md', vaultPath: '/vault' })
     await waitFor(() => expect(getNoteContent).toHaveBeenCalled())
     expect(getNoteContent).toHaveBeenCalledWith({ path: '/vault/project/test.md', vaultPath: '/vault' })
-    await waitFor(() => expect(window.__laputaTest?.activeTabPath).toBe('/vault/project/test.md'))
+    await waitFor(() => expect(window.__hsHubTest?.activeTabPath).toBe('/vault/project/test.md'))
     expect(screen.getByTestId('blocknote-view')).toHaveAttribute('data-editable', 'true')
     expect(listVault).not.toHaveBeenCalled()
   })
@@ -611,7 +611,7 @@ describe('App', () => {
           vaultPath: '/vault',
         })
       })
-      expect(window.__laputaTest?.activeTabPath).not.toBe('/vault/untitled-note-1700000000.md')
+      expect(window.__hsHubTest?.activeTabPath).not.toBe('/vault/untitled-note-1700000000.md')
 
       await act(async () => {
         resolveSave()
@@ -619,7 +619,7 @@ describe('App', () => {
       })
 
       await waitFor(() => {
-        expect(window.__laputaTest?.activeTabPath).toBe('/vault/untitled-note-1700000000.md')
+        expect(window.__hsHubTest?.activeTabPath).toBe('/vault/untitled-note-1700000000.md')
       })
       expect(screen.getAllByText('Untitled Note 1700000000').length).toBeGreaterThan(0)
     } finally {
@@ -646,11 +646,11 @@ describe('App', () => {
     }, { timeout: SLOW_APP_READY_TIMEOUT_MS })
 
     await waitFor(() => {
-      expect(typeof window.__laputaTest?.dispatchBrowserMenuCommand).toBe('function')
+      expect(typeof window.__hsHubTest?.dispatchBrowserMenuCommand).toBe('function')
     })
 
     act(() => {
-      window.__laputaTest?.dispatchBrowserMenuCommand?.('vault-install-mcp')
+      window.__hsHubTest?.dispatchBrowserMenuCommand?.('vault-install-mcp')
     })
 
     await waitFor(() => {
@@ -750,7 +750,7 @@ describe('App', () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByText('Help improve Tolaria')).toBeInTheDocument()
+      expect(screen.getByText('Help improve HS-Hub')).toBeInTheDocument()
     }, { timeout: SLOW_APP_READY_TIMEOUT_MS })
 
     fireEvent.click(screen.getByTestId('telemetry-accept'))
@@ -766,7 +766,7 @@ describe('App', () => {
     ['telemetry-decline', 'No thanks'],
   ])('ignores a remembered default vault after %s when onboarding was never completed', async (buttonTestId) => {
     const rememberedDefaultVaultPath = expectedDefaultVaultPath
-    localStorage.setItem('tolaria_welcome_dismissed', '1')
+    localStorage.setItem('hs-hub_welcome_dismissed', '1')
     mockCommandResults.get_default_vault_path = rememberedDefaultVaultPath
     mockCommandResults.get_settings = createSettings({ telemetry_consent: null })
     mockCommandResults.load_vault_list = {
@@ -779,7 +779,7 @@ describe('App', () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByText('Help improve Tolaria')).toBeInTheDocument()
+      expect(screen.getByText('Help improve HS-Hub')).toBeInTheDocument()
     }, { timeout: SLOW_APP_READY_TIMEOUT_MS })
 
     fireEvent.click(screen.getByTestId(buttonTestId))
@@ -791,7 +791,7 @@ describe('App', () => {
   })
 
   it('uses the app shell loading state while the last vault is still resolving', async () => {
-    localStorage.setItem('tolaria_welcome_dismissed', '1')
+    localStorage.setItem('hs-hub_welcome_dismissed', '1')
 
     let resolveVaultList: ((value: typeof mockVaultList) => void) | null = null
 
@@ -833,7 +833,7 @@ describe('App', () => {
   })
 
   it('shows the missing-vault screen once the resolved active vault is confirmed missing', async () => {
-    localStorage.setItem('tolaria_welcome_dismissed', '1')
+    localStorage.setItem('hs-hub_welcome_dismissed', '1')
     mockCommandResults.load_vault_list = {
       vaults: [{ label: 'Old Vault', path: '/missing-vault' }],
       active_vault: '/missing-vault',
@@ -850,7 +850,7 @@ describe('App', () => {
   })
 
   it('shows welcome instead of vault-missing when the missing path was not a persisted active vault', async () => {
-    localStorage.setItem('tolaria_welcome_dismissed', '1')
+    localStorage.setItem('hs-hub_welcome_dismissed', '1')
     mockCommandResults.load_vault_list = {
       vaults: [],
       active_vault: null,
@@ -861,7 +861,7 @@ describe('App', () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByText('Welcome to Tolaria')).toBeInTheDocument()
+      expect(screen.getByText('Welcome to HS-Hub')).toBeInTheDocument()
     })
     expect(screen.queryByText('Vault not found')).not.toBeInTheDocument()
     expect(screen.getByTestId('welcome-open-folder')).toHaveTextContent('Open existing vault')
@@ -1063,7 +1063,7 @@ describe('App', () => {
       property_display_modes: null,
       inbox: { noteListProperties: null, explicitOrganization: false },
     })
-    localStorage.setItem(`laputa:vault-config:${workVaultPath}`, disabledWorkflowConfig)
+    localStorage.setItem(`hs-hub:vault-config:${workVaultPath}`, disabledWorkflowConfig)
 
     render(<App />)
 
@@ -1096,7 +1096,7 @@ describe('App', () => {
     })
 
     await waitFor(() => {
-      expect(window.__laputaTest?.activeTabPath).toBe('/vault/beta.md')
+      expect(window.__hsHubTest?.activeTabPath).toBe('/vault/beta.md')
     })
   }, 10_000)
 
@@ -1133,7 +1133,7 @@ describe('App', () => {
       await Promise.resolve()
     })
     await waitFor(() => {
-      expect(window.__laputaTest?.activeTabPath).toBe('/vault/gamma.md')
+      expect(window.__hsHubTest?.activeTabPath).toBe('/vault/gamma.md')
     })
 
     await act(async () => {
@@ -1143,7 +1143,7 @@ describe('App', () => {
       await Promise.resolve()
     })
 
-    expect(window.__laputaTest?.activeTabPath).toBe('/vault/gamma.md')
+    expect(window.__hsHubTest?.activeTabPath).toBe('/vault/gamma.md')
   }, 10_000)
 
   it('renders status bar', async () => {

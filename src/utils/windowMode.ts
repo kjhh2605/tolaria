@@ -17,7 +17,7 @@ interface TauriWindowInternals {
   metadata?: { currentWindow?: { label?: string } }
 }
 
-const NOTE_WINDOW_STORAGE_PREFIX = 'tolaria:note-window:'
+const NOTE_WINDOW_STORAGE_PREFIX = 'hs-hub:note-window:'
 
 function getCurrentWindowLabel(): string | null {
   const internals = (window as Window & { __TAURI_INTERNALS__?: TauriWindowInternals }).__TAURI_INTERNALS__

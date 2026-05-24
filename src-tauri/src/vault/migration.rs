@@ -241,7 +241,7 @@ mod tests {
 
     #[test]
     fn test_migrate_vault_returns_error_for_nonexistent_path() {
-        let result = migrate_is_a_to_type("/tmp/this-path-does-not-exist-laputa-test");
+        let result = migrate_is_a_to_type("/tmp/this-path-does-not-exist-hs-hub-test");
         assert!(result.is_err());
     }
 

@@ -105,17 +105,17 @@ async function readProbe(page: Page): Promise<CreateNoteProbe> {
 
 async function dispatchMenuCommandBurst(page: Page, commandId: string, count: number): Promise<void> {
   await page.waitForFunction(
-    () => typeof window.__laputaTest?.dispatchBrowserMenuCommand === 'function',
+    () => typeof window.__hsHubTest?.dispatchBrowserMenuCommand === 'function',
     undefined,
     { timeout: 5_000 },
   )
   await page.evaluate(({ commandId: id, count: commandCount }) => {
     const testWindow = window as typeof window & {
-      __laputaTest?: { dispatchBrowserMenuCommand?: (commandId: string) => void }
+      __hsHubTest?: { dispatchBrowserMenuCommand?: (commandId: string) => void }
     }
-    const dispatchBrowserMenuCommand = testWindow.__laputaTest?.dispatchBrowserMenuCommand
+    const dispatchBrowserMenuCommand = testWindow.__hsHubTest?.dispatchBrowserMenuCommand
     if (typeof dispatchBrowserMenuCommand !== 'function') {
-      throw new Error('Tolaria test bridge is missing dispatchBrowserMenuCommand')
+      throw new Error('HS-Hub test bridge is missing dispatchBrowserMenuCommand')
     }
     for (let index = 0; index < commandCount; index += 1) {
       dispatchBrowserMenuCommand(id)

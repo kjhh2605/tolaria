@@ -9,20 +9,20 @@ vi.mock('../lib/telemetry', () => ({
 import {
   addItemsToMediaGroup,
   createMathSlashMenuItem,
-  filterTolariaFormattingToolbarItems,
-  filterTolariaSlashMenuItems,
-  getTolariaBlockTypeSelectItems,
+  filterHsHubFormattingToolbarItems,
+  filterHsHubSlashMenuItems,
+  getHsHubBlockTypeSelectItems,
   MATH_SLASH_COMMAND_LATEX,
   MERMAID_SLASH_COMMAND_DIAGRAM,
-} from './tolariaEditorFormattingConfig'
+} from './hsHubEditorFormattingConfig'
 import { trackEvent } from '../lib/telemetry'
 import { MATH_BLOCK_TYPE } from '../utils/mathMarkdown'
 import { mermaidFenceSource } from '../utils/mermaidMarkdown'
 
-describe('tolariaEditorFormatting', () => {
+describe('hsHubEditorFormatting', () => {
   it('keeps the markdown-safe toolbar controls and block type select', () => {
-    const itemKeys = filterTolariaFormattingToolbarItems(
-      getFormattingToolbarItems(getTolariaBlockTypeSelectItems()),
+    const itemKeys = filterHsHubFormattingToolbarItems(
+      getFormattingToolbarItems(getHsHubBlockTypeSelectItems()),
     ).map((item) => String(item.key))
 
     expect(itemKeys).toContain('blockTypeSelect')
@@ -41,7 +41,7 @@ describe('tolariaEditorFormatting', () => {
   })
 
   it('returns the audited markdown-safe block types for the toolbar select', () => {
-    expect(getTolariaBlockTypeSelectItems()).toEqual([
+    expect(getHsHubBlockTypeSelectItems()).toEqual([
       expect.objectContaining({ name: 'Paragraph', type: 'paragraph' }),
       expect.objectContaining({ name: 'Heading 1', type: 'heading', props: { level: 1 } }),
       expect.objectContaining({ name: 'Heading 2', type: 'heading', props: { level: 2 } }),
@@ -58,7 +58,7 @@ describe('tolariaEditorFormatting', () => {
   })
 
   it('filters unsupported toggle slash-menu variants and removes command descriptions', () => {
-    type TolariaSlashMenuTestItem = {
+    type HsHubSlashMenuTestItem = {
       key: string
       title: string
       onItemClick: () => void
@@ -66,7 +66,7 @@ describe('tolariaEditorFormatting', () => {
       icon?: ReactElement
     }
 
-    const items = filterTolariaSlashMenuItems([
+    const items = filterHsHubSlashMenuItems([
       { key: 'toggle_heading', title: 'Toggle heading', onItemClick: () => {} },
       { key: 'toggle_list', title: 'Toggle list', onItemClick: () => {} },
       { key: 'heading', title: 'Heading', subtext: 'Default heading copy', onItemClick: () => {} },
@@ -75,7 +75,7 @@ describe('tolariaEditorFormatting', () => {
       { key: 'heading_4', title: 'Heading 4', onItemClick: () => {} },
       { key: 'heading_5', title: 'Heading 5', onItemClick: () => {} },
       { key: 'heading_6', title: 'Heading 6', onItemClick: () => {} },
-    ] satisfies TolariaSlashMenuTestItem[])
+    ] satisfies HsHubSlashMenuTestItem[])
 
     expect(items.map((item) => item.key)).toEqual([
       'heading',
@@ -90,16 +90,16 @@ describe('tolariaEditorFormatting', () => {
   })
 
   it('wraps slash-menu icons so hover can swap Phosphor weights', () => {
-    type TolariaSlashMenuTestItem = {
+    type HsHubSlashMenuTestItem = {
       key: string
       title: string
       onItemClick: () => void
       icon?: ReactElement
     }
 
-    const items = filterTolariaSlashMenuItems([
+    const items = filterHsHubSlashMenuItems([
       { key: 'heading', title: 'Heading', onItemClick: () => {} },
-    ] satisfies TolariaSlashMenuTestItem[])
+    ] satisfies HsHubSlashMenuTestItem[])
     const icon = items[0]?.icon
 
     expect(isValidElement(icon)).toBe(true)
@@ -108,10 +108,10 @@ describe('tolariaEditorFormatting', () => {
     const iconChildren = Children.toArray(icon.props.children) as Array<
       ReactElement<{ className?: string; weight?: string }>
     >
-    expect(icon.props.className).toBe('tolaria-slash-menu-icon')
+    expect(icon.props.className).toBe('hs-hub-slash-menu-icon')
     expect(iconChildren.map((child) => child.props.className)).toEqual([
-      'tolaria-slash-menu-icon__regular',
-      'tolaria-slash-menu-icon__fill',
+      'hs-hub-slash-menu-icon__regular',
+      'hs-hub-slash-menu-icon__fill',
     ])
     expect(iconChildren.map((child) => child.props.weight)).toEqual([
       'regular',
@@ -120,14 +120,14 @@ describe('tolariaEditorFormatting', () => {
   })
 
   it('keeps custom media slash-menu commands searchable', () => {
-    type TolariaSlashMenuTestItem = {
+    type HsHubSlashMenuTestItem = {
       key: string
       title: string
       aliases?: string[]
       onItemClick: () => void
     }
 
-    const items = filterTolariaSlashMenuItems([
+    const items = filterHsHubSlashMenuItems([
       {
         key: 'mermaid',
         title: 'Mermaid',
@@ -146,7 +146,7 @@ describe('tolariaEditorFormatting', () => {
         aliases: ['tldraw', 'drawing', 'canvas', 'sketch'],
         onItemClick: () => {},
       },
-    ] satisfies TolariaSlashMenuTestItem[])
+    ] satisfies HsHubSlashMenuTestItem[])
 
     expect(items[0]).toEqual(expect.objectContaining({
       key: 'mermaid',
@@ -180,7 +180,7 @@ describe('tolariaEditorFormatting', () => {
   })
 
   it('places custom media commands before the existing non-media slash-menu group', () => {
-    type TolariaSlashMenuTestItem = {
+    type HsHubSlashMenuTestItem = {
       key: string
       title: string
       group: string
@@ -191,7 +191,7 @@ describe('tolariaEditorFormatting', () => {
       { key: 'image', title: 'Image', group: 'Media', onItemClick: () => {} },
       { key: 'file', title: 'File', group: 'Media', onItemClick: () => {} },
       { key: 'emoji', title: 'Emoji', group: 'Others', onItemClick: () => {} },
-    ] satisfies TolariaSlashMenuTestItem[], [
+    ] satisfies HsHubSlashMenuTestItem[], [
       {
         key: 'mermaid',
         title: 'Mermaid',

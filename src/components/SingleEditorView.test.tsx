@@ -185,20 +185,20 @@ vi.mock('./blockNoteSideMenuHoverGuard', () => ({
   useBlockNoteSideMenuHoverGuard: (containerRef: unknown) => state.hoverGuardMock(containerRef),
 }))
 
-vi.mock('./tolariaEditorFormattingConfig', () => ({
-  getTolariaSlashMenuItems: vi.fn(async () => []),
+vi.mock('./hsHubEditorFormattingConfig', () => ({
+  getHsHubSlashMenuItems: vi.fn(async () => []),
 }))
 
-vi.mock('./tolariaEditorFormatting', () => ({
-  TolariaFormattingToolbar: () => <div data-testid="tolaria-formatting-toolbar" />,
-  TolariaFormattingToolbarController: (props: Record<string, unknown>) => {
+vi.mock('./hsHubEditorFormatting', () => ({
+  HsHubFormattingToolbar: () => <div data-testid="hs-hub-formatting-toolbar" />,
+  HsHubFormattingToolbarController: (props: Record<string, unknown>) => {
     state.capturedToolbarProps = props
-    return <div data-testid="tolaria-formatting-toolbar-controller" />
+    return <div data-testid="hs-hub-formatting-toolbar-controller" />
   },
 }))
 
-vi.mock('./tolariaBlockNoteSideMenu', () => ({
-  TolariaSideMenu: () => <div data-testid="tolaria-side-menu" />,
+vi.mock('./hsHubBlockNoteSideMenu', () => ({
+  HsHubSideMenu: () => <div data-testid="hs-hub-side-menu" />,
 }))
 
 vi.mock('./useEditorLinkActivation', () => ({
@@ -454,7 +454,7 @@ describe('SingleEditorView', () => {
     mockOpenLocalFile.mockClear()
     document.documentElement.removeAttribute('data-theme')
     document.documentElement.classList.remove('dark')
-    delete window.__laputaTest
+    delete window.__hsHubTest
   })
 
   it('repairs the live editor document before remounting after a stale missing-id block error', async () => {
@@ -517,10 +517,10 @@ describe('SingleEditorView', () => {
     )
 
     expect(state.wikilinkEntriesRef.current).toEqual(entries)
-    expect(typeof window.__laputaTest?.seedBlockNoteTable).toBe('function')
+    expect(typeof window.__hsHubTest?.seedBlockNoteTable).toBe('function')
 
     await act(async () => {
-      await window.__laputaTest?.seedBlockNoteTable?.([120, null, 80])
+      await window.__hsHubTest?.seedBlockNoteTable?.([120, null, 80])
     })
 
     expect(editor.blocksToHTMLLossy).toHaveBeenCalledWith([
@@ -538,7 +538,7 @@ describe('SingleEditorView', () => {
 
     unmount()
 
-    expect(window.__laputaTest?.seedBlockNoteTable).toBeUndefined()
+    expect(window.__hsHubTest?.seedBlockNoteTable).toBeUndefined()
   })
 
   it('shows the drag overlay and inserts dropped images after the active cursor block', () => {

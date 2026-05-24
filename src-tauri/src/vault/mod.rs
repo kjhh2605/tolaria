@@ -225,7 +225,7 @@ pub fn reload_entry(path: &Path) -> Result<VaultEntry, String> {
 }
 
 /// Directories hidden from user-facing vault scans.
-const HIDDEN_DIRS: &[&str] = &[".git", ".laputa", ".DS_Store"];
+const HIDDEN_DIRS: &[&str] = &[".git", ".hs-hub", ".DS_Store"];
 /// Keep type definitions in their dedicated sidebar section instead of the generic folder tree.
 const FOLDER_TREE_EXCLUDED_DIRS: &[&str] = &["type"];
 

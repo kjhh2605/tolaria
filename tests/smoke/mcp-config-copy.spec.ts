@@ -19,7 +19,7 @@ test.describe('MCP config copy', () => {
     const copiedConfig = await page.evaluate(() => navigator.clipboard.readText())
     const parsedConfig = JSON.parse(copiedConfig) as {
       mcpServers: {
-        tolaria: {
+        'hs-hub': {
           args: string[]
           command: string
           env: Record<string, string>
@@ -27,12 +27,12 @@ test.describe('MCP config copy', () => {
         }
       }
     }
-    const tolariaServer = parsedConfig.mcpServers.tolaria
+    const hsHubServer = parsedConfig.mcpServers["hs-hub"]
 
-    expect(tolariaServer.type).toBe('stdio')
-    expect(tolariaServer.command).toBe('node')
-    expect(tolariaServer.args[0]).toContain('mcp-server/index.js')
-    expect(tolariaServer.env.VAULT_PATH).toBeUndefined()
-    expect(tolariaServer.env.WS_UI_PORT).toBe('9711')
+    expect(hsHubServer.type).toBe('stdio')
+    expect(hsHubServer.command).toBe('node')
+    expect(hsHubServer.args[0]).toContain('mcp-server/index.js')
+    expect(hsHubServer.env.VAULT_PATH).toBeUndefined()
+    expect(hsHubServer.env.WS_UI_PORT).toBe('9711')
   })
 })

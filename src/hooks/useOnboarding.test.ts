@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { APP_STORAGE_KEYS, LEGACY_APP_STORAGE_KEYS } from '../constants/appStorage'
+import { APP_STORAGE_KEYS } from '../constants/appStorage'
 
 const DEFAULT_GETTING_STARTED_PATH = '/mock/Documents/Getting Started'
 const DEFAULT_PARENT_PATH = '/mock/Documents'
@@ -192,7 +192,7 @@ describe('useOnboarding', () => {
   })
 
   it('clears the persisted active vault when the saved path no longer exists', async () => {
-    localStorage.setItem(LEGACY_APP_STORAGE_KEYS.welcomeDismissed, '1')
+    localStorage.setItem(APP_STORAGE_KEYS.welcomeDismissed, '1')
     mockCommands({
       load_vault_list: {
         vaults: [{ label: 'Old Vault', path: '/vault/deleted' }],

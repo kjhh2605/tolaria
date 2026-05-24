@@ -44,7 +44,7 @@ describe('useAutoSync', () => {
     return renderHook(() =>
       useAutoSync({
         enabled,
-        vaultPath: '/Users/luca/Laputa',
+        vaultPath: '/Users/hansung/HS-Hub',
         intervalMinutes,
         onVaultUpdated,
         onConflict,
@@ -56,7 +56,7 @@ describe('useAutoSync', () => {
   it('pulls on mount (app launch)', async () => {
     renderSync()
     await waitFor(() => {
-      expect(mockInvokeFn).toHaveBeenCalledWith('git_pull', { vaultPath: '/Users/luca/Laputa' })
+      expect(mockInvokeFn).toHaveBeenCalledWith('git_pull', { vaultPath: '/Users/hansung/HS-Hub' })
     })
   })
 
@@ -67,8 +67,8 @@ describe('useAutoSync', () => {
       expect(result.current.syncStatus).toBe('idle')
     })
 
-    expect(mockInvokeFn).not.toHaveBeenCalledWith('git_pull', { vaultPath: '/Users/luca/Laputa' })
-    expect(mockInvokeFn).not.toHaveBeenCalledWith('git_remote_status', { vaultPath: '/Users/luca/Laputa' })
+    expect(mockInvokeFn).not.toHaveBeenCalledWith('git_pull', { vaultPath: '/Users/hansung/HS-Hub' })
+    expect(mockInvokeFn).not.toHaveBeenCalledWith('git_remote_status', { vaultPath: '/Users/hansung/HS-Hub' })
 
     act(() => {
       result.current.triggerSync()
@@ -76,8 +76,8 @@ describe('useAutoSync', () => {
       window.dispatchEvent(new Event('focus'))
     })
 
-    expect(mockInvokeFn).not.toHaveBeenCalledWith('git_pull', { vaultPath: '/Users/luca/Laputa' })
-    expect(mockInvokeFn).not.toHaveBeenCalledWith('git_push', { vaultPath: '/Users/luca/Laputa' })
+    expect(mockInvokeFn).not.toHaveBeenCalledWith('git_pull', { vaultPath: '/Users/hansung/HS-Hub' })
+    expect(mockInvokeFn).not.toHaveBeenCalledWith('git_push', { vaultPath: '/Users/hansung/HS-Hub' })
   })
 
   it('sets syncStatus to idle after up_to_date pull', async () => {
@@ -96,7 +96,7 @@ describe('useAutoSync', () => {
     const { result } = renderSync()
 
     await waitFor(() => {
-      expect(onVaultUpdated).toHaveBeenCalledWith(['note.md', 'project/plan.md'], '/Users/luca/Laputa')
+      expect(onVaultUpdated).toHaveBeenCalledWith(['note.md', 'project/plan.md'], '/Users/hansung/HS-Hub')
       expect(onToast).toHaveBeenCalledWith('Pulled 2 update(s) from remote')
       expect(result.current.syncStatus).toBe('idle')
     })
@@ -115,7 +115,7 @@ describe('useAutoSync', () => {
 
     renderHook(() =>
       useAutoSync({
-        vaultPath: '/Users/luca/Laputa',
+        vaultPath: '/Users/hansung/HS-Hub',
         intervalMinutes: 5,
         onVaultUpdated: asyncVaultRefresh,
         onConflict,
@@ -124,7 +124,7 @@ describe('useAutoSync', () => {
     )
 
     await waitFor(() => {
-      expect(asyncVaultRefresh).toHaveBeenCalledWith(['note.md'], '/Users/luca/Laputa')
+      expect(asyncVaultRefresh).toHaveBeenCalledWith(['note.md'], '/Users/hansung/HS-Hub')
     })
     expect(onToast).not.toHaveBeenCalledWith('Pulled 1 update(s) from remote')
 
@@ -170,7 +170,7 @@ describe('useAutoSync', () => {
 
     renderSync()
     await waitFor(() => {
-      expect(mockInvokeFn).toHaveBeenCalledWith('git_pull', { vaultPath: '/Users/luca/Laputa' })
+      expect(mockInvokeFn).toHaveBeenCalledWith('git_pull', { vaultPath: '/Users/hansung/HS-Hub' })
     })
 
     // Focus within cooldown — should NOT trigger pull
@@ -185,7 +185,7 @@ describe('useAutoSync', () => {
     await act(async () => { window.dispatchEvent(new Event('focus')) })
 
     await waitFor(() => {
-      expect(mockInvokeFn).toHaveBeenCalledWith('git_pull', { vaultPath: '/Users/luca/Laputa' })
+      expect(mockInvokeFn).toHaveBeenCalledWith('git_pull', { vaultPath: '/Users/hansung/HS-Hub' })
     })
 
     now.mockRestore()
@@ -208,7 +208,7 @@ describe('useAutoSync', () => {
     })
 
     await waitFor(() => {
-      expect(mockInvokeFn).toHaveBeenCalledWith('git_pull', { vaultPath: '/Users/luca/Laputa' })
+      expect(mockInvokeFn).toHaveBeenCalledWith('git_pull', { vaultPath: '/Users/hansung/HS-Hub' })
       expect(onToast).toHaveBeenCalledWith('Pulled 1 update(s) from remote')
     })
   })
@@ -331,7 +331,7 @@ describe('useAutoSync', () => {
     })
     renderHook(() =>
       useAutoSync({
-        vaultPath: '/Users/luca/Laputa',
+        vaultPath: '/Users/hansung/HS-Hub',
         intervalMinutes: 5,
         onVaultUpdated,
         onSyncUpdated,
@@ -349,7 +349,7 @@ describe('useAutoSync', () => {
     const onSyncUpdated = vi.fn()
     renderHook(() =>
       useAutoSync({
-        vaultPath: '/Users/luca/Laputa',
+        vaultPath: '/Users/hansung/HS-Hub',
         intervalMinutes: 5,
         onVaultUpdated,
         onSyncUpdated,
@@ -399,7 +399,7 @@ describe('useAutoSync', () => {
 
     const { result } = renderHook(() =>
       useAutoSync({
-        vaultPath: '/Users/luca/Laputa',
+        vaultPath: '/Users/hansung/HS-Hub',
         intervalMinutes: 5,
         onVaultUpdated,
         onSyncUpdated,
@@ -417,7 +417,7 @@ describe('useAutoSync', () => {
     })
 
     await waitFor(() => {
-      expect(onVaultUpdated).toHaveBeenCalledWith(['note.md'], '/Users/luca/Laputa')
+      expect(onVaultUpdated).toHaveBeenCalledWith(['note.md'], '/Users/hansung/HS-Hub')
       expect(onSyncUpdated).toHaveBeenCalled()
       expect(onToast).toHaveBeenCalledWith('Pulled and pushed successfully')
       expect(result.current.syncStatus).toBe('idle')

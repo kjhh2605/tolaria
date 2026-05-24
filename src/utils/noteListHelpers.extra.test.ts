@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { APP_STORAGE_KEYS, LEGACY_APP_STORAGE_KEYS } from '../constants/appStorage'
+import { APP_STORAGE_KEYS } from '../constants/appStorage'
 import { allSelection, makeEntry } from '../test-utils/noteListTestUtils'
 import {
   clearListSortFromLocalStorage,
@@ -177,11 +177,8 @@ describe('noteListHelpers extra coverage', () => {
     expect(localStorage.getItem(APP_STORAGE_KEYS.sortPreferences)).toBe(JSON.stringify({
       '__list__': { option: 'modified', direction: 'desc' },
     }))
-    expect(localStorage.getItem(LEGACY_APP_STORAGE_KEYS.sortPreferences)).toBeNull()
-
     clearListSortFromLocalStorage()
     expect(localStorage.getItem(APP_STORAGE_KEYS.sortPreferences)).toBeNull()
-    expect(localStorage.getItem(LEGACY_APP_STORAGE_KEYS.sortPreferences)).toBeNull()
   })
 
   it('filters view, folder, favorites, and pulse selections', () => {

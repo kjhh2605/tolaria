@@ -1,4 +1,3 @@
-const DEFAULT_POSTHOG_HOST = 'https://us.i.posthog.com'
 const IPV6_ADDRESS_CHARS = new Set('0123456789abcdefABCDEF:')
 const DISALLOWED_TELEMETRY_VALUES = new Set([
   'false',
@@ -130,7 +129,7 @@ function normalizeSentryRelease({ value }: TelemetryValueInput): string {
 }
 
 function normalizePostHogHost({ value }: TelemetryValueInput): string | null {
-  if (!value) return DEFAULT_POSTHOG_HOST
+  if (!value) return null
   const normalized = normalizeHttpLikeValue({ value })
   return isHttpUrl({ value: normalized }) ? normalized : null
 }
@@ -154,4 +153,3 @@ export function resolveFrontendTelemetryConfig(
   return { sentryDsn, sentryBuildVersion, sentryRelease, posthogKey, posthogHost }
 }
 
-export { DEFAULT_POSTHOG_HOST as _defaultPostHogHostForTest }

@@ -1,6 +1,6 @@
 # Frontmatter Fields
 
-Tolaria uses conventions instead of a required schema.
+HS-Hub uses conventions instead of a required schema.
 
 | Field | Meaning |
 | --- | --- |
@@ -19,7 +19,7 @@ Tolaria uses conventions instead of a required schema.
 
 ## Custom Fields
 
-You can add your own fields. If a field contains wikilinks, Tolaria can treat it as a relationship.
+You can add your own fields. If a field contains wikilinks, HS-Hub can treat it as a relationship.
 
 ## System Fields
 

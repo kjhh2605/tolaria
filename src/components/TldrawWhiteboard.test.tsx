@@ -175,7 +175,7 @@ describe('TldrawWhiteboard', () => {
     expectBundledTldrawAssetUrls(renderedTldrawAssetUrls())
   })
 
-  it('passes Tolaria dark mode to tldraw', () => {
+  it('passes HS-Hub dark mode to tldraw', () => {
     document.documentElement.setAttribute('data-theme', 'dark')
     document.documentElement.classList.add('dark')
 
@@ -193,7 +193,7 @@ describe('TldrawWhiteboard', () => {
     expect(renderedTldrawProps().user?.userPreferences.get().colorScheme).toBe('dark')
   })
 
-  it('updates the tldraw color scheme when Tolaria theme changes', async () => {
+  it('updates the tldraw color scheme when HS-Hub theme changes', async () => {
     document.documentElement.setAttribute('data-theme', 'light')
 
     render(

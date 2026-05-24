@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { NoteList } from './NoteList'
-import { APP_STORAGE_KEYS, LEGACY_APP_STORAGE_KEYS } from '../constants/appStorage'
+import { APP_STORAGE_KEYS } from '../constants/appStorage'
 import { getSortComparator } from '../utils/noteListHelpers'
 import { buildNoteListProps, makeEntry, mockEntries, renderNoteList } from '../test-utils/noteListTestUtils'
 import type { ViewFile } from '../types'
@@ -112,7 +112,6 @@ describe('NoteList sort controls', () => {
   beforeEach(() => {
     try {
       localStorage.removeItem(APP_STORAGE_KEYS.sortPreferences)
-      localStorage.removeItem(LEGACY_APP_STORAGE_KEYS.sortPreferences)
     } catch {
       // ignore storage failures in tests
     }

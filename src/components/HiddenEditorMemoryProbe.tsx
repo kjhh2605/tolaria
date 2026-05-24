@@ -34,8 +34,8 @@ function useProbeReadySignal(target: ProbeTarget, onReady: (path: string) => voi
       const detail = (event as CustomEvent<{ path?: string }>).detail
       if (detail?.path === target.entry.path) onReady(target.entry.path)
     }
-    window.addEventListener('laputa:editor-tab-swapped', handleSwap)
-    return () => window.removeEventListener('laputa:editor-tab-swapped', handleSwap)
+    window.addEventListener('hs-hub:editor-tab-swapped', handleSwap)
+    return () => window.removeEventListener('hs-hub:editor-tab-swapped', handleSwap)
   }, [onReady, target.entry.path])
 }
 

@@ -97,7 +97,7 @@ mod tests {
         let claude = std::fs::read_to_string(vault_path.join("CLAUDE.md")).unwrap();
 
         assert!(agents.contains("Use the first H1 as the note title."));
-        assert!(agents.contains("Tolaria reads notes recursively from all folders"));
+        assert!(agents.contains("HS-Hub reads notes recursively from all folders"));
         assert!(agents.contains("views/*.yml"));
         assert!(claude.starts_with("---\ntype: Note\n_organized: true\n---"));
         assert!(claude.contains("@AGENTS.md"));
@@ -240,7 +240,7 @@ mod tests {
 
         let cache_dir = tempfile::TempDir::new().unwrap();
         std::env::set_var(
-            "LAPUTA_CACHE_DIR",
+            "HS_HUB_CACHE_DIR",
             cache_dir.path().to_string_lossy().as_ref(),
         );
 

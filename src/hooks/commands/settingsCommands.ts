@@ -66,7 +66,7 @@ function buildPrimarySettingsCommands({
       id: 'open-contribute',
       label: t('command.contribute'),
       group: 'Settings',
-      keywords: ['contribute', 'feedback', 'feature', 'canny', 'discussion', 'github', 'bug', 'report'],
+      keywords: ['contribute', 'feedback', 'feature', 'discussion', 'github', 'bug', 'report'],
       enabled: !!onOpenFeedback,
       execute: () => {
         rememberFeedbackDialogOpener(document.activeElement instanceof HTMLElement ? document.activeElement : null)

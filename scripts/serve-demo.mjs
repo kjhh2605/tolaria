@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Production static server for Laputa App demo.
+ * Production static server for HS-Hub demo.
  * Serves dist/ + handles /api/vault/* routes for browser testing.
  */
 
@@ -227,6 +227,6 @@ const server = http.createServer((req, res) => {
 })
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Laputa demo server running on http://0.0.0.0:${PORT}`)
+  console.log(`✅ HS-Hub demo server running on http://0.0.0.0:${PORT}`)
   console.log(`   Tailscale: https://mac-mini.tail7cbc15.ts.net`)
 })

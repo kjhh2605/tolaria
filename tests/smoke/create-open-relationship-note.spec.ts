@@ -23,7 +23,7 @@ test.describe('Create & open note from relationship input', () => {
     const pageErrors: string[] = []
     page.on('pageerror', (err) => pageErrors.push(err.message))
 
-    await openNoteViaQuickOpen(page, 'Start Laputa App')
+    await openNoteViaQuickOpen(page, 'Start HS-Hub Project')
 
     const belongsToLabel = page.locator('span.font-mono-overline').filter({ hasText: 'Belongs to' })
     await expect(belongsToLabel).toBeVisible({ timeout: 5000 })
@@ -53,7 +53,7 @@ test.describe('Create & open note from relationship input', () => {
   })
 
   test('only the new note tab is active after creation', async ({ page }) => {
-    await openNoteViaQuickOpen(page, 'Start Laputa App')
+    await openNoteViaQuickOpen(page, 'Start HS-Hub Project')
 
     const belongsToLabel = page.locator('span.font-mono-overline').filter({ hasText: 'Belongs to' })
     await expect(belongsToLabel).toBeVisible({ timeout: 5000 })
@@ -76,7 +76,7 @@ test.describe('Create & open note from relationship input', () => {
   // TODO: fix relationship wikilink persistence in single-note model — the wikilink
   // write to the original note may race with navigation to the new note.
   test.skip('relationship wikilink is added to original note after creation', async ({ page }) => {
-    await openNoteViaQuickOpen(page, 'Start Laputa App')
+    await openNoteViaQuickOpen(page, 'Start HS-Hub Project')
 
     const belongsToLabel = page.locator('span.font-mono-overline').filter({ hasText: 'Belongs to' })
     await expect(belongsToLabel).toBeVisible({ timeout: 5000 })
@@ -93,7 +93,7 @@ test.describe('Create & open note from relationship input', () => {
     await page.waitForTimeout(3000)
 
     // Navigate back to the original note (single-note model: replaces the newly created note)
-    await openNoteViaQuickOpen(page, 'Start Laputa App')
+    await openNoteViaQuickOpen(page, 'Start HS-Hub Project')
     await page.waitForTimeout(2000)
 
     // The new wikilink should appear in the relationships

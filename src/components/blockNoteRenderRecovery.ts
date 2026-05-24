@@ -1,6 +1,6 @@
 const BLOCKNOTE_MISSING_ID_ERROR = "Block doesn't have id"
 const BLOCKNOTE_RECOVERY_BOUNDARY_NAME = 'BlockNoteRenderRecoveryBoundary'
-const RECOVERED_BLOCKNOTE_RENDER_ERROR_MARK = '__tolariaRecoveredBlockNoteRenderError'
+const RECOVERED_BLOCKNOTE_RENDER_ERROR_MARK = '__hsHubRecoveredBlockNoteRenderError'
 
 type MarkedRecoveredBlockNoteRenderError = Error & {
   [RECOVERED_BLOCKNOTE_RENDER_ERROR_MARK]?: true

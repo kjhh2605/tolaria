@@ -44,7 +44,7 @@ const MERMAID_RENDER_HOST_STYLE = [
 
 function renderIdFromReactId(reactId: string): string {
   const safeId = reactId.replace(/[^a-zA-Z0-9_-]/g, '')
-  return `tolaria-mermaid-${safeId || 'diagram'}`
+  return `hs-hub-mermaid-${safeId || 'diagram'}`
 }
 
 function initializeMermaid(mermaid: MermaidApi) {
@@ -65,7 +65,7 @@ function initializeMermaid(mermaid: MermaidApi) {
 
 function appendMermaidRenderHost(): HTMLDivElement {
   const host = document.createElement('div')
-  host.setAttribute('data-tolaria-mermaid-render-host', '')
+  host.setAttribute('data-hs-hub-mermaid-render-host', '')
   host.style.cssText = MERMAID_RENDER_HOST_STYLE
   document.body.appendChild(host)
   return host

@@ -1,7 +1,7 @@
 [package]
-name = "hs-tolaria"
+name = "hs-hub"
 version = "0.1.0"
-description = "Hansung University student helper, forked from Tolaria"
+description = "Hansung University student hub, forked from Tolaria"
 authors = ["kjhh2605"]
 license = "AGPL-3.0-or-later"
 repository = ""
@@ -9,7 +9,7 @@ edition = "2021"
 rust-version = "1.77.2"
 
 [lib]
-name = "hs_tolaria_lib"
+name = "hs_hub_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

@@ -5,27 +5,15 @@ URL: /reference/contribute
 
 # Contribute
 
-Tolaria is free and open source, and any kind of help is useful. Pick the path that matches what you want to do.
+HS-Hub is maintained for the Hansung University app context. This build does not ship the previous public product board, discussion forum, sponsor link, or issue tracker endpoints.
 
-## Sponsor Or Support
+## Report an issue
 
-The best way to support Tolaria is to subscribe to [Refactoring](https://refactoring.fm/), Luca's newsletter and community about running good teams and shipping software with AI.
+Use the in-app feedback dialog to copy sanitized diagnostics and share them with the HS-Hub maintainer through your internal support channel. Include what happened, what you expected, and clear reproduction steps.
 
-## Feature Requests
+## Feature ideas
 
-Use the [product board](https://tolaria.canny.io/) for feature ideas. Search first, upvote existing ideas, and create a new post when the request is genuinely new.
-
-## Discussions
-
-Use [GitHub Discussions](https://github.com/refactoringhq/tolaria/discussions) for questions, conversations, show and tell, and broader community context.
-
-## Contribute Code
-
-Small, focused pull requests are welcome. Check the product board first so you build the right thing, then open a PR on [GitHub](https://github.com/refactoringhq/tolaria/pulls). The [contributing guide](https://github.com/refactoringhq/tolaria/blob/main/CONTRIBUTING.md) explains the local workflow.
-
-## Report A Bug
-
-Use [GitHub Issues](https://github.com/refactoringhq/tolaria/issues) for bugs. Include what happened, what you expected, and clear reproduction steps. If you are reporting from inside Tolaria, use the Contribute panel to copy sanitized diagnostics and attach them to the issue.
+Collect feature requests in the Hansung-owned planning space for this app. Do not send users to prior previous app community services.
 
 ---
 
@@ -82,7 +70,7 @@ URL: /reference/file-layout
 
 # File Layout
 
-Tolaria is not opinionated about folder structure. It finds notes recursively across the whole vault, stores new notes in the root by default, and uses types and relationships for real organization.
+HS-Hub is not opinionated about folder structure. It finds notes recursively across the whole vault, stores new notes in the root by default, and uses types and relationships for real organization.
 
 ```txt
 my-vault/
@@ -101,9 +89,9 @@ my-vault/
 
 ## Root Notes
 
-Tolaria works well with a flat vault. Folders are optional and can be useful for compatibility with other tools, but they are not required for people, projects, topics, or any other note category.
+HS-Hub works well with a flat vault. Folders are optional and can be useful for compatibility with other tools, but they are not required for people, projects, topics, or any other note category.
 
-Type is not inferred from folder location. It comes from frontmatter, and relationships are expressed with wikilinks in fields. That is what Tolaria uses for the sidebar, Properties panel, search, custom views, and neighborhood navigation.
+Type is not inferred from folder location. It comes from frontmatter, and relationships are expressed with wikilinks in fields. That is what HS-Hub uses for the sidebar, Properties panel, search, custom views, and neighborhood navigation.
 
 ## Special Folders
 
@@ -120,7 +108,7 @@ Type definitions are Markdown notes with `type: Type` in frontmatter. New type d
 
 ## Git Files
 
-If the vault is a Git repository, `.git/` belongs to Git. Tolaria reads Git state but does not treat `.git/` as notes.
+If the vault is a Git repository, `.git/` belongs to Git. HS-Hub reads Git state but does not treat `.git/` as notes.
 
 ---
 
@@ -131,7 +119,7 @@ URL: /reference/frontmatter-fields
 
 # Frontmatter Fields
 
-Tolaria uses conventions instead of a required schema.
+HS-Hub uses conventions instead of a required schema.
 
 | Field | Meaning |
 | --- | --- |
@@ -150,7 +138,7 @@ Tolaria uses conventions instead of a required schema.
 
 ## Custom Fields
 
-You can add your own fields. If a field contains wikilinks, Tolaria can treat it as a relationship.
+You can add your own fields. If a field contains wikilinks, HS-Hub can treat it as a relationship.
 
 ## System Fields
 
@@ -197,7 +185,7 @@ URL: /reference/release-channels
 
 # Release Channels
 
-Tolaria publishes Stable and Alpha release metadata to GitHub Pages.
+HS-Hub publishes Stable and Alpha release metadata to GitHub Pages.
 
 ## Stable
 
@@ -241,7 +229,7 @@ URL: /reference/supported-platforms
 
 # Supported Platforms
 
-Tolaria is a desktop app built with Tauri. Releases currently target macOS, Windows, and Linux.
+HS-Hub is a desktop app built with Tauri. Releases currently target macOS, Windows, and Linux.
 
 | Platform | Current support | Notes |
 | --- | --- | --- |
@@ -257,7 +245,7 @@ Primary support means the platform is part of normal development and release val
 
 Include:
 
-- Tolaria version.
+- HS-Hub version.
 - Operating system and version.
 - CPU architecture.
 - Whether the vault is local-only or connected to a remote.

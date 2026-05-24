@@ -232,7 +232,7 @@ describe('useVaultLoader', () => {
   it('does not re-add the base vault as a folder root after it is unmounted', async () => {
     const entryVaults = [
       { label: 'Brian', path: '/brian', alias: 'brian', available: true, mounted: false },
-      { label: 'Laputa', path: '/laputa', alias: 'laputa', available: true, mounted: true },
+      { label: 'HS-Hub', path: '/hs-hub', alias: 'hs-hub', available: true, mounted: true },
     ]
     const folderVaults = [entryVaults[1]]
     backendInvokeFn.mockImplementation(((cmd: string, args?: Record<string, unknown>) => {
@@ -243,23 +243,23 @@ describe('useVaultLoader', () => {
       if (cmd === 'list_vault_folders') {
         const path = args?.path
         return Promise.resolve([
-          { name: path === '/brian' ? 'brian-projects' : 'laputa-projects', path: 'projects', children: [] },
+          { name: path === '/brian' ? 'brian-projects' : 'hs-hub-projects', path: 'projects', children: [] },
         ])
       }
       if (cmd === 'list_views' || cmd === 'get_modified_files') return Promise.resolve([])
       return Promise.resolve(null)
     }) as typeof defaultMockInvoke)
 
-    const { result } = renderHook(() => useVaultLoader('/brian', entryVaults, '/laputa', folderVaults))
+    const { result } = renderHook(() => useVaultLoader('/brian', entryVaults, '/hs-hub', folderVaults))
 
     await waitForEntries(result, 2)
     await waitFor(() => {
       expect(result.current.folders).toEqual([
         {
-          name: 'Laputa',
+          name: 'HS-Hub',
           path: '',
-          rootPath: '/laputa',
-          children: [{ name: 'laputa-projects', path: 'projects', rootPath: '/laputa', children: [] }],
+          rootPath: '/hs-hub',
+          children: [{ name: 'hs-hub-projects', path: 'projects', rootPath: '/hs-hub', children: [] }],
         },
       ])
     })
@@ -332,14 +332,14 @@ describe('useVaultLoader', () => {
 
   it('reloads scoped folder roots when another mounted workspace is added', async () => {
     const brian = { label: 'Brian', path: '/brian', alias: 'brian', available: true, mounted: true }
-    const laputa = { label: 'Laputa', path: '/laputa', alias: 'laputa', available: true, mounted: true }
+    const hsHub = { label: 'HS-Hub', path: '/hs-hub', alias: 'hs-hub', available: true, mounted: true }
     const third = { label: 'Third', path: '/third', alias: 'third', available: true, mounted: true }
     backendInvokeFn.mockImplementation(((cmd: string, args?: Record<string, unknown>) => {
       const path = args?.path
       if (isVaultLoadCommand(cmd)) return Promise.resolve([{ ...mockEntries[0], path: `${path}/note/hello.md` }])
       if (cmd === 'list_vault_folders') {
-        const rootName = path === '/laputa'
-          ? 'laputa-root'
+        const rootName = path === '/hs-hub'
+          ? 'hs-hub-root'
           : path === '/third'
             ? 'third-root'
             : 'brian-root'
@@ -349,7 +349,7 @@ describe('useVaultLoader', () => {
       return Promise.resolve(null)
     }) as typeof defaultMockInvoke)
     const { result, rerender } = renderHook(
-      ({ folderVaults }) => useVaultLoader('/brian', [brian, laputa, third], '/brian', folderVaults),
+      ({ folderVaults }) => useVaultLoader('/brian', [brian, hsHub, third], '/brian', folderVaults),
       { initialProps: { folderVaults: [brian] } },
     )
 
@@ -358,32 +358,32 @@ describe('useVaultLoader', () => {
       expect(result.current.folders.map((folder) => folder.name)).toEqual(['brian-root'])
     })
 
-    rerender({ folderVaults: [brian, laputa] })
+    rerender({ folderVaults: [brian, hsHub] })
 
     await waitFor(() => {
-      expect(result.current.folders.map((folder) => folder.rootPath)).toEqual(['/brian', '/laputa'])
+      expect(result.current.folders.map((folder) => folder.rootPath)).toEqual(['/brian', '/hs-hub'])
     })
 
-    rerender({ folderVaults: [brian, laputa, third] })
+    rerender({ folderVaults: [brian, hsHub, third] })
 
     await waitFor(() => {
-      expect(result.current.folders.map((folder) => folder.rootPath)).toEqual(['/brian', '/laputa', '/third'])
+      expect(result.current.folders.map((folder) => folder.rootPath)).toEqual(['/brian', '/hs-hub', '/third'])
     })
   })
 
   it('adds each mounted workspace as soon as that workspace finishes loading', async () => {
-    let resolveLaputa: ((entries: VaultEntry[]) => void) | null = null
+    let resolveHsHub: ((entries: VaultEntry[]) => void) | null = null
     const brian = { label: 'Brian', path: '/brian', alias: 'brian', available: true, mounted: true }
-    const laputa = { label: 'Laputa', path: '/laputa', alias: 'laputa', available: true, mounted: true }
+    const hsHub = { label: 'HS-Hub', path: '/hs-hub', alias: 'hs-hub', available: true, mounted: true }
     const team = { label: 'Team', path: '/team', alias: 'team', available: true, mounted: true }
-    const vaults = [brian, laputa, team]
+    const vaults = [brian, hsHub, team]
 
     backendInvokeFn.mockImplementation(((cmd: string, args?: Record<string, unknown>) => {
       const path = args?.path
       if (isVaultLoadCommand(cmd)) {
-        if (path === '/laputa') {
+        if (path === '/hs-hub') {
           return new Promise<VaultEntry[]>((resolve) => {
-            resolveLaputa = resolve
+            resolveHsHub = resolve
           })
         }
         return Promise.resolve([{ ...mockEntries[0], path: `${path}/note/hello.md` }])
@@ -399,11 +399,11 @@ describe('useVaultLoader', () => {
     })
 
     await act(async () => {
-      resolveLaputa?.([{ ...mockEntries[0], path: '/laputa/note/hello.md' }])
+      resolveHsHub?.([{ ...mockEntries[0], path: '/hs-hub/note/hello.md' }])
     })
 
     await waitFor(() => {
-      expect(result.current.entries.map((entry) => entry.workspace?.path).sort()).toEqual(['/brian', '/laputa', '/team'])
+      expect(result.current.entries.map((entry) => entry.workspace?.path).sort()).toEqual(['/brian', '/hs-hub', '/team'])
     })
   })
 
@@ -445,8 +445,8 @@ describe('useVaultLoader', () => {
   it('uses cached vault listing for background workspace loads in Tauri mode', async () => {
     await enableTauriMode()
     const brian = { label: 'Brian', path: '/brian', alias: 'brian', available: true, mounted: true }
-    const laputa = { label: 'Laputa', path: '/laputa', alias: 'laputa', available: true, mounted: true }
-    const vaults = [brian, laputa]
+    const hsHub = { label: 'HS-Hub', path: '/hs-hub', alias: 'hs-hub', available: true, mounted: true }
+    const vaults = [brian, hsHub]
 
     backendInvokeFn.mockImplementation(((cmd: string, args?: Record<string, unknown>) => {
       if (isVaultLoadCommand(cmd)) {
@@ -461,11 +461,11 @@ describe('useVaultLoader', () => {
 
     await waitForEntries(result, 2)
 
-    const laputaLoadCommands = backendInvokeFn.mock.calls
-      .filter(([, args]) => args?.path === '/laputa')
+    const hsHubLoadCommands = backendInvokeFn.mock.calls
+      .filter(([, args]) => args?.path === '/hs-hub')
       .map(([command]) => command)
-    expect(laputaLoadCommands).toContain('list_vault')
-    expect(laputaLoadCommands).not.toContain('reload_vault')
+    expect(hsHubLoadCommands).toContain('list_vault')
+    expect(hsHubLoadCommands).not.toContain('reload_vault')
   })
 
   it('clears stale views immediately when switching to another preloaded workspace', async () => {
@@ -481,8 +481,8 @@ describe('useVaultLoader', () => {
       return Promise.resolve(null)
     }) as typeof defaultMockInvoke)
     const brian = { label: 'Brian', path: '/brian', alias: 'brian', available: true, mounted: true }
-    const laputa = { label: 'Laputa', path: '/laputa', alias: 'laputa', available: true, mounted: true }
-    const vaults = [brian, laputa]
+    const hsHub = { label: 'HS-Hub', path: '/hs-hub', alias: 'hs-hub', available: true, mounted: true }
+    const vaults = [brian, hsHub]
     const { result, rerender } = renderHook(
       ({ path }) => useVaultLoader(path, vaults, path),
       { initialProps: { path: '/brian' } },
@@ -492,7 +492,7 @@ describe('useVaultLoader', () => {
       expect(result.current.views.map((view) => view.filename)).toEqual(['brian.yml'])
     })
 
-    rerender({ path: '/laputa' })
+    rerender({ path: '/hs-hub' })
 
     expect(result.current.views).toEqual([])
     await waitFor(() => {
@@ -660,31 +660,31 @@ describe('useVaultLoader', () => {
   it('freshly reloads the active mounted workspace on startup in Tauri mode', async () => {
     await enableTauriMode()
     const brian = { label: 'Brian', path: '/brian', alias: 'brian', available: true, mounted: true }
-    const laputa = { label: 'Laputa', path: '/laputa', alias: 'laputa', available: true, mounted: true }
-    const vaults = [laputa, brian]
+    const hsHub = { label: 'HS-Hub', path: '/hs-hub', alias: 'hs-hub', available: true, mounted: true }
+    const vaults = [hsHub, brian]
 
     backendInvokeFn.mockImplementation(((cmd: string, args?: Record<string, unknown>) => {
-      if (cmd === 'reload_vault' && args?.path === '/laputa') {
+      if (cmd === 'reload_vault' && args?.path === '/hs-hub') {
         return Promise.resolve([
-          { ...mockEntries[0], path: '/laputa/note/alpha.md', filename: 'alpha.md', title: 'Alpha' },
+          { ...mockEntries[0], path: '/hs-hub/note/alpha.md', filename: 'alpha.md', title: 'Alpha' },
         ])
       }
-      if (cmd === 'list_vault' && args?.path === '/laputa') return Promise.resolve([])
+      if (cmd === 'list_vault' && args?.path === '/hs-hub') return Promise.resolve([])
       if (cmd === 'list_vault_folders' || cmd === 'list_views' || cmd === 'get_modified_files') return Promise.resolve([])
       return Promise.resolve(null)
     }) as typeof defaultMockInvoke)
 
-    const { result } = renderHook(() => useVaultLoader('/laputa', vaults, '/laputa', vaults))
+    const { result } = renderHook(() => useVaultLoader('/hs-hub', vaults, '/hs-hub', vaults))
 
     await waitFor(() => {
       expect(result.current.entries.map((entry) => entry.title)).toEqual(['Alpha'])
     })
 
-    const laputaLoadCommands = backendInvokeFn.mock.calls
-      .filter(([, args]) => args?.path === '/laputa')
+    const hsHubLoadCommands = backendInvokeFn.mock.calls
+      .filter(([, args]) => args?.path === '/hs-hub')
       .map(([command]) => command)
-    expect(laputaLoadCommands).toContain('reload_vault')
-    expect(laputaLoadCommands).not.toContain('list_vault')
+    expect(hsHubLoadCommands).toContain('reload_vault')
+    expect(hsHubLoadCommands).not.toContain('list_vault')
   })
 
   it('marks the vault unavailable when the initial load finds a missing active vault', async () => {

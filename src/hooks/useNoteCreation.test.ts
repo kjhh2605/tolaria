@@ -238,10 +238,10 @@ describe('resolveNewNote', () => {
 
   it('blocks creation when macOS /tmp aliases point at the same note path', () => {
     const plan = planNewNoteCreation({
-      entries: [makeEntry({ path: '/private/tmp/tolaria-vault/briefing.md', filename: 'briefing.md' })],
+      entries: [makeEntry({ path: '/private/tmp/hs-hub-vault/briefing.md', filename: 'briefing.md' })],
       title: 'Briefing',
       type: 'Note',
-      vaultPath: '/tmp/tolaria-vault',
+      vaultPath: '/tmp/hs-hub-vault',
     })
 
     expect(plan.status).toBe('blocked')
@@ -479,8 +479,8 @@ describe('useNoteCreation hook', () => {
     vi.mocked(isTauri).mockReturnValue(true)
     vi.mocked(invoke).mockResolvedValueOnce(undefined)
     vi.spyOn(Date, 'now').mockReturnValue(1700000000000)
-    const windowsVaultPath = String.raw`\\?\C:\Users\alex\Documents\Tolaria`
-    const createdPath = String.raw`\\?\C:\Users\alex\Documents\Tolaria/untitled-project-1700000000.md`
+    const windowsVaultPath = String.raw`\\?\C:\Users\alex\Documents\HS-Hub`
+    const createdPath = String.raw`\\?\C:\Users\alex\Documents\HS-Hub/untitled-project-1700000000.md`
     const { result } = renderHook(() => useNoteCreation({
       ...makeConfig(),
       vaultPath: windowsVaultPath,
@@ -571,7 +571,7 @@ describe('useNoteCreation hook', () => {
 
   it('handleCreateNoteImmediate requests editor focus for the new path', async () => {
     const focusListener = vi.fn()
-    window.addEventListener('laputa:focus-editor', focusListener)
+    window.addEventListener('hs-hub:focus-editor', focusListener)
     const { result } = renderHook(() => useNoteCreation(makeConfig(), tabDeps))
 
     await act(async () => {
@@ -584,7 +584,7 @@ describe('useNoteCreation hook', () => {
     expect(event.detail.path).toMatch(/\/test\/vault\/untitled-note-\d+\.md$/)
     expect(event.detail.selectTitle).toBe(true)
 
-    window.removeEventListener('laputa:focus-editor', focusListener)
+    window.removeEventListener('hs-hub:focus-editor', focusListener)
   })
 
   it('handleCreateType creates type entry', async () => {
@@ -605,8 +605,8 @@ describe('useNoteCreation hook', () => {
       .mockRejectedValueOnce(new Error('not found'))
       .mockResolvedValueOnce(undefined)
     const onTypeStateChanged = vi.fn()
-    const windowsVaultPath = String.raw`\\?\C:\Users\alex\Documents\Tolaria`
-    const createdPath = String.raw`\\?\C:\Users\alex\Documents\Tolaria/recipe.md`
+    const windowsVaultPath = String.raw`\\?\C:\Users\alex\Documents\HS-Hub`
+    const createdPath = String.raw`\\?\C:\Users\alex\Documents\HS-Hub/recipe.md`
     const { result } = renderHook(() => useNoteCreation({
       ...makeConfig(),
       vaultPath: windowsVaultPath,

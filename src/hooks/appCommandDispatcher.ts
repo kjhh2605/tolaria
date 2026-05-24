@@ -8,7 +8,7 @@ import {
 import type { ViewMode } from './useViewMode'
 import type { NoteListMultiSelectionCommands } from '../components/note-list/multiSelectionCommands'
 
-export const APP_COMMAND_EVENT_NAME = 'laputa:dispatch-command'
+export const APP_COMMAND_EVENT_NAME = 'hs-hub:dispatch-command'
 
 export {
   APP_COMMAND_IDS,

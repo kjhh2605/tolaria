@@ -120,7 +120,7 @@ const docsLinks: DocsLink[] = [
   {
     icon: "rocket",
     title: "Start with a vault",
-    text: "Install Tolaria, open the Getting Started vault, and understand the first-launch flow.",
+    text: "Install HS-Hub, open the Getting Started vault, and understand the first-launch flow.",
     link: "/start/install",
   },
   {
@@ -145,34 +145,34 @@ const docsLinks: DocsLink[] = [
 
 const testimonials = [
   {
-    name: "Gregor O.",
-    role: "CTO",
-    image: "gregor.webp",
-    alt: "Gregor O.",
+    name: "Course notes",
+    role: "Markdown vaults",
+    image: "hs-hub-icon.png",
+    alt: "HS-Hub notes",
     quote:
-      "Great newsletter for everyone interested in topics all the way from Software to People working well together! Luca is providing a LOT of value filled with actionable insights in a very easy to read way.",
+      "Keep class notes, research logs, and project decisions in plain Markdown files that remain readable outside the app.",
   },
   {
-    name: "Ananth R.",
-    role: "Engineering Manager & O'Reilly Instructor",
-    image: "ananth.webp",
-    alt: "Ananth R.",
+    name: "Team projects",
+    role: "Git workflows",
+    image: "hs-hub-icon.png",
+    alt: "HS-Hub Git",
     quote:
-      "Luca's newsletter is one of the best in the industry for software engineers and engineers leaders. I highly recommend to anyone who would like to build high performing engineering teams.",
+      "Use built-in Git status, history, commit, pull, push, and conflict flows without losing local-first ownership.",
   },
   {
-    name: "Jordan C.",
-    role: "Staff Engineer",
-    image: "jordan.webp",
-    alt: "Jordan C.",
+    name: "AI assistance",
+    role: "Explicit integrations",
+    image: "hs-hub-icon.png",
+    alt: "HS-Hub AI",
     quote:
-      "There's a reason Refactoring has over 100k subscribers. It's a newsletter you CANNOT miss as a software engineer. Follow the advice here and you will see huge wins throughout your career.",
+      "Connect local agents or configured model providers when needed while keeping credentials and endpoints outside shipped defaults.",
   },
 ];
 </script>
 
 <template>
-  <main class="tolaria-landing">
+  <main class="hs-hub-landing">
     <section class="landing-container hero-section">
       <h1>A second brain for the AI era. Free forever.</h1>
       <p class="hero-lede">
@@ -182,22 +182,22 @@ const testimonials = [
       <div class="hero-actions">
         <a
           class="landing-button primary"
-          href="https://tolaria.md/download/"
+          href="/download/"
           target="_self"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
           </svg>
-          Download Tolaria
+          Download HS-Hub
         </a>
-        <a class="landing-button secondary" href="https://github.com/refactoringhq/tolaria">
+        <a class="landing-button secondary" :href="route('/start/install')">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.1-1.3-.3-2.6-1.2-3.6.2-1.1.2-2.3-.1-3.4 0 0-1 0-3.3 1.2a11.5 11.5 0 0 0-6 0C7 2 6 2 6 2c-.3 1.1-.3 2.3-.1 3.4A5 5 0 0 0 4.7 9c0 3.5 3 5.5 6 5.5a4.8 4.8 0 0 0-1 3.5v4"
             />
             <path d="M9 18c-4.5 2-5-2-7-2" />
           </svg>
-          Check on GitHub
+          Read setup guide
         </a>
         <a class="landing-button secondary" :href="route('/start/install')">Read the docs</a>
       </div>
@@ -212,14 +212,14 @@ const testimonials = [
         <div class="screenshot-frame">
           <img
             class="screenshot-image light"
-            :src="asset('tolaria-screenshot.png')"
-            alt="Tolaria app in light mode"
+            :src="asset('hs-hub-screenshot.png')"
+            alt="HS-Hub app in light mode"
             draggable="false"
           />
           <img
             class="screenshot-image dark"
-            :src="asset('tolaria-screenshot-dark.png')"
-            alt="Tolaria app in dark mode"
+            :src="asset('hs-hub-screenshot-dark.png')"
+            alt="HS-Hub app in dark mode"
             draggable="false"
           />
         </div>
@@ -336,47 +336,40 @@ const testimonials = [
             </svg>
             Made with Love
           </span>
-          <h2>Built by Luca, for Luca</h2>
+          <h2>Built for Hansung University workspaces</h2>
           <p>
-            Tolaria is the product of the learnings from 5 years of full-time
-            content creation. I published 300+ articles and organized my
-            knowledge into 9000+ notes.
+            HS-Hub is maintained as a Hansung University-focused Markdown workspace.
+            It keeps local notes, Git history, and AI-assisted workflows under
+            university-owned product boundaries.
           </p>
         </div>
 
         <div class="author-card">
           <div class="author-image">
-            <img :src="asset('Luca hello.jpeg')" alt="Luca" />
+            <img :src="asset('hs-hub-icon.png')" alt="HS-Hub" />
           </div>
           <div class="author-copy">
             <div class="author-heading">
-              <h3>Hey, I am Luca &#x1F44B;</h3>
-              <p>
-                Founder & Author of
-                <a href="https://refactoring.fm">Refactoring</a>
-              </p>
+              <h3>Built for Hansung University workflows</h3>
+              <p>Local-first knowledge management for coursework, research, and project notes</p>
             </div>
             <p>
-              Tolaria is born from 5 years of full-time writing at Refactoring,
-              during which I have written 300+ articles about software
-              engineering and developer productivity. Along the way, I amassed
-              9000+ notes on my Notion workspace, learned a lot about knowledge
-              management, productivity, and, more recently, on working well with
-              AI on docs. None of the existing tools matched what I wanted, so I
-              built one myself.
+              HS-Hub preserves the existing core strengths—Markdown files, Git-backed
+              history, relationships, and AI/MCP integrations—while removing prior
+              public-service defaults and keeping deployment-specific endpoints explicit.
             </p>
             <div class="author-stats">
               <div>
-                <strong>5 years</strong>
-                <span>full-time writing</span>
+                <strong>Local</strong>
+                <span>Markdown-first vaults</span>
               </div>
               <div>
-                <strong>300+</strong>
-                <span>articles published</span>
+                <strong>Git</strong>
+                <span>history and sync controls</span>
               </div>
               <div>
-                <strong>170,000+</strong>
-                <span>newsletter subscribers</span>
+                <strong>AI</strong>
+                <span>explicitly configured agents</span>
               </div>
             </div>
           </div>
@@ -401,32 +394,31 @@ const testimonials = [
       <div class="landing-container final-cta-inner">
         <h2>Stay in the loop.</h2>
         <p>
-          Subscribe to the Refactoring newsletter for updates on Tolaria, new
-          features, and behind-the-scenes of building in public.
+          Use the HS-Hub docs to configure vaults, Git remotes, and AI integrations for your Hansung workspace.
         </p>
-        <a class="landing-button primary" href="https://refactoring.fm">
-          Subscribe to Refactoring
+        <a class="landing-button primary" :href="route('/start/install')">
+          Open the setup guide
         </a>
-        <span>170,000+ engineers already subscribed</span>
+        <span>No account required; endpoints are configured explicitly.</span>
       </div>
     </section>
   </main>
 </template>
 
 <style scoped>
-.tolaria-landing {
-  --landing-bg: var(--tolaria-bg);
-  --landing-surface: var(--tolaria-surface);
+.hs-hub-landing {
+  --landing-bg: var(--hs-hub-bg);
+  --landing-surface: var(--hs-hub-surface);
   --landing-dark: #1a1a18;
-  --landing-text: var(--tolaria-text);
-  --landing-muted: var(--tolaria-text-secondary);
-  --landing-tertiary: var(--tolaria-text-muted);
-  --landing-border: var(--tolaria-border);
-  --landing-subtle: var(--tolaria-surface-muted);
+  --landing-text: var(--hs-hub-text);
+  --landing-muted: var(--hs-hub-text-secondary);
+  --landing-tertiary: var(--hs-hub-text-muted);
+  --landing-border: var(--hs-hub-border);
+  --landing-subtle: var(--hs-hub-surface-muted);
   --landing-blue: #155dff;
   --landing-blue-hover: #4a5ad6;
   --landing-accent: var(--landing-blue);
-  --landing-blue-soft: var(--tolaria-blue-soft);
+  --landing-blue-soft: var(--hs-hub-blue-soft);
   --landing-blue-border: color-mix(in srgb, var(--landing-accent) 20%, transparent);
   --landing-page-width: 1280px;
   color: var(--landing-text);
@@ -1103,17 +1095,17 @@ const testimonials = [
 </style>
 
 <style>
-.dark .tolaria-landing {
+.dark .hs-hub-landing {
   --landing-accent: #9bbeff;
   --landing-blue-soft: rgba(120, 164, 255, 0.24);
   --landing-blue-border: rgba(120, 164, 255, 0.38);
 }
 
-.dark .tolaria-landing .screenshot-image.light {
+.dark .hs-hub-landing .screenshot-image.light {
   display: none;
 }
 
-.dark .tolaria-landing .screenshot-image.dark {
+.dark .hs-hub-landing .screenshot-image.dark {
   display: block;
 }
 </style>

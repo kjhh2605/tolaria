@@ -41,7 +41,7 @@ async function openAlphaProject(page: Page, notePath: string): Promise<void> {
 
 async function showStatusChipInInbox(page: Page): Promise<void> {
   await page.evaluate(() => {
-    window.dispatchEvent(new CustomEvent('laputa:open-note-list-properties', {
+    window.dispatchEvent(new CustomEvent('hs-hub:open-note-list-properties', {
       detail: { scope: 'inbox' },
     }))
   })

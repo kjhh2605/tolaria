@@ -28,7 +28,7 @@ pub(super) fn migrate_views(vault_path: &Path) {
 }
 
 fn legacy_views_dir(vault_path: &Path) -> PathBuf {
-    vault_path.join(".laputa").join("views")
+    vault_path.join(".hs-hub").join("views")
 }
 
 fn current_views_dir(vault_path: &Path) -> PathBuf {

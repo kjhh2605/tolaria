@@ -409,10 +409,10 @@ PROJECTS = [
     ("24q3-new-sponsor-verticals","Expand Sponsor Verticals","24q3","responsibility-sponsorships","Done","Target cloud infra, devtools, and AI/ML companies as new sponsor categories."),
     ("24q4-annual-review-process","Team Annual Review","24q4","responsibility-team-management","Done","Design and run the first structured annual review for Matteo, Paco, and Sara."),
     ("24q4-sponsor-dashboard","Build Sponsor Dashboard","24q4","responsibility-sponsorships","Done","Build an Airtable dashboard giving sponsors real-time click and performance data."),
-    ("24q4-laputa-start","Start Laputa App Project","24q4","responsibility-learning","Done","Begin building Laputa — a custom Tauri desktop app for managing the personal knowledge vault."),
+    ("24q4-hs-hub-start","Start HS-Hub Project Project","24q4","responsibility-learning","Done","Begin building HS-Hub — a custom Tauri desktop app for managing the personal knowledge vault."),
     ("24q4-black-friday-campaign","Black Friday Newsletter Campaign","24q4","responsibility-grow-newsletter","Done","Run a curated Black Friday campaign with tool recommendations. +1200 subscribers in 3 days."),
     ("24q4-cycling-year-review","Cycling Year in Review 2024","24q4","responsibility-health-fitness","Done","Review the 2024 cycling season and plan 2025: races, training peaks, and gear."),
-    ("25q1-laputa-v1","Laputa App V1","25q1","responsibility-learning","Done","Ship the first working version of Laputa with 4-panel layout, inspector, and quick open."),
+    ("25q1-hs-hub-v1","HS-Hub Project V1","25q1","responsibility-learning","Done","Ship the first working version of HS-Hub with 4-panel layout, inspector, and quick open."),
     ("25q1-newsletter-seo-sprint","Newsletter SEO Sprint","25q1","responsibility-grow-newsletter","Done","30-day SEO sprint: 5 high-traffic articles + internal linking overhaul."),
     ("25q1-strength-program","New Strength Program","25q1","responsibility-health-fitness","Done","Start a 12-week strength program to complement cycling and prevent injury."),
     ("25q1-rate-increase","Increase Sponsorship Rates Q2","25q1","responsibility-sponsorships","Done","Raise ad rates by 25% for Q2 based on audience growth and click-through data."),
@@ -420,7 +420,7 @@ PROJECTS = [
     ("25q2-reach-70k","Reach 70k Subscribers","25q2","responsibility-grow-newsletter","Done","Growth sprint to 70k: referral push + partnership with 3 complementary newsletters."),
     ("25q2-podcast-season-3","Podcast Season 3","25q2","responsibility-podcast","Done","10 episodes on building in public, founder journeys, and product-led growth."),
     ("25q2-team-retreat","Team Retreat Milan","25q2","responsibility-team-management","Done","First in-person team retreat: 2 days of strategy, workshops, and dinner."),
-    ("25q2-laputa-v2","Laputa App V2","25q2","responsibility-learning","Done","V2 with BlockNote editor, wiki-links autocomplete, and redesigned theme system."),
+    ("25q2-hs-hub-v2","HS-Hub Project V2","25q2","responsibility-learning","Done","V2 with BlockNote editor, wiki-links autocomplete, and redesigned theme system."),
     ("25q2-dolomites-trip","Cycling Trip: Dolomites","25q2","responsibility-health-fitness","Done","5-day cycling trip with Alessandro. Stelvio + Mortirolo. 650km total."),
     ("25q3-ebook","Write Newsletter Growth E-book","25q3","responsibility-content-production","Done","15,000-word e-book on newsletter growth for technical founders. Free lead magnet."),
     ("25q3-community-launch","Launch Refactoring Community","25q3","responsibility-grow-newsletter","Open","Private Discord for premium subscribers. Still in soft launch."),
@@ -430,7 +430,7 @@ PROJECTS = [
     ("25q4-year-review-2025","2025 Annual Review","25q4","responsibility-team-management","Open","Full 2025 retrospective for team and personal year review."),
     ("25q4-reach-85k","Reach 85k Subscribers","25q4","responsibility-grow-newsletter","Open","Year-end push through partnerships and referral program expansion."),
     ("25q4-2026-sponsors","2026 Sponsorship Pipeline","25q4","responsibility-sponsorships","Open","Pre-sell Q1-Q2 2026 sponsorships. Target: 80% sold before Dec 31."),
-    ("25q4-laputa-v3","Laputa App V3","25q4","responsibility-learning","Open","V3: mobile sync, AI note linking, and quick capture from menu bar."),
+    ("25q4-hs-hub-v3","HS-Hub Project V3","25q4","responsibility-learning","Open","V3: mobile sync, AI note linking, and quick capture from menu bar."),
     ("25q4-financial-review","2025 Financial Review","25q4","responsibility-personal-finance","Open","Annual review: savings rate, portfolio performance, 2026 targets."),
 ]
 
@@ -453,7 +453,7 @@ GOALS = [
     ("2024-launch-podcast","Launch Refactoring Podcast","2024","Done","Launch and sustain the podcast through at least 2 seasons."),
     ("2025-reach-85k-subscribers","Reach 85k Subscribers","2025","Open","End 2025 with 85,000+ subscribers. On track at 75k in Q3."),
     ("2025-reach-22k-mrr","Reach €22k MRR","2025","Open","Grow sponsorship revenue to €22k/month by end of year."),
-    ("2025-ship-laputa","Ship Laputa App","2025","Done","Build and use Laputa v1 as my daily knowledge management tool."),
+    ("2025-ship-hs-hub","Ship HS-Hub Project","2025","Done","Build and use HS-Hub v1 as my daily knowledge management tool."),
     ("2025-ride-stelvio","Ride the Stelvio Pass","2025","Done","Complete a full ascent of the Stelvio — bucket list cycling goal."),
     ("2025-read-20-books","Read 20 Books in 2025","2025","Open","Target: 20 books. At 14 in Q3. Achievable."),
 ]
@@ -1106,7 +1106,7 @@ def generate_all(output_path: Path | None = None):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Generate the large synthetic Tolaria fixture.")
+    parser = argparse.ArgumentParser(description="Generate the large synthetic HS-Hub fixture.")
     parser.add_argument(
         "--output",
         type=Path,

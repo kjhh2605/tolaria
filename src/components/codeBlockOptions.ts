@@ -45,9 +45,9 @@ const GO_LANGUAGE_REGISTRATION = {
   },
 }
 
-type TolariaCodeHighlighter = Awaited<ReturnType<NonNullable<typeof codeBlockOptions.createHighlighter>>>
-type TolariaLoadLanguage = TolariaCodeHighlighter['loadLanguage']
-type TolariaLanguageInput = Parameters<TolariaLoadLanguage>[number]
+type HsHubCodeHighlighter = Awaited<ReturnType<NonNullable<typeof codeBlockOptions.createHighlighter>>>
+type HsHubLoadLanguage = HsHubCodeHighlighter['loadLanguage']
+type HsHubLanguageInput = Parameters<HsHubLoadLanguage>[number]
 
 function currentCodeBlockTheme() {
   if (typeof document === 'undefined') return LIGHT_CODE_THEME
@@ -62,15 +62,15 @@ function prioritizeTheme(themes: string[], theme: string) {
   return [theme, ...themes.filter((candidate) => candidate !== theme)]
 }
 
-function expandGoLanguage(language: TolariaLanguageInput): TolariaLanguageInput[] {
+function expandGoLanguage(language: HsHubLanguageInput): HsHubLanguageInput[] {
   if (typeof language !== 'string') return [language]
   const languageName: string = language
   return languageName === 'go' || languageName === 'golang'
-    ? [GO_LANGUAGE_REGISTRATION as TolariaLanguageInput]
+    ? [GO_LANGUAGE_REGISTRATION as HsHubLanguageInput]
     : [language]
 }
 
-async function createTolariaCodeHighlighter(): Promise<TolariaCodeHighlighter> {
+async function createHsHubCodeHighlighter(): Promise<HsHubCodeHighlighter> {
   const highlighter = await codeBlockOptions.createHighlighter()
   return {
     ...highlighter,
@@ -79,10 +79,10 @@ async function createTolariaCodeHighlighter(): Promise<TolariaCodeHighlighter> {
   }
 }
 
-export function createTolariaCodeBlockOptions(): Partial<CodeBlockOptions> {
+export function createHsHubCodeBlockOptions(): Partial<CodeBlockOptions> {
   const options: Partial<CodeBlockOptions> = {
     ...codeBlockOptions,
-    createHighlighter: createTolariaCodeHighlighter,
+    createHighlighter: createHsHubCodeHighlighter,
     defaultLanguage: 'text',
     supportedLanguages: {
       ...codeBlockOptions.supportedLanguages,

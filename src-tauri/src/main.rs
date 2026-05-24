@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    hs_tolaria_lib::run();
+    hs_hub_lib::run();
 }

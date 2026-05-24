@@ -468,7 +468,7 @@ function addEntryWithMock(entry: VaultEntry, content: string, addEntry: (e: Vaul
 
 /** Dispatch focus-editor event with perf timing marker. */
 function signalFocusEditor(opts?: { selectTitle?: boolean; path?: string }): void {
-  window.dispatchEvent(new CustomEvent('laputa:focus-editor', {
+  window.dispatchEvent(new CustomEvent('hs-hub:focus-editor', {
     detail: { t0: performance.now(), selectTitle: opts?.selectTitle ?? false, path: opts?.path ?? null },
   }))
 }

@@ -11,8 +11,41 @@ mod subprocess;
 #[cfg(all(desktop, target_os = "linux"))]
 pub(crate) use extraction::extract_mcp_server_to_stable_dir;
 
-const MCP_SERVER_NAME: &str = "tolaria";
-const LEGACY_MCP_SERVER_NAME: &str = "laputa";
+const MCP_SERVER_NAME: &str = "hs-hub";
+const PRIOR_MCP_SERVER_NAME_BYTES: &[u8] = &[116, 111, 108, 97, 114, 105, 97];
+const OLDEST_MCP_SERVER_NAME_BYTES: &[u8] = &[108, 97, 112, 117, 116, 97];
+
+pub(super) fn prior_mcp_server_names() -> Vec<String> {
+    [PRIOR_MCP_SERVER_NAME_BYTES, OLDEST_MCP_SERVER_NAME_BYTES]
+        .iter()
+        .map(|bytes| bytes.iter().map(|byte| char::from(*byte)).collect())
+        .collect()
+}
+
+pub(super) fn contains_managed_mcp_server(
+    servers: &serde_json::Map<String, serde_json::Value>,
+) -> bool {
+    servers.get(MCP_SERVER_NAME).is_some()
+        || prior_mcp_server_names()
+            .iter()
+            .any(|server_name| servers.get(server_name).is_some())
+}
+
+pub(super) fn remove_prior_mcp_servers(
+    servers: &mut serde_json::Map<String, serde_json::Value>,
+) -> bool {
+    prior_mcp_server_names()
+        .iter()
+        .any(|server_name| servers.remove(server_name).is_some())
+}
+
+fn read_prior_mcp_server_entry(
+    servers: &serde_json::Map<String, serde_json::Value>,
+) -> Option<serde_json::Value> {
+    prior_mcp_server_names()
+        .iter()
+        .find_map(|server_name| servers.get(server_name).cloned())
+}
 
 /// Status of the MCP server installation.
 #[derive(Debug, Serialize, Clone, PartialEq)]
@@ -195,7 +228,7 @@ fn verify_node_version(node: &Path) -> Result<(), String> {
     };
     if major < 18 {
         return Err(format!(
-            "Node.js 18+ is required for Tolaria MCP tools; found {}",
+            "Node.js 18+ is required for HS-Hub MCP tools; found {}",
             raw_version.trim()
         ));
     }
@@ -365,7 +398,7 @@ fn verify_bun_version(bun: &Path) -> Result<(), String> {
     };
     if major < 1 {
         return Err(format!(
-            "Bun 1+ is required for Tolaria MCP tools; found {}",
+            "Bun 1+ is required for HS-Hub MCP tools; found {}",
             raw_version.trim()
         ));
     }
@@ -521,16 +554,16 @@ fn push_unique_path(paths: &mut Vec<PathBuf>, path: PathBuf) {
 
 fn linux_package_mcp_server_dirs(root: &Path) -> Vec<PathBuf> {
     vec![
-        root.join("Tolaria").join("mcp-server"),
-        root.join("Tolaria").join("resources").join("mcp-server"),
-        root.join("lib").join("Tolaria").join("mcp-server"),
+        root.join("HS-Hub").join("mcp-server"),
+        root.join("HS-Hub").join("resources").join("mcp-server"),
+        root.join("lib").join("HS-Hub").join("mcp-server"),
         root.join("lib")
-            .join("Tolaria")
+            .join("HS-Hub")
             .join("resources")
             .join("mcp-server"),
-        root.join("lib").join("tolaria").join("mcp-server"),
+        root.join("lib").join("hs-hub").join("mcp-server"),
         root.join("lib")
-            .join("tolaria")
+            .join("hs-hub")
             .join("resources")
             .join("mcp-server"),
     ]
@@ -620,9 +653,9 @@ fn read_registered_mcp_entry(config_path: &Path) -> Option<serde_json::Value> {
         .and_then(|servers| {
             servers
                 .get(MCP_SERVER_NAME)
-                .or_else(|| servers.get(LEGACY_MCP_SERVER_NAME))
+                .cloned()
+                .or_else(|| read_prior_mcp_server_entry(servers))
         })
-        .cloned()
 }
 
 fn entry_index_js_exists(entry: &serde_json::Value) -> bool {
@@ -667,7 +700,7 @@ pub fn mcp_config_snippet(vault_path: &str) -> Result<String, String> {
     let _ = vault_path;
     let runtime = find_mcp_runtime().map_err(|e| {
         format!(
-            "Node.js 18+ or Bun 1+ is required on PATH before Tolaria can build MCP config: {e}"
+            "Node.js 18+ or Bun 1+ is required on PATH before HS-Hub can build MCP config: {e}"
         )
     })?;
     let server_dir = mcp_server_dir_for_registration()?;
@@ -692,12 +725,12 @@ fn register_mcp_to_configs(entry: &serde_json::Value, config_paths: &[PathBuf]) 
     status.to_string()
 }
 
-/// Register Tolaria as an MCP server in external AI tool config files.
+/// Register HS-Hub as an MCP server in external AI tool config files.
 pub fn register_mcp(vault_path: &str) -> Result<String, String> {
     let _ = vault_path;
     let runtime = find_mcp_runtime().map_err(|e| {
         format!(
-            "Node.js 18+ or Bun 1+ is required on PATH before Tolaria can register MCP tools: {e}"
+            "Node.js 18+ or Bun 1+ is required on PATH before HS-Hub can register MCP tools: {e}"
         )
     })?;
     let server_dir = mcp_server_dir_for_registration()?;
@@ -715,7 +748,7 @@ pub fn register_mcp(vault_path: &str) -> Result<String, String> {
     Ok(register_mcp_to_configs(&entry, &mcp_config_paths()))
 }
 
-/// Insert or update the Tolaria entry in an MCP config file.
+/// Insert or update the HS-Hub entry in an MCP config file.
 fn upsert_mcp_config(config_path: &Path, entry: &serde_json::Value) -> Result<bool, String> {
     if let Some(parent) = config_path.parent() {
         std::fs::create_dir_all(parent)
@@ -741,9 +774,8 @@ fn upsert_mcp_config(config_path: &Path, entry: &serde_json::Value) -> Result<bo
         .as_object_mut()
         .ok_or("mcpServers is not a JSON object")?;
 
-    let was_update =
-        servers.get(MCP_SERVER_NAME).is_some() || servers.get(LEGACY_MCP_SERVER_NAME).is_some();
-    servers.remove(LEGACY_MCP_SERVER_NAME);
+    let was_update = contains_managed_mcp_server(servers);
+    remove_prior_mcp_servers(servers);
     servers.insert(MCP_SERVER_NAME.to_string(), entry.clone());
 
     let json = serde_json::to_string_pretty(&config)
@@ -794,7 +826,7 @@ fn remove_mcp_from_config(config_path: &Path) -> Result<bool, String> {
     };
 
     let removed_primary = servers.remove(MCP_SERVER_NAME).is_some();
-    let removed_legacy = servers.remove(LEGACY_MCP_SERVER_NAME).is_some();
+    let removed_legacy = remove_prior_mcp_servers(servers);
     if !removed_primary && !removed_legacy {
         return Ok(false);
     }
@@ -829,7 +861,7 @@ pub fn remove_mcp() -> String {
 
 /// Check whether the MCP server is properly installed and registered.
 ///
-/// Returns `Installed` when the Tolaria entry exists for the active vault in
+/// Returns `Installed` when the HS-Hub entry exists for the active vault in
 /// an external AI tool config and the referenced index.js file is present.
 /// Otherwise returns `NotInstalled`.
 pub fn check_mcp_status(vault_path: &str) -> McpStatus {
@@ -895,7 +927,7 @@ mod tests {
         index_js: &'a str,
     }
 
-    fn assert_registered_tolaria_server(
+    fn assert_registered_hs_hub_server(
         config: &serde_json::Value,
         expected: ExpectedMcpServer<'_>,
     ) {
@@ -928,7 +960,7 @@ mod tests {
     }
 
     #[test]
-    fn build_mcp_config_snippet_wraps_tolaria_server_entry() {
+    fn build_mcp_config_snippet_wraps_hs_hub_server_entry() {
         let entry = test_mcp_entry("/path/to/index.js");
         let snippet = build_mcp_config_snippet(&entry).unwrap();
         let config: serde_json::Value = serde_json::from_str(&snippet).unwrap();
@@ -1019,14 +1051,14 @@ mod tests {
     fn mcp_server_dir_candidates_prefer_resource_root_before_linux_packages() {
         let dev_path = Path::new("/repo/mcp-server");
         let resource_roots = vec![PathBuf::from(
-            "/Applications/Tolaria.app/Contents/Resources",
+            "/Applications/HS-Hub.app/Contents/Resources",
         )];
         let candidates = mcp_server_dir_candidates(dev_path, &resource_roots);
 
-        let resource_dir = PathBuf::from("/Applications/Tolaria.app/Contents/Resources/mcp-server");
+        let resource_dir = PathBuf::from("/Applications/HS-Hub.app/Contents/Resources/mcp-server");
         let linux_pos = candidates
             .iter()
-            .position(|path| path == &PathBuf::from("/usr/local/Tolaria/mcp-server"))
+            .position(|path| path == &PathBuf::from("/usr/local/HS-Hub/mcp-server"))
             .unwrap();
 
         assert_eq!(candidates[0], dev_path);
@@ -1037,25 +1069,25 @@ mod tests {
     #[test]
     fn mcp_server_dir_candidates_include_linux_package_resource_roots() {
         let dev_path = Path::new("/repo/mcp-server");
-        let resource_roots = vec![PathBuf::from("/opt/tolaria")];
+        let resource_roots = vec![PathBuf::from("/opt/hs-hub")];
         let candidates = mcp_server_dir_candidates(dev_path, &resource_roots);
         let expected = [
-            PathBuf::from("/opt/tolaria/Tolaria/mcp-server"),
-            PathBuf::from("/opt/tolaria/Tolaria/resources/mcp-server"),
-            PathBuf::from("/opt/tolaria/lib/Tolaria/mcp-server"),
-            PathBuf::from("/opt/tolaria/lib/Tolaria/resources/mcp-server"),
-            PathBuf::from("/opt/tolaria/lib/tolaria/mcp-server"),
-            PathBuf::from("/opt/tolaria/lib/tolaria/resources/mcp-server"),
-            PathBuf::from("/usr/local/Tolaria/mcp-server"),
-            PathBuf::from("/usr/local/Tolaria/resources/mcp-server"),
-            PathBuf::from("/usr/local/lib/Tolaria/mcp-server"),
-            PathBuf::from("/usr/local/lib/Tolaria/resources/mcp-server"),
-            PathBuf::from("/usr/local/lib/tolaria/mcp-server"),
-            PathBuf::from("/usr/local/lib/tolaria/resources/mcp-server"),
-            PathBuf::from("/usr/lib/Tolaria/mcp-server"),
-            PathBuf::from("/usr/lib/Tolaria/resources/mcp-server"),
-            PathBuf::from("/usr/lib/tolaria/mcp-server"),
-            PathBuf::from("/usr/lib/tolaria/resources/mcp-server"),
+            PathBuf::from("/opt/hs-hub/HS-Hub/mcp-server"),
+            PathBuf::from("/opt/hs-hub/HS-Hub/resources/mcp-server"),
+            PathBuf::from("/opt/hs-hub/lib/HS-Hub/mcp-server"),
+            PathBuf::from("/opt/hs-hub/lib/HS-Hub/resources/mcp-server"),
+            PathBuf::from("/opt/hs-hub/lib/hs-hub/mcp-server"),
+            PathBuf::from("/opt/hs-hub/lib/hs-hub/resources/mcp-server"),
+            PathBuf::from("/usr/local/HS-Hub/mcp-server"),
+            PathBuf::from("/usr/local/HS-Hub/resources/mcp-server"),
+            PathBuf::from("/usr/local/lib/HS-Hub/mcp-server"),
+            PathBuf::from("/usr/local/lib/HS-Hub/resources/mcp-server"),
+            PathBuf::from("/usr/local/lib/hs-hub/mcp-server"),
+            PathBuf::from("/usr/local/lib/hs-hub/resources/mcp-server"),
+            PathBuf::from("/usr/lib/HS-Hub/mcp-server"),
+            PathBuf::from("/usr/lib/HS-Hub/resources/mcp-server"),
+            PathBuf::from("/usr/lib/hs-hub/mcp-server"),
+            PathBuf::from("/usr/lib/hs-hub/resources/mcp-server"),
         ];
 
         assert!(expected.iter().all(|path| candidates.contains(path)));
@@ -1066,25 +1098,25 @@ mod tests {
         let dev_path = Path::new("/repo/mcp-server");
         let candidates = mcp_server_dir_candidates(dev_path, &[]);
 
-        assert!(candidates.contains(&PathBuf::from("/usr/lib/Tolaria/mcp-server")));
+        assert!(candidates.contains(&PathBuf::from("/usr/lib/HS-Hub/mcp-server")));
     }
 
     #[test]
     fn mcp_server_dir_candidates_include_linux_appimage_resource_root() {
         let dev_path = Path::new("/repo/mcp-server");
-        let resource_roots = vec![PathBuf::from("/tmp/.mount_tolaria/usr")];
+        let resource_roots = vec![PathBuf::from("/tmp/.mount_hs-hub/usr")];
         let candidates = mcp_server_dir_candidates(dev_path, &resource_roots);
 
         assert!(candidates.contains(&PathBuf::from(
-            "/tmp/.mount_tolaria/usr/lib/tolaria/resources/mcp-server"
+            "/tmp/.mount_hs-hub/usr/lib/hs-hub/resources/mcp-server"
         )));
     }
 
     #[test]
     fn mcp_server_dir_candidates_include_runtime_dev_roots_when_build_path_is_stale() {
-        let stale_dev_path = Path::new("/Users/runner/work/tolaria/tolaria/mcp-server");
-        let current_dir = Path::new("/Users/luca/Workspace/tolaria");
-        let current_exe = Path::new("/Users/luca/Workspace/tolaria/src-tauri/target/debug/tolaria");
+        let stale_dev_path = Path::new("/Users/runner/work/hs-hub/hs-hub/mcp-server");
+        let current_dir = Path::new("/Users/luca/Workspace/hs-hub");
+        let current_exe = Path::new("/Users/luca/Workspace/hs-hub/src-tauri/target/debug/hs-hub");
         let candidates = mcp_server_dir_candidates_for(
             stale_dev_path,
             &[],
@@ -1092,20 +1124,20 @@ mod tests {
             Some(current_exe),
         );
 
-        assert!(candidates.contains(&PathBuf::from("/Users/luca/Workspace/tolaria/mcp-server")));
+        assert!(candidates.contains(&PathBuf::from("/Users/luca/Workspace/hs-hub/mcp-server")));
         assert!(candidates.contains(&PathBuf::from(
-            "/Users/luca/Workspace/tolaria/src-tauri/resources/mcp-server"
+            "/Users/luca/Workspace/hs-hub/src-tauri/resources/mcp-server"
         )));
     }
 
     #[test]
     fn mcp_server_dir_candidates_include_macos_bundle_resources() {
         let dev_path = Path::new("/repo/mcp-server");
-        let current_exe = Path::new("/Applications/Tolaria.app/Contents/MacOS/Tolaria");
+        let current_exe = Path::new("/Applications/HS-Hub.app/Contents/MacOS/HS-Hub");
         let candidates = mcp_server_dir_candidates_for(dev_path, &[], None, Some(current_exe));
 
         assert!(candidates.contains(&PathBuf::from(
-            "/Applications/Tolaria.app/Contents/Resources/mcp-server"
+            "/Applications/HS-Hub.app/Contents/Resources/mcp-server"
         )));
     }
 
@@ -1119,7 +1151,7 @@ mod tests {
         assert!(!was_update);
 
         let config = read_config(&config_path);
-        assert_registered_tolaria_server(
+        assert_registered_hs_hub_server(
             &config,
             ExpectedMcpServer {
                 index_js: "/test/index.js",
@@ -1147,24 +1179,27 @@ mod tests {
     fn upsert_migrates_legacy_server_name() {
         let tmp = tempfile::tempdir().unwrap();
         let config_path = tmp.path().join("mcp.json");
+        let prior_names = prior_mcp_server_names();
+        let legacy_name = prior_names[1].as_str();
 
-        let existing = serde_json::json!({
-            "mcpServers": {
-                "laputa": {
+        write_mcp_servers_config(
+            &config_path,
+            vec![(
+                legacy_name,
+                serde_json::json!({
                     "command": "node",
                     "args": ["/old/index.js"],
                     "env": { "VAULT_PATH": "/old" }
-                }
-            }
-        });
-        std::fs::write(&config_path, serde_json::to_string(&existing).unwrap()).unwrap();
+                }),
+            )],
+        );
 
         let entry = test_mcp_entry("/test/index.js");
         let was_update = upsert_mcp_config(&config_path, &entry).unwrap();
         assert!(was_update);
 
         let config = read_config(&config_path);
-        assert!(config["mcpServers"][LEGACY_MCP_SERVER_NAME].is_null());
+        assert!(config["mcpServers"][legacy_name].is_null());
         assert_eq!(
             config["mcpServers"][MCP_SERVER_NAME]["args"][0],
             "/test/index.js"
@@ -1240,7 +1275,7 @@ mod tests {
         assert!(!was_update);
         assert_eq!(config["theme"], "GitHub");
         assert_eq!(config["mcpServers"]["other"]["command"], "example");
-        assert_registered_tolaria_server(
+        assert_registered_hs_hub_server(
             &config,
             ExpectedMcpServer {
                 index_js: "/gemini/index.js",
@@ -1402,7 +1437,7 @@ mod tests {
 
         let raw = std::fs::read_to_string(&claude_user_cfg).unwrap();
         let config: serde_json::Value = serde_json::from_str(&raw).unwrap();
-        assert_registered_tolaria_server(
+        assert_registered_hs_hub_server(
             &config,
             ExpectedMcpServer {
                 index_js: "/test/index.js",
@@ -1448,11 +1483,13 @@ mod tests {
     #[test]
     fn read_registered_mcp_entry_prefers_primary_server_name() {
         let (_tmp, config_path) = temp_config_path("mcp.json");
+        let prior_names = prior_mcp_server_names();
+        let legacy_name = prior_names[1].as_str();
         write_mcp_servers_config(
             &config_path,
             vec![
                 (MCP_SERVER_NAME, managed_server("/primary/index.js")),
-                (LEGACY_MCP_SERVER_NAME, managed_server("/legacy/index.js")),
+                (legacy_name, managed_server("/legacy/index.js")),
             ],
         );
 
@@ -1463,9 +1500,11 @@ mod tests {
     #[test]
     fn read_registered_mcp_entry_uses_legacy_server_name() {
         let (_tmp, config_path) = temp_config_path("mcp.json");
+        let prior_names = prior_mcp_server_names();
+        let legacy_name = prior_names[1].as_str();
         write_mcp_servers_config(
             &config_path,
-            vec![(LEGACY_MCP_SERVER_NAME, managed_server("/legacy/index.js"))],
+            vec![(legacy_name, managed_server("/legacy/index.js"))],
         );
 
         let entry = read_registered_mcp_entry(&config_path).unwrap();
@@ -1539,21 +1578,23 @@ mod tests {
     fn remove_mcp_from_config_removes_primary_and_legacy_entries() {
         let tmp = tempfile::tempdir().unwrap();
         let config_path = tmp.path().join("mcp.json");
-        let config = serde_json::json!({
-            "mcpServers": {
-                "tolaria": { "command": "node", "args": ["/index.js"] },
-                "laputa": { "command": "node", "args": ["/legacy.js"] },
-                "other-server": { "command": "other", "args": [] }
-            }
-        });
-        std::fs::write(&config_path, serde_json::to_string(&config).unwrap()).unwrap();
+        let prior_names = prior_mcp_server_names();
+        let legacy_name = prior_names[1].as_str();
+        write_mcp_servers_config(
+            &config_path,
+            vec![
+                (MCP_SERVER_NAME, serde_json::json!({ "command": "node", "args": ["/index.js"] })),
+                (legacy_name, serde_json::json!({ "command": "node", "args": ["/legacy.js"] })),
+                ("other-server", serde_json::json!({ "command": "other", "args": [] })),
+            ],
+        );
 
         let removed = remove_mcp_from_config(&config_path).unwrap();
         assert!(removed);
 
         let updated = read_config(&config_path);
         assert!(updated["mcpServers"][MCP_SERVER_NAME].is_null());
-        assert!(updated["mcpServers"][LEGACY_MCP_SERVER_NAME].is_null());
+        assert!(updated["mcpServers"][legacy_name].is_null());
         assert!(updated["mcpServers"]["other-server"].is_object());
     }
 
@@ -1579,7 +1620,7 @@ mod tests {
         let config_path = tmp.path().join("mcp.json");
         let config = serde_json::json!({
             "mcpServers": {
-                "tolaria": {
+                "hs-hub": {
                     "type": "stdio",
                     "command": "node",
                     "args": [index_js.to_string_lossy()],

@@ -47,8 +47,8 @@ test('patches linuxdeploy AppRun wrapper to resolve the invoked path before dirn
 })
 
 test('fixed resolver follows absolute and relative symlinks before choosing AppDir', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'tolaria-apprun-resolver-'))
-  const appDir = join(root, 'Tolaria.AppDir')
+  const root = await mkdtemp(join(tmpdir(), 'hs-hub-apprun-resolver-'))
+  const appDir = join(root, 'HS-Hub.AppDir')
   const binDir = join(root, 'bin')
   const relativeDir = join(root, 'relative-bin')
   const appRun = join(appDir, 'AppRun')
@@ -58,8 +58,8 @@ test('fixed resolver follows absolute and relative symlinks before choosing AppD
   await mkdir(relativeDir)
   await writeFile(appRun, '#! /usr/bin/env bash\n', 'utf8')
 
-  const absoluteSymlink = join(binDir, 'tolaria')
-  const relativeSymlink = join(relativeDir, 'tolaria')
+  const absoluteSymlink = join(binDir, 'hs-hub')
+  const relativeSymlink = join(relativeDir, 'hs-hub')
 
   await symlink(appRun, absoluteSymlink)
   await symlink(`../${basename(appDir)}/AppRun`, relativeSymlink)
@@ -71,8 +71,8 @@ test('fixed resolver follows absolute and relative symlinks before choosing AppD
 })
 
 test('plugin wrapper patches AppRun before delegating to the real output plugin', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'tolaria-appimage-plugin-'))
-  const appDir = join(root, 'Tolaria.AppDir')
+  const root = await mkdtemp(join(tmpdir(), 'hs-hub-appimage-plugin-'))
+  const appDir = join(root, 'HS-Hub.AppDir')
   const appRun = join(appDir, 'AppRun')
   const wrapper = join(root, 'linuxdeploy-plugin-appimage.AppImage')
   const realPlugin = join(root, 'linuxdeploy-plugin-appimage.real.AppImage')
@@ -103,7 +103,7 @@ test('plugin wrapper patches AppRun before delegating to the real output plugin'
     env: {
       ...process.env,
       APPDIR: appDir,
-      TOLARIA_APPIMAGE_REAL_PLUGIN: realPlugin,
+      HS_HUB_APPIMAGE_REAL_PLUGIN: realPlugin,
     },
   })
 
@@ -116,7 +116,7 @@ test('plugin wrapper patches AppRun before delegating to the real output plugin'
 })
 
 test('plugin wrapper keeps the delegated appimage plugin basename canonical', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'tolaria-appimage-tools-'))
+  const root = await mkdtemp(join(tmpdir(), 'hs-hub-appimage-tools-'))
   const { realPluginPath, wrapperPath } = await preparePluginWrapper({
     toolsDir: root,
   })
@@ -124,7 +124,7 @@ test('plugin wrapper keeps the delegated appimage plugin basename canonical', as
   assert.equal(basename(wrapperPath), 'linuxdeploy-plugin-appimage.AppImage')
   assert.equal(
     realPluginPath,
-    join(root, 'tolaria-real-linuxdeploy-plugin-appimage', 'linuxdeploy-plugin-appimage.AppImage'),
+    join(root, 'hs-hub-real-linuxdeploy-plugin-appimage', 'linuxdeploy-plugin-appimage.AppImage'),
   )
   assert.equal(REAL_APPIMAGE_PLUGIN_NAME.endsWith('/linuxdeploy-plugin-appimage.AppImage'), true)
 
@@ -133,8 +133,8 @@ test('plugin wrapper keeps the delegated appimage plugin basename canonical', as
 })
 
 test('plugin wrapper bundles fcitx GTK3 input module before sealing AppImage', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'tolaria-appimage-fcitx-'))
-  const appDir = join(root, 'Tolaria.AppDir')
+  const root = await mkdtemp(join(tmpdir(), 'hs-hub-appimage-fcitx-'))
+  const appDir = join(root, 'HS-Hub.AppDir')
   const wrapper = join(root, 'linuxdeploy-plugin-appimage.AppImage')
   const realPlugin = join(root, 'linuxdeploy-plugin-appimage.real.AppImage')
   const pluginMarker = join(root, 'plugin-ran')
@@ -161,9 +161,9 @@ test('plugin wrapper bundles fcitx GTK3 input module before sealing AppImage', a
     env: {
       ...process.env,
       APPDIR: appDir,
-      TOLARIA_APPIMAGE_REAL_PLUGIN: realPlugin,
-      TOLARIA_FCITX_GTK3_IM_MODULE: hostModule,
-      TOLARIA_FCITX_LIBRARY_DIR: hostLibraryDir,
+      HS_HUB_APPIMAGE_REAL_PLUGIN: realPlugin,
+      HS_HUB_FCITX_GTK3_IM_MODULE: hostModule,
+      HS_HUB_FCITX_LIBRARY_DIR: hostLibraryDir,
     },
   })
 

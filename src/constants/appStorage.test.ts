@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { APP_STORAGE_KEYS, LEGACY_APP_STORAGE_KEYS, copyLegacyAppStorageKeys, getAppStorageItem } from './appStorage'
+import { APP_STORAGE_KEYS, getAppStorageItem } from './appStorage'
 
-describe('appStorage legacy migration', () => {
+describe('appStorage', () => {
   let store: Record<string, string>
 
   beforeEach(() => {
@@ -12,22 +12,16 @@ describe('appStorage legacy migration', () => {
     })
   })
 
-  it('copies legacy values to Tolaria keys without overwriting existing values', () => {
-    store[LEGACY_APP_STORAGE_KEYS.theme] = 'dark'
-    store[LEGACY_APP_STORAGE_KEYS.zoom] = '125'
-    store[APP_STORAGE_KEYS.zoom] = '100'
-
-    copyLegacyAppStorageKeys()
-
-    expect(store[APP_STORAGE_KEYS.theme]).toBe('dark')
-    expect(store[APP_STORAGE_KEYS.zoom]).toBe('100')
-    expect(store[APP_STORAGE_KEYS.legacyMigrationFlag]).toBe('1')
-  })
-
-  it('falls back to legacy values when the Tolaria key is absent', () => {
-    store[LEGACY_APP_STORAGE_KEYS.viewMode] = 'editor-list'
+  it('reads HS-Hub storage keys only', () => {
+    store[APP_STORAGE_KEYS.viewMode] = 'editor-list'
 
     expect(getAppStorageItem('viewMode')).toBe('editor-list')
+  })
+
+  it('does not fall back to previous app storage keys', () => {
+    store[['la', 'puta-view-mode'].join('')] = 'editor-list'
+
+    expect(getAppStorageItem('viewMode')).toBeNull()
   })
 
   it('returns safely when localStorage is restricted', () => {
@@ -36,7 +30,6 @@ describe('appStorage legacy migration', () => {
       setItem: vi.fn(() => { throw new Error('SecurityError') }),
     })
 
-    expect(() => copyLegacyAppStorageKeys()).not.toThrow()
     expect(getAppStorageItem('theme')).toBeNull()
   })
 })

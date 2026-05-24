@@ -78,7 +78,7 @@ fn build_settings(
     let vault_paths = crate::cli_agent_runtime::active_vault_paths_json(vault_path, vault_paths);
     let mut settings = serde_json::json!({
         "mcpServers": {
-            "tolaria": {
+            "hs-hub": {
                 "command": "node",
                 "args": [mcp_server_path],
                 "env": {
@@ -86,7 +86,7 @@ fn build_settings(
                     "VAULT_PATHS": vault_paths,
                     "WS_UI_PORT": "9711"
                 },
-                "description": "Tolaria active vault MCP server",
+                "description": "HS-Hub active vault MCP server",
                 "trust": permission_mode == AiAgentPermissionMode::PowerUser
             }
         }
@@ -203,30 +203,30 @@ mod tests {
     }
 
     #[test]
-    fn safe_settings_include_tolaria_mcp_and_exclude_shell() {
+    fn safe_settings_include_hs_hub_mcp_and_exclude_shell() {
         let settings = build_settings("/tmp/vault", &[], AiAgentPermissionMode::Safe).unwrap();
         let json: serde_json::Value = serde_json::from_str(&settings).unwrap();
 
-        assert_eq!(json["mcpServers"]["tolaria"]["command"], "node");
+        assert_eq!(json["mcpServers"]["hs-hub"]["command"], "node");
         assert_eq!(
-            json["mcpServers"]["tolaria"]["env"]["VAULT_PATH"],
+            json["mcpServers"]["hs-hub"]["env"]["VAULT_PATH"],
             "/tmp/vault"
         );
-        assert_eq!(json["mcpServers"]["tolaria"]["env"]["WS_UI_PORT"], "9711");
-        assert_eq!(json["mcpServers"]["tolaria"]["trust"], false);
+        assert_eq!(json["mcpServers"]["hs-hub"]["env"]["WS_UI_PORT"], "9711");
+        assert_eq!(json["mcpServers"]["hs-hub"]["trust"], false);
         assert_eq!(json["tools"]["exclude"][0], "run_shell_command");
-        assert!(json["mcpServers"]["tolaria"]["args"][0]
+        assert!(json["mcpServers"]["hs-hub"]["args"][0]
             .as_str()
             .unwrap()
             .ends_with("index.js"));
     }
 
     #[test]
-    fn power_user_settings_trust_tolaria_and_allow_shell_discovery() {
+    fn power_user_settings_trust_hs_hub_and_allow_shell_discovery() {
         let settings = build_settings("/tmp/vault", &[], AiAgentPermissionMode::PowerUser).unwrap();
         let json: serde_json::Value = serde_json::from_str(&settings).unwrap();
 
-        assert_eq!(json["mcpServers"]["tolaria"]["trust"], true);
+        assert_eq!(json["mcpServers"]["hs-hub"]["trust"], true);
         assert!(json.get("tools").is_none());
         assert_eq!(approval_mode(AiAgentPermissionMode::PowerUser), "yolo");
     }

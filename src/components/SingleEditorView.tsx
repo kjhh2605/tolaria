@@ -39,12 +39,12 @@ import {
   openEditorAttachmentOrUrl,
 } from './editorAttachmentActions'
 import { useBlockNoteSideMenuHoverGuard } from './blockNoteSideMenuHoverGuard'
-import { getTolariaSlashMenuItems } from './tolariaEditorFormattingConfig'
+import { getHsHubSlashMenuItems } from './hsHubEditorFormattingConfig'
 import {
-  TolariaFormattingToolbar,
-  TolariaFormattingToolbarController,
-} from './tolariaEditorFormatting'
-import { TolariaSideMenu } from './tolariaBlockNoteSideMenu'
+  HsHubFormattingToolbar,
+  HsHubFormattingToolbarController,
+} from './hsHubEditorFormatting'
+import { HsHubSideMenu } from './hsHubBlockNoteSideMenu'
 import { useEditorLinkActivation } from './useEditorLinkActivation'
 import { findNearestTextCursorBlock } from './blockNoteCursorTarget'
 import { ImageLightbox } from './ImageLightbox'
@@ -261,7 +261,7 @@ function handleToolbarMouseDownCapture(
   event.preventDefault()
 }
 
-function TolariaOpenLinkButton({
+function HsHubOpenLinkButton({
   url,
   vaultPath,
 }: Pick<LinkToolbarProps, 'url'> & { vaultPath?: string }) {
@@ -283,7 +283,7 @@ function TolariaOpenLinkButton({
   )
 }
 
-function TolariaLinkToolbar({ vaultPath, ...props }: LinkToolbarProps & { vaultPath?: string }) {
+function HsHubLinkToolbar({ vaultPath, ...props }: LinkToolbarProps & { vaultPath?: string }) {
   return (
     <LinkToolbar {...props}>
       <EditLinkButton
@@ -293,7 +293,7 @@ function TolariaLinkToolbar({ vaultPath, ...props }: LinkToolbarProps & { vaultP
         setToolbarOpen={props.setToolbarOpen}
         setToolbarPositionFrozen={props.setToolbarPositionFrozen}
       />
-      <TolariaOpenLinkButton url={props.url} vaultPath={vaultPath} />
+      <HsHubOpenLinkButton url={props.url} vaultPath={vaultPath} />
       <DeleteLinkButton
         range={props.range}
         setToolbarOpen={props.setToolbarOpen}
@@ -341,14 +341,14 @@ function useSeedBlockNoteTableBridge(editor: ReturnType<typeof useCreateBlockNot
       seedEditorWithTestTable(editor, columnWidths)
     )
 
-    window.__laputaTest = {
-      ...window.__laputaTest,
+    window.__hsHubTest = {
+      ...window.__hsHubTest,
       seedBlockNoteTable,
     }
 
     return () => {
-      if (window.__laputaTest?.seedBlockNoteTable === seedBlockNoteTable) {
-        delete window.__laputaTest.seedBlockNoteTable
+      if (window.__hsHubTest?.seedBlockNoteTable === seedBlockNoteTable) {
+        delete window.__hsHubTest.seedBlockNoteTable
       }
     }
   }, [editor])
@@ -1135,7 +1135,7 @@ function useSuggestionMenuItems(options: {
   const getSlashMenuItems = useCallback(async (query: string) => {
     try {
       return guardSuggestionMenuItems(
-        await Promise.resolve(getTolariaSlashMenuItems(editor, query, {
+        await Promise.resolve(getHsHubSlashMenuItems(editor, query, {
           mathTitle: t('editor.slash.math'),
         })),
         runEditorAction,
@@ -1167,10 +1167,10 @@ function EditorInteractionControllers({
 }: EditorInteractionControllersProps) {
   return (
     <>
-      <SideMenuController sideMenu={TolariaSideMenu} />
-      <TolariaFormattingToolbarController
+      <SideMenuController sideMenu={HsHubSideMenu} />
+      <HsHubFormattingToolbarController
         formattingToolbar={(props) => (
-          <TolariaFormattingToolbar {...props} vaultPath={vaultPath} />
+          <HsHubFormattingToolbar {...props} vaultPath={vaultPath} />
         )}
         floatingUIOptions={{
           elementProps: {
@@ -1180,7 +1180,7 @@ function EditorInteractionControllers({
       />
       <LinkToolbarController
         linkToolbar={(props) => (
-          <TolariaLinkToolbar {...props} vaultPath={vaultPath} />
+          <HsHubLinkToolbar {...props} vaultPath={vaultPath} />
         )}
         floatingUIOptions={{
           elementProps: {

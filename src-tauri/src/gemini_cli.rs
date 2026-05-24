@@ -23,7 +23,7 @@ where
     F: FnMut(AiAgentStreamEvent),
 {
     let settings_dir = tempfile::Builder::new()
-        .prefix("tolaria-gemini-agent-")
+        .prefix("hs-hub-gemini-agent-")
         .tempdir()
         .map_err(|error| format!("Failed to create Gemini settings directory: {error}"))?;
     let command = crate::gemini_config::build_command(binary, &request, settings_dir.path())?;
@@ -236,7 +236,7 @@ printf '%s\n' '{"type":"result","status":"success","stats":{"tool_calls":0}}'
         let binary = executable_script(
             dir.path(),
             r#"printf '%s\n' '{"type":"init","session_id":"gemini_2","model":"gemini-2.5-pro"}'
-printf '%s\n' '{"type":"tool_use","tool_name":"tolaria__search_notes","tool_id":"tool_1","parameters":{"query":"meeting"}}'
+printf '%s\n' '{"type":"tool_use","tool_name":"hs-hub__search_notes","tool_id":"tool_1","parameters":{"query":"meeting"}}'
 printf '%s\n' '{"type":"tool_result","tool_id":"tool_1","status":"success","output":"2 notes"}'
 printf '%s\n' '{"type":"message","role":"assistant","content":"I found 2 notes.","delta":true}'
 printf '%s\n' '{"type":"result","status":"success","stats":{"tool_calls":1}}'
@@ -255,7 +255,7 @@ printf '%s\n' '{"type":"result","status":"success","stats":{"tool_calls":1}}'
         assert!(events.iter().any(|event| matches!(
             event,
             AiAgentStreamEvent::ToolStart { tool_name, tool_id, input }
-                if tool_name == "tolaria__search_notes"
+                if tool_name == "hs-hub__search_notes"
                     && tool_id == "tool_1"
                     && input.as_deref() == Some(r#"{"query":"meeting"}"#)
         )));

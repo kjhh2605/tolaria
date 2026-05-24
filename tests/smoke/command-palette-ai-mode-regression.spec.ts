@@ -59,14 +59,14 @@ test.describe('Command palette AI mode regression', () => {
     await page.keyboard.press('Backspace')
 
     await page.keyboard.type('edit my [[b')
-    await expect(page.getByTestId('wikilink-menu')).toContainText('Build Laputa App')
+    await expect(page.getByTestId('wikilink-menu')).toContainText('Build HS-Hub Project')
 
-    await page.getByTestId('wikilink-menu').getByText('Build Laputa App').click()
-    await expect(aiInput.getByTestId('inline-wikilink-chip')).toContainText('Build Laputa App')
+    await page.getByTestId('wikilink-menu').getByText('Build HS-Hub Project').click()
+    await expect(aiInput.getByTestId('inline-wikilink-chip')).toContainText('Build HS-Hub Project')
     await expectCaretAfterChip(page)
 
     await page.keyboard.type(' essay')
-    await expectNormalizedEditorText(aiInput, 'edit my Build Laputa App essay')
+    await expectNormalizedEditorText(aiInput, 'edit my Build HS-Hub Project essay')
 
     await selectEditorTextRange(page, 'command-palette-ai-input', 5)
     await page.keyboard.press('Backspace')

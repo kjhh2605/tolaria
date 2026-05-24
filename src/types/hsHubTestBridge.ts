@@ -3,7 +3,7 @@ import type {
   AppCommandShortcutEventOptions,
 } from '../hooks/appCommandCatalog'
 
-export interface LaputaTestBridge {
+export interface HsHubTestBridge {
   activeTabPath?: string | null
   dispatchAppCommand?: (id: string) => void
   dispatchShortcutEvent?: (init: AppCommandShortcutEventInit) => void
@@ -16,7 +16,7 @@ export interface LaputaTestBridge {
 
 declare global {
   interface Window {
-    __laputaTest?: LaputaTestBridge
+    __hsHubTest?: HsHubTestBridge
   }
 }
 

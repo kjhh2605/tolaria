@@ -165,19 +165,19 @@ fn build_mcp_config_from_base(
     vault_paths: &[String],
     _permission_mode: AiAgentPermissionMode,
 ) -> Result<String, String> {
-    let mcp_server = tolaria_mcp_server_config(vault_path, vault_paths)?;
+    let mcp_server = hs_hub_mcp_server_config(vault_path, vault_paths)?;
     let root = ensure_object(&mut config);
     let settings = ensure_child_object(root, "settings");
     settings.insert("toolPrefix".into(), Value::String("none".into()));
     settings.insert("idleTimeout".into(), Value::Number(10.into()));
     let servers = ensure_child_object(root, "mcpServers");
-    servers.insert("tolaria".into(), mcp_server);
+    servers.insert("hs-hub".into(), mcp_server);
 
     serde_json::to_string(&config)
         .map_err(|error| format!("Failed to serialize Pi MCP config: {error}"))
 }
 
-fn tolaria_mcp_server_config(vault_path: &str, vault_paths: &[String]) -> Result<Value, String> {
+fn hs_hub_mcp_server_config(vault_path: &str, vault_paths: &[String]) -> Result<Value, String> {
     let mcp_server_path = crate::cli_agent_runtime::mcp_server_path_string()?;
     let vault_paths = crate::cli_agent_runtime::active_vault_paths_json(vault_path, vault_paths);
 
@@ -362,13 +362,13 @@ mod tests {
         assert_eq!(mcp["imports"][0], "codex");
         assert_eq!(mcp["mcpServers"]["personal"]["command"], "personal-mcp");
         assert_eq!(
-            mcp["mcpServers"]["tolaria"]["env"]["VAULT_PATH"],
+            mcp["mcpServers"]["hs-hub"]["env"]["VAULT_PATH"],
             "/tmp/vault"
         );
     }
 
     #[test]
-    fn mcp_config_includes_tolaria_server_for_active_vault() {
+    fn mcp_config_includes_hs_hub_server_for_active_vault() {
         if let Ok(config) = build_mcp_config(
             "/tmp/vault",
             &[],
@@ -376,32 +376,32 @@ mod tests {
         ) {
             let json: serde_json::Value = serde_json::from_str(&config).unwrap();
             assert_base_mcp_config(&json);
-            assert_tolaria_mcp_env(&json);
-            assert_tolaria_mcp_args(&json);
+            assert_hs_hub_mcp_env(&json);
+            assert_hs_hub_mcp_args(&json);
         }
     }
 
     fn assert_base_mcp_config(json: &serde_json::Value) {
         assert_eq!(json["settings"]["toolPrefix"], "none");
-        assert_eq!(json["mcpServers"]["tolaria"]["command"], "node");
-        assert_eq!(json["mcpServers"]["tolaria"]["lifecycle"], "lazy");
-        assert_eq!(json["mcpServers"]["tolaria"]["directTools"], true);
+        assert_eq!(json["mcpServers"]["hs-hub"]["command"], "node");
+        assert_eq!(json["mcpServers"]["hs-hub"]["lifecycle"], "lazy");
+        assert_eq!(json["mcpServers"]["hs-hub"]["directTools"], true);
     }
 
-    fn assert_tolaria_mcp_env(json: &serde_json::Value) {
+    fn assert_hs_hub_mcp_env(json: &serde_json::Value) {
         assert_eq!(
-            json["mcpServers"]["tolaria"]["env"]["VAULT_PATH"],
+            json["mcpServers"]["hs-hub"]["env"]["VAULT_PATH"],
             "/tmp/vault"
         );
         assert_eq!(
-            json["mcpServers"]["tolaria"]["env"]["VAULT_PATHS"],
+            json["mcpServers"]["hs-hub"]["env"]["VAULT_PATHS"],
             r#"["/tmp/vault"]"#
         );
-        assert_eq!(json["mcpServers"]["tolaria"]["env"]["WS_UI_PORT"], "9711");
+        assert_eq!(json["mcpServers"]["hs-hub"]["env"]["WS_UI_PORT"], "9711");
     }
 
-    fn assert_tolaria_mcp_args(json: &serde_json::Value) {
-        assert!(json["mcpServers"]["tolaria"]["args"][0]
+    fn assert_hs_hub_mcp_args(json: &serde_json::Value) {
+        assert!(json["mcpServers"]["hs-hub"]["args"][0]
             .as_str()
             .unwrap()
             .ends_with("index.js"));

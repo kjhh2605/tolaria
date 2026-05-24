@@ -18,7 +18,7 @@ The first launch flow is designed to get you into a real vault quickly without h
 
 ## What You Choose
 
-Tolaria asks whether you want to:
+HS-Hub asks whether you want to:
 
 - Create or clone the Getting Started vault.
 - Open an existing local vault.
@@ -26,9 +26,9 @@ Tolaria asks whether you want to:
 
 The Getting Started vault is cloned locally and then disconnected from its remote. That keeps the sample safe to edit without accidentally pushing tutorial changes.
 
-## What Tolaria Creates
+## What HS-Hub Creates
 
-Tolaria stores app-level settings on the local machine. Your notes stay in the vault folder you choose.
+HS-Hub stores app-level settings on the local machine. Your notes stay in the vault folder you choose.
 
 | Data | Stored in |
 | --- | --- |
@@ -46,7 +46,7 @@ Tolaria stores app-level settings on the local machine. Your notes stay in the v
 
 ## AI Setup Prompt
 
-Tolaria can show an optional AI agents prompt after a vault is open. It checks common local install locations for supported coding agents and gives you setup paths, but you can dismiss it and use Tolaria without AI.
+HS-Hub can show an optional AI agents prompt after a vault is open. It checks common local install locations for supported coding agents and gives you setup paths, but you can dismiss it and use HS-Hub without AI.
 
 ---
 
@@ -57,9 +57,9 @@ URL: /start/getting-started-vault
 
 # Getting Started Vault
 
-The Getting Started vault is a small public sample vault hosted at [refactoringhq/tolaria-getting-started](https://github.com/refactoringhq/tolaria-getting-started).
+The Getting Started vault is a small public sample vault hosted at [hansung/hs-hub-getting-started](https://github.com/hansung/hs-hub-getting-started).
 
-It exists to show Tolaria's conventions without requiring you to restructure your own notes first.
+It exists to show HS-Hub's conventions without requiring you to restructure your own notes first.
 
 ## What It Demonstrates
 
@@ -72,11 +72,11 @@ It exists to show Tolaria's conventions without requiring you to restructure you
 
 ## Local-Only By Default
 
-When Tolaria clones the sample, it removes the remote from the local copy. This makes the sample vault disposable. You can edit it freely, commit locally, and delete it later.
+When HS-Hub clones the sample, it removes the remote from the local copy. This makes the sample vault disposable. You can edit it freely, commit locally, and delete it later.
 
 To connect a vault to your own remote, use the bottom status bar remote chip or run `Add Remote` from the command palette.
 
-Tolaria also repairs starter-vault guidance files when needed. `AGENTS.md` is the canonical guidance file, `CLAUDE.md` is kept as a compatibility shim, and `GEMINI.md` is only created when you explicitly restore Gemini guidance.
+HS-Hub also repairs starter-vault guidance files when needed. `AGENTS.md` is the canonical guidance file, `CLAUDE.md` is kept as a compatibility shim, and `GEMINI.md` is only created when you explicitly restore Gemini guidance.
 
 ## Use It Alongside Your Own Vaults
 
@@ -86,33 +86,33 @@ This lets search, quick open, note lists, backlinks, and wikilink navigation spa
 
 ## When To Move On
 
-After you understand the sample, open your own vault. Tolaria does not require a special folder structure: a folder of Markdown files is enough to start. You can remove the sample from Tolaria's vault list later without deleting its files from disk.
+After you understand the sample, open your own vault. HS-Hub does not require a special folder structure: a folder of Markdown files is enough to start. You can remove the sample from HS-Hub's vault list later without deleting its files from disk.
 
 ---
 
-# Install Tolaria
+# Install HS-Hub
 
 Source: start/install.md
 URL: /start/install
 
-# Install Tolaria
+# Install HS-Hub
 
-Tolaria publishes desktop builds for macOS, Windows, and Linux. macOS is the primary day-to-day development target, with Windows and Linux builds supported through the release pipeline and fixed as platform issues are found.
+HS-Hub publishes desktop builds for macOS, Windows, and Linux. macOS is the primary day-to-day development target, with Windows and Linux builds supported through the release pipeline and fixed as platform issues are found.
 
 ## Download
 
 Use the latest stable release unless you are intentionally testing pre-release builds:
 
-- <a href="https://tolaria.md/download/" target="_self">Download the latest stable build</a>
-- [Browse all GitHub releases](https://github.com/refactoringhq/tolaria/releases)
-- <a href="https://tolaria.md/releases/" target="_self">Read the release notes</a>
+- <a href="https://hs-hub.md/download/" target="_self">Download the latest stable build</a>
+- [Browse all GitHub releases](#)
+- <a href="https://hs-hub.md/releases/" target="_self">Read the release notes</a>
 
 ## Homebrew
 
 On macOS you can install the cask:
 
 ```bash
-brew install --cask tolaria
+# Hansung-owned distribution channel not configured yet
 ```
 
 ## Platform Status
@@ -127,7 +127,7 @@ See [Supported Platforms](/reference/supported-platforms) for the current suppor
 
 ## After Installing
 
-1. Open Tolaria.
+1. Open HS-Hub.
 2. Choose the Getting Started vault if you want a guided sample.
 3. Or open an existing folder of Markdown files as a vault.
 4. Use the command palette with `Cmd+K` on macOS or `Ctrl+K` on Linux and Windows.
@@ -141,11 +141,11 @@ URL: /start/open-or-create-vault
 
 # Open Or Create A Vault
 
-A Tolaria vault is a folder on disk. The folder can contain Markdown notes, attachments, type definitions, saved views, and Git metadata.
+A HS-Hub vault is a folder on disk. The folder can contain Markdown notes, attachments, type definitions, saved views, and Git metadata.
 
 ## Open An Existing Folder
 
-Choose an existing folder if you already have Markdown notes. Tolaria scans `.md` files and uses frontmatter when it exists.
+Choose an existing folder if you already have Markdown notes. HS-Hub scans `.md` files and uses frontmatter when it exists.
 
 Good starting points:
 
@@ -156,7 +156,7 @@ Good starting points:
 
 ## Create A New Vault
 
-Choose a new empty folder if you want Tolaria conventions from the start. New notes and optional type definitions are created as Markdown files.
+Choose a new empty folder if you want HS-Hub conventions from the start. New notes and optional type definitions are created as Markdown files.
 
 ## Use More Than One Vault
 
@@ -166,9 +166,9 @@ Once enabled, the bottom-left vault menu lets you include vaults in the unified 
 
 ## Git Is Recommended, Not Required
 
-Tolaria works well with a plain folder of Markdown files. You can open, edit, organize, and search notes without making the vault a Git repository.
+HS-Hub works well with a plain folder of Markdown files. You can open, edit, organize, and search notes without making the vault a Git repository.
 
-Git is recommended when you want local history, diff views, recovery, pull, push, and remote sync without a proprietary backend. If a vault is not already a repository, Tolaria can initialize one when you explicitly ask it to.
+Git is recommended when you want local history, diff views, recovery, pull, push, and remote sync without a proprietary backend. If a vault is not already a repository, HS-Hub can initialize one when you explicitly ask it to.
 
 ---
 
@@ -179,11 +179,11 @@ URL: /concepts/ai
 
 # AI
 
-Tolaria has two AI paths: coding agents that can use tools to inspect and edit a vault, and direct model targets that answer in chat mode from note context.
+HS-Hub has two AI paths: coding agents that can use tools to inspect and edit a vault, and direct model targets that answer in chat mode from note context.
 
 ## Coding Agents
 
-The AI panel can stream supported local CLI agents through Tolaria's normalized event layer. Current targets include Claude Code, Codex, OpenCode, Pi, and Gemini CLI when they are installed on the machine.
+The AI panel can stream supported local CLI agents through HS-Hub's normalized event layer. Current targets include Claude Code, Codex, OpenCode, Pi, and Gemini CLI when they are installed on the machine.
 
 Coding agents can run in:
 
@@ -202,7 +202,7 @@ Supported provider shapes include:
 
 ## External MCP Setup
 
-Tolaria exposes an MCP server for external tools. The setup flow can write Tolaria's MCP entry into Claude Code, Gemini CLI, Cursor, and a generic MCP config path, and it can also copy the exact JSON snippet for manual setup.
+HS-Hub exposes an MCP server for external tools. The setup flow can write HS-Hub's MCP entry into Claude Code, Gemini CLI, Cursor, and a generic MCP config path, and it can also copy the exact JSON snippet for manual setup.
 
 MCP setup is explicit. Closing the dialog leaves third-party config files untouched.
 
@@ -219,7 +219,7 @@ URL: /concepts/editor
 
 # Editor
 
-Tolaria offers a rich editor for daily writing and a raw Markdown mode for exact file control. Both modes write back to the same Markdown file.
+HS-Hub offers a rich editor for daily writing and a raw Markdown mode for exact file control. Both modes write back to the same Markdown file.
 
 ## Rich Editing
 
@@ -250,7 +250,7 @@ URL: /concepts/files-and-media
 
 # Files And Media
 
-Tolaria starts with Markdown notes, but a vault can also contain images, PDFs, media files, whiteboards, and other local files.
+HS-Hub starts with Markdown notes, but a vault can also contain images, PDFs, media files, whiteboards, and other local files.
 
 ## Mermaid Diagrams
 
@@ -263,7 +263,7 @@ flowchart LR
 ```
 ````
 
-Tolaria renders Mermaid diagrams in the editor while keeping the source in Markdown.
+HS-Hub renders Mermaid diagrams in the editor while keeping the source in Markdown.
 
 ## Attachments
 
@@ -271,7 +271,7 @@ Images pasted into the editor are saved into the vault as normal files. They rem
 
 ## Previews
 
-Tolaria can preview common image files, PDFs, and supported media files in the app. Files without an in-app preview can still be opened in the default system app.
+HS-Hub can preview common image files, PDFs, and supported media files in the app. Files without an in-app preview can still be opened in the default system app.
 
 Settings control whether PDFs, images, and unsupported files appear in All Notes. Folder browsing still shows files in their folders.
 
@@ -281,7 +281,7 @@ Whiteboards use tldraw in the editor, but their durable representation stays in 
 
 ## Git Boundary
 
-If generated or local-only files are ignored by Git, Tolaria can hide them from notes, search, quick open, and folders. Use this when build artifacts or private local files should not behave like vault content.
+If generated or local-only files are ignored by Git, HS-Hub can hide them from notes, search, quick open, and folders. Use this when build artifacts or private local files should not behave like vault content.
 
 ---
 
@@ -292,11 +292,11 @@ URL: /concepts/git
 
 # Git
 
-Git is Tolaria's recommended history and sync layer. Tolaria can work with plain Markdown folders, and Git unlocks local history, recovery, remote backup, and multi-device workflows when you want them.
+Git is HS-Hub's recommended history and sync layer. HS-Hub can work with plain Markdown folders, and Git unlocks local history, recovery, remote backup, and multi-device workflows when you want them.
 
-Tolaria acts as a lightweight Git client for your vault. You can review changes, commit, pull, push, and inspect history without leaving the app.
+HS-Hub acts as a lightweight Git client for your vault. You can review changes, commit, pull, push, and inspect history without leaving the app.
 
-## What Tolaria Uses Git For
+## What HS-Hub Uses Git For
 
 - Whole-vault commit history.
 - Current diff for the vault.
@@ -310,15 +310,15 @@ Tolaria acts as a lightweight Git client for your vault. You can review changes,
 
 Each note can show its own history and current diff, so you can understand how that file changed over time or what is unsaved relative to Git.
 
-Tolaria also shows a history of the whole vault. Use it when you want to review broader changes across multiple notes before committing or syncing.
+HS-Hub also shows a history of the whole vault. Use it when you want to review broader changes across multiple notes before committing or syncing.
 
 ## Local Commits
 
-You can commit changes inside Tolaria without leaving the app. This gives you useful restore points even before a remote is configured.
+You can commit changes inside HS-Hub without leaving the app. This gives you useful restore points even before a remote is configured.
 
 ## Remotes
 
-Connect a compatible Git remote when you want sync or backup. Tolaria relies on your system Git authentication, so GitHub CLI, SSH keys, credential helpers, and existing Git configuration can continue to work.
+Connect a compatible Git remote when you want sync or backup. HS-Hub relies on your system Git authentication, so GitHub CLI, SSH keys, credential helpers, and existing Git configuration can continue to work.
 
 ---
 
@@ -349,7 +349,7 @@ When reviewing the Inbox:
 
 ## Healthy Inbox Habit
 
-Keep the Inbox small enough that it can be reviewed in one focused pass. Tolaria works best when capture is fast and organization is deliberate.
+Keep the Inbox small enough that it can be reviewed in one focused pass. HS-Hub works best when capture is fast and organization is deliberate.
 
 ---
 
@@ -360,7 +360,7 @@ URL: /concepts/notes
 
 # Notes
 
-A note is a Markdown file with optional YAML frontmatter. Tolaria reads the first H1 as the primary title and keeps the file on disk as the durable representation.
+A note is a Markdown file with optional YAML frontmatter. HS-Hub reads the first H1 as the primary title and keeps the file on disk as the durable representation.
 
 ## Anatomy
 
@@ -374,12 +374,12 @@ belongs_to:
 
 # Launch Documentation
 
-Draft the public Tolaria docs and keep them close to code changes.
+Draft the public HS-Hub docs and keep them close to code changes.
 ```
 
 ## Titles
 
-The first H1 is the note title. Tolaria uses that title wherever the note is displayed: note lists, search results, wikilink suggestions, relationship pickers, tabs, and window titles.
+The first H1 is the note title. HS-Hub uses that title wherever the note is displayed: note lists, search results, wikilink suggestions, relationship pickers, tabs, and window titles.
 
 The title is separate from the filename. The filename stays visible in the breadcrumb so you can see the file on disk, and you can rename it independently when needed.
 
@@ -387,7 +387,7 @@ Use the breadcrumb action to rename the file to match the title. New untitled no
 
 ## Body Links
 
-Use `[[wikilinks]]` to connect notes from the body. Tolaria shows autocomplete suggestions while you type, and links can resolve by filename or title.
+Use `[[wikilinks]]` to connect notes from the body. HS-Hub shows autocomplete suggestions while you type, and links can resolve by filename or title.
 
 ## Frontmatter
 
@@ -402,11 +402,11 @@ URL: /concepts/properties
 
 # Properties
 
-Properties are frontmatter fields that Tolaria can display, filter, and edit.
+Properties are frontmatter fields that HS-Hub can display, filter, and edit.
 
 ## Suggested Properties
 
-Suggested properties are the fields Tolaria knows how to create quickly from the Properties panel. When a suggested property is missing, the panel shows a shortcut to add it with the right editor.
+Suggested properties are the fields HS-Hub knows how to create quickly from the Properties panel. When a suggested property is missing, the panel shows a shortcut to add it with the right editor.
 
 | Field | Purpose |
 | --- | --- |
@@ -425,7 +425,7 @@ Examples include `_icon`, `_color`, `_order`, `_sidebar_label`, `_width`, and `_
 
 The Properties panel is the safest place to edit structured properties. Toggle it with `Cmd+Shift+I` on macOS or `Ctrl+Shift+I` on Windows and Linux.
 
-Date fields use Tolaria's picker, relationship fields can use wikilinks, and raw Markdown mode is available when you need direct control over YAML.
+Date fields use HS-Hub's picker, relationship fields can use wikilinks, and raw Markdown mode is available when you need direct control over YAML.
 
 ---
 
@@ -453,7 +453,7 @@ blocked_by:
   - "[[sync-conflicts]]"
 ```
 
-Tolaria supports default relationship fields out of the box: `belongs_to`, `has`, and `related_to`. It also detects custom relationship fields dynamically when they contain wikilinks.
+HS-Hub supports default relationship fields out of the box: `belongs_to`, `has`, and `related_to`. It also detects custom relationship fields dynamically when they contain wikilinks.
 
 Default relationships have automatically computed inverses. If a note says it `belongs_to` a project, the project can show that note under its inverse `has` relationship without you writing the reverse link by hand. `related_to` works as a lateral relationship in both directions.
 
@@ -465,7 +465,7 @@ Use body links when the relationship appears naturally in writing. Use frontmatt
 
 ## Backlinks
 
-Tolaria can show incoming links and inverse relationships, making it easier to navigate from a note to the rest of its context.
+HS-Hub can show incoming links and inverse relationships, making it easier to navigate from a note to the rest of its context.
 
 ---
 
@@ -486,13 +486,13 @@ The `type:` field assigns a note to a type.
 type: Project
 ```
 
-Tolaria does not infer type from folder location. Moving a file into another folder does not change its type.
+HS-Hub does not infer type from folder location. Moving a file into another folder does not change its type.
 
 ## Prefer Types Over Folders
 
-Types are the preferred way to group notes in Tolaria. Folders are supported for existing vaults and fallback organization, but Tolaria is built around types and relationships because they carry stronger meaning than file paths.
+Types are the preferred way to group notes in HS-Hub. Folders are supported for existing vaults and fallback organization, but HS-Hub is built around types and relationships because they carry stronger meaning than file paths.
 
-Use types for semantic groups such as Projects, People, Topics, Procedures, Events, and Essays. Use relationships to connect notes across those groups. This gives Tolaria better structure for navigation, filtering, properties, templates, and future automation than folder location alone.
+Use types for semantic groups such as Projects, People, Topics, Procedures, Events, and Essays. Use relationships to connect notes across those groups. This gives HS-Hub better structure for navigation, filtering, properties, templates, and future automation than folder location alone.
 
 ## Type Documents
 
@@ -520,7 +520,7 @@ _order: 10
 
 ## New Note Defaults
 
-Type documents can define empty properties and relationships. When you create a new note of that type, Tolaria shows placeholders for those fields so you can fill them in from the Properties panel.
+Type documents can define empty properties and relationships. When you create a new note of that type, HS-Hub shows placeholders for those fields so you can fill them in from the Properties panel.
 
 If a type document gives a property a value, that value becomes the default for new notes of that type. For example, a Project type can define `status: Active` so every new project starts active until you change it.
 
@@ -533,7 +533,7 @@ URL: /concepts/vaults
 
 # Vaults
 
-A vault is the folder Tolaria reads and writes. The filesystem is the source of truth; the app state and cache are derived from files.
+A vault is the folder HS-Hub reads and writes. The filesystem is the source of truth; the app state and cache are derived from files.
 
 ## Core Rules
 
@@ -547,19 +547,19 @@ A vault is the folder Tolaria reads and writes. The filesystem is the source of 
 
 Local files keep your notes inspectable. You can open them in another editor, search with command-line tools, back them up with your own system, and version them with Git.
 
-Tolaria should never become the only way to read your data.
+HS-Hub should never become the only way to read your data.
 
 ## Git Is A Capability
 
 A plain folder of Markdown files can open as a vault. Git-backed vaults unlock history, changes, commits, pull, push, conflict handling, and remote setup.
 
-If a folder is not a Git repository, Tolaria can initialize Git when you explicitly ask it to. It avoids initializing broad personal folders such as Desktop, Documents, or Downloads unless they are clearly dedicated vault folders.
+If a folder is not a Git repository, HS-Hub can initialize Git when you explicitly ask it to. It avoids initializing broad personal folders such as Desktop, Documents, or Downloads unless they are clearly dedicated vault folders.
 
 ## Multiple Vaults At The Same Time
 
-Tolaria can load multiple registered vaults into one unified graph. Enable this from `Settings` -> `Vaults` -> `Use multiple vaults at the same time`.
+HS-Hub can load multiple registered vaults into one unified graph. Enable this from `Settings` -> `Vaults` -> `Use multiple vaults at the same time`.
 
-After the option is enabled, open the bottom-left vault menu to include or exclude vaults from the graph. Included vaults appear together in note lists, search, quick open, backlinks, and wikilink navigation. Each note keeps a compact vault badge when Tolaria needs to disambiguate where it lives.
+After the option is enabled, open the bottom-left vault menu to include or exclude vaults from the graph. Included vaults appear together in note lists, search, quick open, backlinks, and wikilink navigation. Each note keeps a compact vault badge when HS-Hub needs to disambiguate where it lives.
 
 The selected vault still matters. Git status, commits, sync, folder navigation, saved views, and vault repair actions stay scoped to the current repository. Use `Manage vaults` from the vault menu or the Vaults settings section to rename vaults, choose colors, and set the default destination for new notes.
 
@@ -645,7 +645,7 @@ URL: /guides/commit-and-push
 
 # Manage Git Manually Or With AutoGit
 
-Tolaria can act as a lightweight Git client for a Git-enabled vault. You can manage commits and pushes yourself, or enable AutoGit to create conservative checkpoints after editing pauses or when the app is no longer active.
+HS-Hub can act as a lightweight Git client for a Git-enabled vault. You can manage commits and pushes yourself, or enable AutoGit to create conservative checkpoints after editing pauses or when the app is no longer active.
 
 ## Manual Git
 
@@ -659,7 +659,7 @@ If the remote has changed, pull first and resolve any conflicts. If the vault ha
 
 ## AutoGit
 
-AutoGit is available in Settings for Git-enabled vaults. When enabled, Tolaria automatically commits and pushes saved local changes after an idle pause or after the app becomes inactive.
+AutoGit is available in Settings for Git-enabled vaults. When enabled, HS-Hub automatically commits and pushes saved local changes after an idle pause or after the app becomes inactive.
 
 Use AutoGit when you want the safety of regular checkpoints without interrupting capture or editing. You can still inspect each note's current diff, review note history, and browse the whole-vault history before making larger manual commits.
 
@@ -686,7 +686,7 @@ Local model targets are for tools such as Ollama and LM Studio. They usually nee
 
 API model targets are for hosted providers such as OpenAI, Anthropic, Gemini, OpenRouter, or another OpenAI-compatible endpoint.
 
-Tolaria does not store provider API keys in vault settings. Choose one of the supported key paths:
+HS-Hub does not store provider API keys in vault settings. Choose one of the supported key paths:
 
 - Save the key locally on this device.
 - Read the key from an environment variable.
@@ -694,7 +694,7 @@ Tolaria does not store provider API keys in vault settings. Choose one of the su
 
 ## Test The Connection
 
-After adding a provider, use the test action in Settings. A successful test means Tolaria reached the endpoint and the model replied.
+After adding a provider, use the test action in Settings. A successful test means HS-Hub reached the endpoint and the model replied.
 
 ## Select The Target
 
@@ -713,7 +713,7 @@ Connect a remote when you want backup or sync beyond the current machine.
 
 ## Before You Start
 
-Make sure the remote repository exists and your system Git can authenticate to it. Tolaria uses system Git rather than storing provider-specific credentials.
+Make sure the remote repository exists and your system Git can authenticate to it. HS-Hub uses system Git rather than storing provider-specific credentials.
 
 ## Steps
 
@@ -800,7 +800,7 @@ An individual note can override the default width from the editor toolbar. That 
 
 ## Sidebar Labels
 
-Tolaria can pluralize type names in the sidebar. Turn this off in Settings if your type names should be shown exactly as written, or use `_sidebar_label` on a type document for an explicit label.
+HS-Hub can pluralize type names in the sidebar. Turn this off in Settings if your type names should be shown exactly as written, or use `_sidebar_label` on a type document for an explicit label.
 
 ## Vault Content
 
@@ -821,7 +821,7 @@ Inbox review turns quick captures into usable knowledge.
 
 When a note is organized enough, mark it as organized. Use `Cmd+E` on macOS or `Ctrl+E` on Windows and Linux, or click the organize action in the breadcrumb bar.
 
-That action is what removes the note from Inbox. If auto-advance is enabled in Settings > Workflow, Tolaria opens the next Inbox item immediately after you mark the current note organized.
+That action is what removes the note from Inbox. If auto-advance is enabled in Settings > Workflow, HS-Hub opens the next Inbox item immediately after you mark the current note organized.
 
 ## Review Checklist
 
@@ -854,7 +854,7 @@ URL: /guides/use-ai-panel
 
 # Use The AI
 
-Tolaria gives you two ways to ask for AI help: open the AI panel for an ongoing conversation, or prompt directly from the editor with `Cmd+K` followed by a space.
+HS-Hub gives you two ways to ask for AI help: open the AI panel for an ongoing conversation, or prompt directly from the editor with `Cmd+K` followed by a space.
 
 ## Choose How To Prompt
 
@@ -869,7 +869,7 @@ Open Settings and choose the default AI target:
 - **Local model** for Ollama or LM Studio chat over note context.
 - **API model** for OpenAI, Anthropic, Gemini, OpenRouter, or an OpenAI-compatible endpoint.
 
-If a coding agent is missing, install it and reopen Tolaria or switch to another target.
+If a coding agent is missing, install it and reopen HS-Hub or switch to another target.
 
 ## Permission Mode
 
@@ -889,7 +889,7 @@ Direct model targets always stay in chat mode. They can use note context, but th
 
 ## Review Changes
 
-AI edits are file edits. Review them with Tolaria's diff and Git history before committing.
+AI edits are file edits. Review them with HS-Hub's diff and Git history before committing.
 
 ---
 
@@ -900,7 +900,7 @@ URL: /guides/use-command-palette
 
 # Use The Command Palette
 
-The command palette is the fastest way to move around Tolaria.
+The command palette is the fastest way to move around HS-Hub.
 
 Open it with:
 
@@ -934,11 +934,11 @@ URL: /guides/use-media-previews
 
 # Use Media Previews
 
-Media previews let you inspect vault files without leaving Tolaria.
+Media previews let you inspect vault files without leaving HS-Hub.
 
 ## Open A File
 
-Select an image, PDF, media file, or unsupported file from a folder or file list. Tolaria opens supported files in the app and offers an external-open action for files that should use the system default app.
+Select an image, PDF, media file, or unsupported file from a folder or file list. HS-Hub opens supported files in the app and offers an external-open action for files that should use the system default app.
 
 ## All Notes Visibility
 
@@ -952,7 +952,7 @@ Folder browsing still shows files in their folders even when a category is hidde
 
 ## Attachments
 
-When you paste or drop an image into a note, Tolaria copies it into the vault and references the copied file from Markdown.
+When you paste or drop an image into a note, HS-Hub copies it into the vault and references the copied file from Markdown.
 
 ## Troubleshooting
 
@@ -978,7 +978,7 @@ Use the editor toolbar, the command palette, or the shortcut:
 
 ## How It Works
 
-Tolaria builds the outline from the current note's headings. The panel updates as the note changes and can jump to sections in the editor.
+HS-Hub builds the outline from the current note's headings. The panel updates as the note changes and can jump to sections in the editor.
 
 ## Good Uses
 
@@ -1019,7 +1019,7 @@ related_to:
 
 ## Keep Links Stable
 
-Prefer clear note titles and filenames. Tolaria's wikilink autocomplete helps you pick the right target while you type.
+Prefer clear note titles and filenames. HS-Hub's wikilink autocomplete helps you pick the right target while you type.
 
 ---
 
@@ -1032,7 +1032,7 @@ URL: /templates/portent
 
 [Portent](https://portent.md) is an open specification and template for work and personal knowledge bases.
 
-It gives a Tolaria vault a small set of defaults for organizing information: clear types, generic graph-like relationships, and a simple lifecycle for captured knowledge. The goal is to make a knowledge base useful to humans and AI agents without forcing every person or team to design a private ontology first.
+It gives a HS-Hub vault a small set of defaults for organizing information: clear types, generic graph-like relationships, and a simple lifecycle for captured knowledge. The goal is to make a knowledge base useful to humans and AI agents without forcing every person or team to design a private ontology first.
 
 ## Core Questions
 
@@ -1042,7 +1042,7 @@ Portent favors convention over configuration. Instead of asking "where should th
 - What is it useful for?
 - Is it captured, organized, or archived?
 
-Those questions map naturally to Tolaria's type documents, relationship fields, Inbox, organized state, archive behavior, and custom views.
+Those questions map naturally to HS-Hub's type documents, relationship fields, Inbox, organized state, archive behavior, and custom views.
 
 ## Types
 
@@ -1071,7 +1071,7 @@ Portent models knowledge as a graph. The two default relationships are:
 - `belongs_to`: primary ownership, composition, or context.
 - `related_to`: a looser semantic connection.
 
-In Tolaria, these relationships can live in YAML frontmatter and point to other notes with wikilinks. That keeps the graph portable, searchable, and readable outside the app.
+In HS-Hub, these relationships can live in YAML frontmatter and point to other notes with wikilinks. That keeps the graph portable, searchable, and readable outside the app.
 
 ## Lifecycle
 
@@ -1081,21 +1081,21 @@ Portent separates capture from organization:
 2. Organize it by assigning a type and useful relationships.
 3. Archive it when it has served its purpose.
 
-Tolaria supports that lifecycle directly: the Inbox holds captured notes, organizing a note marks it ready for normal views, and archiving hides old or obsolete notes from active surfaces while keeping them available.
+HS-Hub supports that lifecycle directly: the Inbox holds captured notes, organizing a note marks it ready for normal views, and archiving hides old or obsolete notes from active surfaces while keeping them available.
 
 ## Why Use It
 
 A blank vault is flexible, but it also asks you to make structural decisions before you have momentum. Portent gives you enough structure to start capturing, organizing, and retrieving notes immediately.
 
-Because Portent is file-friendly and portable, the same model can work across local Markdown vaults, note apps, docs tools, and agent-readable knowledge bases. Tolaria is the first intended implementation, but the spec is not tied to Tolaria internals.
+Because Portent is file-friendly and portable, the same model can work across local Markdown vaults, note apps, docs tools, and agent-readable knowledge bases. HS-Hub is the first intended implementation, but the spec is not tied to HS-Hub internals.
 
 ## Start From The Template
 
 The fastest starting point is the Portent template vault:
 
-- [refactoringhq/portent-vault-template](https://github.com/refactoringhq/portent-vault-template)
+- [hansung/portent-vault-template](https://github.com/hansung/portent-vault-template)
 
-Use it as-is, rename pieces to match your language, or treat it as a reference model for your own Tolaria setup.
+Use it as-is, rename pieces to match your language, or treat it as a reference model for your own HS-Hub setup.
 
 ## Learn More
 
@@ -1110,27 +1110,15 @@ URL: /reference/contribute
 
 # Contribute
 
-Tolaria is free and open source, and any kind of help is useful. Pick the path that matches what you want to do.
+HS-Hub is maintained for the Hansung University app context. This build does not ship the previous public product board, discussion forum, sponsor link, or issue tracker endpoints.
 
-## Sponsor Or Support
+## Report an issue
 
-The best way to support Tolaria is to subscribe to [Refactoring](https://refactoring.fm/), Luca's newsletter and community about running good teams and shipping software with AI.
+Use the in-app feedback dialog to copy sanitized diagnostics and share them with the HS-Hub maintainer through your internal support channel. Include what happened, what you expected, and clear reproduction steps.
 
-## Feature Requests
+## Feature ideas
 
-Use the [product board](https://tolaria.canny.io/) for feature ideas. Search first, upvote existing ideas, and create a new post when the request is genuinely new.
-
-## Discussions
-
-Use [GitHub Discussions](https://github.com/refactoringhq/tolaria/discussions) for questions, conversations, show and tell, and broader community context.
-
-## Contribute Code
-
-Small, focused pull requests are welcome. Check the product board first so you build the right thing, then open a PR on [GitHub](https://github.com/refactoringhq/tolaria/pulls). The [contributing guide](https://github.com/refactoringhq/tolaria/blob/main/CONTRIBUTING.md) explains the local workflow.
-
-## Report A Bug
-
-Use [GitHub Issues](https://github.com/refactoringhq/tolaria/issues) for bugs. Include what happened, what you expected, and clear reproduction steps. If you are reporting from inside Tolaria, use the Contribute panel to copy sanitized diagnostics and attach them to the issue.
+Collect feature requests in the Hansung-owned planning space for this app. Do not send users to prior previous app community services.
 
 ---
 
@@ -1187,7 +1175,7 @@ URL: /reference/file-layout
 
 # File Layout
 
-Tolaria is not opinionated about folder structure. It finds notes recursively across the whole vault, stores new notes in the root by default, and uses types and relationships for real organization.
+HS-Hub is not opinionated about folder structure. It finds notes recursively across the whole vault, stores new notes in the root by default, and uses types and relationships for real organization.
 
 ```txt
 my-vault/
@@ -1206,9 +1194,9 @@ my-vault/
 
 ## Root Notes
 
-Tolaria works well with a flat vault. Folders are optional and can be useful for compatibility with other tools, but they are not required for people, projects, topics, or any other note category.
+HS-Hub works well with a flat vault. Folders are optional and can be useful for compatibility with other tools, but they are not required for people, projects, topics, or any other note category.
 
-Type is not inferred from folder location. It comes from frontmatter, and relationships are expressed with wikilinks in fields. That is what Tolaria uses for the sidebar, Properties panel, search, custom views, and neighborhood navigation.
+Type is not inferred from folder location. It comes from frontmatter, and relationships are expressed with wikilinks in fields. That is what HS-Hub uses for the sidebar, Properties panel, search, custom views, and neighborhood navigation.
 
 ## Special Folders
 
@@ -1225,7 +1213,7 @@ Type definitions are Markdown notes with `type: Type` in frontmatter. New type d
 
 ## Git Files
 
-If the vault is a Git repository, `.git/` belongs to Git. Tolaria reads Git state but does not treat `.git/` as notes.
+If the vault is a Git repository, `.git/` belongs to Git. HS-Hub reads Git state but does not treat `.git/` as notes.
 
 ---
 
@@ -1236,7 +1224,7 @@ URL: /reference/frontmatter-fields
 
 # Frontmatter Fields
 
-Tolaria uses conventions instead of a required schema.
+HS-Hub uses conventions instead of a required schema.
 
 | Field | Meaning |
 | --- | --- |
@@ -1255,7 +1243,7 @@ Tolaria uses conventions instead of a required schema.
 
 ## Custom Fields
 
-You can add your own fields. If a field contains wikilinks, Tolaria can treat it as a relationship.
+You can add your own fields. If a field contains wikilinks, HS-Hub can treat it as a relationship.
 
 ## System Fields
 
@@ -1302,7 +1290,7 @@ URL: /reference/release-channels
 
 # Release Channels
 
-Tolaria publishes Stable and Alpha release metadata to GitHub Pages.
+HS-Hub publishes Stable and Alpha release metadata to GitHub Pages.
 
 ## Stable
 
@@ -1346,7 +1334,7 @@ URL: /reference/supported-platforms
 
 # Supported Platforms
 
-Tolaria is a desktop app built with Tauri. Releases currently target macOS, Windows, and Linux.
+HS-Hub is a desktop app built with Tauri. Releases currently target macOS, Windows, and Linux.
 
 | Platform | Current support | Notes |
 | --- | --- | --- |
@@ -1362,7 +1350,7 @@ Primary support means the platform is part of normal development and release val
 
 Include:
 
-- Tolaria version.
+- HS-Hub version.
 - Operating system and version.
 - CPU architecture.
 - Whether the vault is local-only or connected to a remote.
@@ -1418,12 +1406,12 @@ URL: /troubleshooting/ai-agent-not-found
 
 # AI Agent Not Found
 
-Tolaria can only launch local CLI agents that are installed and discoverable.
+HS-Hub can only launch local CLI agents that are installed and discoverable.
 
 ## Symptoms
 
 - The AI panel says no supported agent is available.
-- Claude Code or another agent works in one shell but not in Tolaria.
+- Claude Code or another agent works in one shell but not in HS-Hub.
 
 ## Checks
 
@@ -1437,7 +1425,7 @@ If the command fails, install or repair the agent first.
 
 ## Path Issues
 
-Desktop apps can inherit a different `PATH` from your interactive shell. Tolaria checks common install locations, but shell setup can still vary. Prefer installing CLI tools in standard locations or making them available from your login shell.
+Desktop apps can inherit a different `PATH` from your interactive shell. HS-Hub checks common install locations, but shell setup can still vary. Prefer installing CLI tools in standard locations or making them available from your login shell.
 
 ---
 
@@ -1448,13 +1436,13 @@ URL: /troubleshooting/git-auth
 
 # Git Authentication
 
-Tolaria uses system Git authentication. It does not manage provider passwords directly.
+HS-Hub uses system Git authentication. It does not manage provider passwords directly.
 
 ## Symptoms
 
 - Push fails.
 - Pull asks for credentials repeatedly.
-- Remote fetch works in one terminal but not in Tolaria.
+- Remote fetch works in one terminal but not in HS-Hub.
 
 ## Checks
 
@@ -1488,7 +1476,7 @@ Use this checklist when a local or API model provider does not connect.
 For Ollama or LM Studio:
 
 1. Start the local model server.
-2. Confirm the base URL in Tolaria matches the server.
+2. Confirm the base URL in HS-Hub matches the server.
 3. Confirm the model ID is installed and loaded by the provider.
 4. Use the Settings test action again.
 
@@ -1519,7 +1507,7 @@ Sync conflicts happen when local and remote changes touch the same content.
 ## What To Do
 
 1. Stop editing the conflicted note.
-2. Open the conflict resolver if Tolaria presents it.
+2. Open the conflict resolver if HS-Hub presents it.
 3. Review both sides.
 4. Choose the correct content or merge manually.
 5. Commit the resolved file.
@@ -1541,13 +1529,13 @@ URL: /troubleshooting/vault-not-loading
 
 # Vault Not Loading
 
-Use this checklist when Tolaria cannot open or refresh a vault.
+Use this checklist when HS-Hub cannot open or refresh a vault.
 
 ## Check The Folder
 
 - Confirm the folder exists.
 - Confirm the folder contains readable files.
-- Confirm Tolaria has permission to access the folder.
+- Confirm HS-Hub has permission to access the folder.
 - Try opening a smaller test vault to isolate the issue.
 
 ## Check Git

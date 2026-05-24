@@ -60,7 +60,7 @@ describe('useMenuEvents editor find state', () => {
     }))
 
     act(() => {
-      window.dispatchEvent(new CustomEvent('laputa:editor-find-availability', {
+      window.dispatchEvent(new CustomEvent('hs-hub:editor-find-availability', {
         detail: { enabled: true },
       }))
     })

@@ -107,7 +107,7 @@ async function installVaultSwitcherMocks(
 
   await page.addInitScript((data: VaultSwitcherInitData) => {
     localStorage.clear()
-    localStorage.setItem('tolaria:claude-code-onboarding-dismissed', '1')
+    localStorage.setItem('hs-hub:claude-code-onboarding-dismissed', '1')
 
     let ref: Record<string, unknown> | null = null
 

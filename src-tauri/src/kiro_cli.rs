@@ -176,7 +176,7 @@ fn write_mcp_json(config: KiroMcpConfig<'_>) -> Result<(), String> {
 
     let active_vault_paths =
         crate::cli_agent_runtime::active_vault_paths_json(config.vault_path, config.vault_paths);
-    servers["tolaria"] = serde_json::json!({
+    servers["hs-hub"] = serde_json::json!({
         "command": "node",
         "args": [config.mcp_server_path],
         "env": {
@@ -272,21 +272,21 @@ mod tests {
         let config_path = dir.path().join(".kiro/settings/mcp.json");
         let content: serde_json::Value =
             serde_json::from_str(&std::fs::read_to_string(&config_path).unwrap()).unwrap();
-        assert_eq!(content["mcpServers"]["tolaria"]["command"], "node");
+        assert_eq!(content["mcpServers"]["hs-hub"]["command"], "node");
         assert_eq!(
-            content["mcpServers"]["tolaria"]["args"][0],
+            content["mcpServers"]["hs-hub"]["args"][0],
             "/opt/mcp/index.js"
         );
         assert_eq!(
-            content["mcpServers"]["tolaria"]["env"]["VAULT_PATH"],
+            content["mcpServers"]["hs-hub"]["env"]["VAULT_PATH"],
             vault_path
         );
         assert_eq!(
-            content["mcpServers"]["tolaria"]["env"]["VAULT_PATHS"],
+            content["mcpServers"]["hs-hub"]["env"]["VAULT_PATHS"],
             serde_json::json!(serde_json::to_string(&vec![vault_path, "/other/vault"]).unwrap())
         );
         assert_eq!(
-            content["mcpServers"]["tolaria"]["env"]["WS_UI_PORT"],
+            content["mcpServers"]["hs-hub"]["env"]["WS_UI_PORT"],
             "9711"
         );
     }
@@ -314,7 +314,7 @@ mod tests {
             &std::fs::read_to_string(dir.path().join(".kiro/settings/mcp.json")).unwrap(),
         )
         .unwrap();
-        assert_eq!(content["mcpServers"]["tolaria"]["args"][0], "/new/index.js");
+        assert_eq!(content["mcpServers"]["hs-hub"]["args"][0], "/new/index.js");
         assert_eq!(content["mcpServers"]["other"]["command"], "python");
     }
 }

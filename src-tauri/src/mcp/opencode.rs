@@ -2,7 +2,9 @@ use std::path::{Path, PathBuf};
 
 use serde_json::{Map, Value};
 
-use super::{LEGACY_MCP_SERVER_NAME, MCP_SERVER_NAME};
+use super::{
+    contains_managed_mcp_server, prior_mcp_server_names, remove_prior_mcp_servers, MCP_SERVER_NAME,
+};
 
 const OPENCODE_MCP_KEY: &str = "mcp";
 
@@ -24,10 +26,9 @@ pub(super) fn build_entry(node_command: &str, index_js: &str) -> Value {
 pub(super) fn upsert_config(config_path: &Path, entry: &Value) -> Result<bool, String> {
     let mut config = read_config_or_empty(config_path)?;
     let servers = ensure_servers_object(&mut config)?;
-    let was_update =
-        servers.get(MCP_SERVER_NAME).is_some() || servers.get(LEGACY_MCP_SERVER_NAME).is_some();
+    let was_update = contains_managed_mcp_server(servers);
 
-    servers.remove(LEGACY_MCP_SERVER_NAME);
+    remove_prior_mcp_servers(servers);
     servers.insert(MCP_SERVER_NAME.to_string(), entry.clone());
     write_config(config_path, &config)?;
     Ok(was_update)
@@ -50,7 +51,7 @@ pub(super) fn remove_config(config_path: &Path) -> Result<bool, String> {
     };
 
     let removed_primary = servers.remove(MCP_SERVER_NAME).is_some();
-    let removed_legacy = servers.remove(LEGACY_MCP_SERVER_NAME).is_some();
+    let removed_legacy = remove_prior_mcp_servers(servers);
     if !removed_primary && !removed_legacy {
         return Ok(false);
     }
@@ -71,9 +72,13 @@ pub(super) fn read_registered_entry(config_path: &Path) -> Option<Value> {
         .and_then(|servers| {
             servers
                 .get(MCP_SERVER_NAME)
-                .or_else(|| servers.get(LEGACY_MCP_SERVER_NAME))
+                .cloned()
+                .or_else(|| {
+                    prior_mcp_server_names()
+                        .iter()
+                        .find_map(|server_name| servers.get(server_name).cloned())
+                })
         })
-        .cloned()
 }
 
 pub(super) fn entry_is_installed(entry: &Value) -> bool {
@@ -187,20 +192,20 @@ mod tests {
     fn upsert_config_migrates_legacy_server_name() {
         let tmp = tempfile::tempdir().unwrap();
         let config_path = tmp.path().join("opencode.json");
-        write_config_json(
-            &config_path,
-            serde_json::json!({
-                "mcp": {
-                    "laputa": { "type": "local", "command": ["node", "/old.js"] }
-                }
-            }),
+        let prior_names = prior_mcp_server_names();
+        let legacy_name = prior_names[1].as_str();
+        let mut servers = Map::new();
+        servers.insert(
+            legacy_name.to_string(),
+            serde_json::json!({ "type": "local", "command": ["node", "/old.js"] }),
         );
+        write_config_json(&config_path, serde_json::json!({ "mcp": servers }));
 
         let was_update = upsert_config(&config_path, &build_entry("node", "/new.js")).unwrap();
         let config = read_config(&config_path);
 
         assert!(was_update);
-        assert!(config["mcp"][LEGACY_MCP_SERVER_NAME].is_null());
+        assert!(config["mcp"][legacy_name].is_null());
         assert_eq!(config["mcp"][MCP_SERVER_NAME]["command"][1], "/new.js");
     }
 
@@ -208,21 +213,18 @@ mod tests {
     fn remove_config_removes_primary_and_legacy_entries() {
         let tmp = tempfile::tempdir().unwrap();
         let config_path = tmp.path().join("opencode.json");
-        write_config_json(
-            &config_path,
-            serde_json::json!({
-                "mcp": {
-                    "tolaria": { "type": "local" },
-                    "laputa": { "type": "local" },
-                    "other": { "type": "local" }
-                }
-            }),
-        );
+        let prior_names = prior_mcp_server_names();
+        let legacy_name = prior_names[1].as_str();
+        let mut servers = Map::new();
+        servers.insert(MCP_SERVER_NAME.to_string(), serde_json::json!({ "type": "local" }));
+        servers.insert(legacy_name.to_string(), serde_json::json!({ "type": "local" }));
+        servers.insert("other".to_string(), serde_json::json!({ "type": "local" }));
+        write_config_json(&config_path, serde_json::json!({ "mcp": servers }));
 
         assert!(remove_config(&config_path).unwrap());
         let config = read_config(&config_path);
         assert!(config["mcp"][MCP_SERVER_NAME].is_null());
-        assert!(config["mcp"][LEGACY_MCP_SERVER_NAME].is_null());
+        assert!(config["mcp"][legacy_name].is_null());
         assert!(config["mcp"]["other"].is_object());
     }
 

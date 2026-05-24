@@ -102,7 +102,7 @@ interface UseTabSwapEffectOptions extends Omit<RunTabSwapEffectOptions, 'vaultPa
 type ParsedBlockPreloadEvent = { path: string; content: string }
 
 function signalEditorTabSwapped(path: string): void {
-  window.dispatchEvent(new CustomEvent('laputa:editor-tab-swapped', {
+  window.dispatchEvent(new CustomEvent('hs-hub:editor-tab-swapped', {
     detail: { path },
   }))
   finishNoteOpenTrace(path)

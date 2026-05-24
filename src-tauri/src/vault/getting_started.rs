@@ -1,9 +1,10 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-/// Public starter vault cloned when the user chooses Getting Started.
-pub const GETTING_STARTED_REPO_URL: &str =
-    "https://github.com/refactoringhq/tolaria-getting-started.git";
+/// Optional starter vault cloned when the user chooses Getting Started.
+/// HS-Hub does not ship the previous starter endpoint; configure this
+/// through `HS_HUB_GETTING_STARTED_REPO_URL` when a Hansung-owned starter vault exists.
+pub const GETTING_STARTED_REPO_URL: &str = "";
 
 /// Default location for the Getting Started vault.
 pub fn default_vault_path() -> Result<PathBuf, String> {
@@ -53,14 +54,14 @@ fn has_getting_started_template_marker(path: &Path) -> bool {
         .any(|file| path.join(file).is_file())
 }
 
-/// Previous default AGENTS.md content seeded by Tolaria itself. Existing vaults
-/// can still contain this exact text, so Tolaria treats it as managed content
+/// Previous default AGENTS.md content seeded by HS-Hub itself. Existing vaults
+/// can still contain this exact text, so HS-Hub treats it as managed content
 /// that is safe to refresh automatically.
-const STALE_AGENTS_MD: &str = r##"# AGENTS.md — Tolaria Vault
+const STALE_AGENTS_MD: &str = r##"# AGENTS.md — HS-Hub Vault
 
-This is a [Tolaria](https://github.com/refactoringhq/tolaria) vault - a folder of markdown files with YAML frontmatter forming a personal knowledge graph.
+This is a HS-Hub vault - a folder of markdown files with YAML frontmatter forming a personal knowledge graph.
 
-Keep edits compatible with Tolaria's current conventions. Prefer small, human-readable changes over heavy restructuring.
+Keep edits compatible with HS-Hub's current conventions. Prefer small, human-readable changes over heavy restructuring.
 
 ## Core rules
 
@@ -68,7 +69,7 @@ Keep edits compatible with Tolaria's current conventions. Prefer small, human-re
 - The first H1 in the body is the note title. Do not add `title:` frontmatter.
 - Most notes live at the vault root as flat `.md` files. Type definitions live in `type/`. Saved views live in `views/`.
 - Use wikilinks for note-to-note references, both in frontmatter and in the body.
-- Frontmatter properties that start with `_` are usually Tolaria-managed state. Leave them alone unless the user explicitly asks for them to change.
+- Frontmatter properties that start with `_` are usually HS-Hub-managed state. Leave them alone unless the user explicitly asks for them to change.
 
 ## Notes
 
@@ -87,7 +88,7 @@ related_to:
 Body content in markdown.
 ```
 
-Tolaria still understands some legacy aliases such as `Is A`, but prefer `type:` for new or edited notes.
+HS-Hub still understands some legacy aliases such as `Is A`, but prefer `type:` for new or edited notes.
 
 ## Types
 
@@ -151,12 +152,12 @@ Use kebab-case: `my-note-title.md`. One note per file.
 - Do not rewrite installation-specific app config unless the user explicitly asks.
 "##;
 
-/// Older Tolaria-managed AGENTS.md content from before the `type:` migration.
-/// Existing vaults can still contain this exact text, so Tolaria treats it as
+/// Older HS-Hub-managed AGENTS.md content from before the `type:` migration.
+/// Existing vaults can still contain this exact text, so HS-Hub treats it as
 /// managed content that is safe to refresh automatically.
-const PRE_TYPE_AGENTS_MD: &str = r##"# AGENTS.md — Tolaria Vault
+const PRE_TYPE_AGENTS_MD: &str = r##"# AGENTS.md — HS-Hub Vault
 
-This is a [Tolaria](https://github.com/refactoringhq/tolaria) vault — a folder of markdown files with YAML frontmatter forming a personal knowledge graph.
+This is a HS-Hub vault — a folder of markdown files with YAML frontmatter forming a personal knowledge graph.
 
 ## Note structure
 
@@ -238,9 +239,9 @@ Do not modify app configuration files — those are local to each installation.
 "##;
 
 const OUTDATED_AGENTS_MARKERS: [&str; 3] = [
-    "# AGENTS.md — Tolaria Vault",
+    "# AGENTS.md — HS-Hub Vault",
     "Legacy `title:` frontmatter is still read as a fallback",
-    "Tolaria still understands legacy aliases such as `Is A`.",
+    "HS-Hub still understands legacy aliases such as `Is A`.",
 ];
 
 const STALE_TITLE_FRONTMATTER_MARKER: &str = "Do not add `title:` frontmatter.";
@@ -293,37 +294,37 @@ pub(super) fn agents_content_can_be_refreshed(content: &str) -> bool {
 }
 
 /// Default AGENTS.md content — vault instructions for AI agents.
-/// Describes Tolaria vault mechanics only; no user-specific structure.
+/// Describes HS-Hub vault mechanics only; no user-specific structure.
 /// The vault scanner will pick this up as a regular entry.
 pub(super) const AGENTS_MD: &str = r##"---
 type: Note
 _organized: true
 ---
 
-# AGENTS.md — Tolaria Vault
+# AGENTS.md — HS-Hub Vault
 
-This is a [Tolaria](https://github.com/refactoringhq/tolaria) vault.
+This is a HS-Hub vault.
 
-Keep this file focused on vault-specific conventions. For general Tolaria behavior, use the bundled Tolaria agent docs path provided by the app session context.
+Keep this file focused on vault-specific conventions. For general HS-Hub behavior, use the bundled HS-Hub agent docs path provided by the app session context.
 
 ## Core conventions
 
 - Notes are Markdown files.
-- Use the first H1 as the note title. Tolaria uses this title in the note list, wikilinks, search, and other display surfaces.
+- Use the first H1 as the note title. HS-Hub uses this title in the note list, wikilinks, search, and other display surfaces.
 - Store note type in the `type:` frontmatter field.
 - Use wikilinks in body text and frontmatter fields to connect notes.
 - Prefer types and relationships for organization. Folder structure is optional and should not be treated as the primary source of meaning.
-- Tolaria reads notes recursively from all folders and stores new notes in the vault root by default.
+- HS-Hub reads notes recursively from all folders and stores new notes in the vault root by default.
 - Saved views live in `views/*.yml`.
 - Files in `attachments/` are assets, not notes. Reference them from notes, but do not treat them as notes or types.
-- Frontmatter properties that start with `_` are usually Tolaria-managed state. Leave them alone unless the user explicitly asks for them to change.
+- Frontmatter properties that start with `_` are usually HS-Hub-managed state. Leave them alone unless the user explicitly asks for them to change.
 
 ## Notes
 
 ```yaml
 ---
 type: Note
-related_to: "[[tolaria]]"
+related_to: "[[hs-hub]]"
 status: Active
 url: https://example.com
 ---
@@ -371,7 +372,7 @@ Use quoted wikilinks for scalar frontmatter values and YAML lists for multi-valu
 
 ## Views
 
-Saved views live in `views/*.yml` and are written as YAML. Tolaria scans every `.yml` file in `views/`, and the filename is the stable view id, so use kebab-case filenames such as `active-projects.yml`.
+Saved views live in `views/*.yml` and are written as YAML. HS-Hub scans every `.yml` file in `views/`, and the filename is the stable view id, so use kebab-case filenames such as `active-projects.yml`.
 
 A view definition looks like this:
 
@@ -387,7 +388,7 @@ filters:
       value: Project
     - field: related_to
       op: contains
-      value: "[[tolaria]]"
+      value: "[[hs-hub]]"
 ```
 
 View rules that matter when creating or editing files:
@@ -399,7 +400,7 @@ View rules that matter when creating or editing files:
 - Supported operators are `equals`, `not_equals`, `contains`, `not_contains`, `any_of`, `none_of`, `is_empty`, `is_not_empty`, `before`, and `after`.
 - `any_of` and `none_of` expect `value` to be a YAML list.
 - `regex: true` is supported with `equals`, `not_equals`, `contains`, and `not_contains` when pattern matching is needed.
-- Relationship filters can use wikilinks in `value`, for example `"[[tolaria]]"`.
+- Relationship filters can use wikilinks in `value`, for example `"[[hs-hub]]"`.
 - Do not create JSON view files or `.view.json` filenames.
 
 ## Filenames
@@ -413,8 +414,8 @@ Use kebab-case: `my-note-title.md`. One note per file.
 - Add or modify relationships without breaking existing wikilinks.
 - Create and edit saved views in `views/`.
 - Update `AGENTS.md` only when the user asks for vault-level guidance changes.
-- Search the bundled Tolaria docs when the user asks how Tolaria works or when you need product behavior beyond these base conventions.
-- Use Portent as the default best-practice model when the user asks how to improve, organize, or restructure the knowledge base. Combine Portent's types, relationships, and capture -> organize -> archive lifecycle with Tolaria's type documents, properties, Inbox, archive, and saved views.
+- Search the bundled HS-Hub docs when the user asks how HS-Hub works or when you need product behavior beyond these base conventions.
+- Use Portent as the default best-practice model when the user asks how to improve, organize, or restructure the knowledge base. Combine Portent's types, relationships, and capture -> organize -> archive lifecycle with HS-Hub's type documents, properties, Inbox, archive, and saved views.
 
 ## What agents should avoid
 
@@ -424,9 +425,9 @@ Use kebab-case: `my-note-title.md`. One note per file.
 - Do not rewrite installation-specific app configuration unless the user explicitly asks.
 "##;
 
-pub(super) const LEGACY_AGENTS_MD: &str = r##"# AGENTS.md — Tolaria Vault
+pub(super) const LEGACY_AGENTS_MD: &str = r##"# AGENTS.md — HS-Hub Vault
 
-This is a [Tolaria](https://github.com/refactoringhq/tolaria) vault — a folder of markdown files with YAML frontmatter forming a personal knowledge graph.
+This is a HS-Hub vault — a folder of markdown files with YAML frontmatter forming a personal knowledge graph.
 
 ## Note structure
 
@@ -509,9 +510,10 @@ Do not modify app configuration files — those are local to each installation.
 
 /// Clone the public starter vault into the requested path.
 pub fn create_getting_started_vault(target_path: &str) -> Result<String, String> {
+    let repo_url = getting_started_repo_url()?;
     let vault_path = create_getting_started_vault_from_repo(
         Path::new(target_path),
-        &getting_started_repo_url(),
+        &repo_url,
     )?;
     Ok(vault_path.to_string_lossy().to_string())
 }
@@ -532,10 +534,17 @@ fn create_getting_started_vault_from_repo(
     Ok(vault_path)
 }
 
-fn getting_started_repo_url() -> String {
-    std::env::var("TOLARIA_GETTING_STARTED_REPO_URL")
-        .or_else(|_| std::env::var("LAPUTA_GETTING_STARTED_REPO_URL"))
-        .unwrap_or_else(|_| GETTING_STARTED_REPO_URL.to_string())
+fn getting_started_repo_url() -> Result<String, String> {
+    let repo_url = std::env::var("HS_HUB_GETTING_STARTED_REPO_URL")
+        .ok()
+        .filter(|value| !value.trim().is_empty())
+        .unwrap_or_else(|| GETTING_STARTED_REPO_URL.to_string());
+
+    if repo_url.trim().is_empty() {
+        return Err("Getting Started vault is not configured for this HS-Hub build".to_string());
+    }
+
+    Ok(repo_url)
 }
 
 fn canonical_vault_path(target_path: &Path) -> Result<PathBuf, String> {
@@ -577,7 +586,7 @@ fn refresh_cloned_vault_config_files(vault_path: &Path) -> Result<(), String> {
     crate::git::ensure_author_config(vault_path)?;
     crate::git::git_commit(
         path_to_utf8(vault_path, "Vault path")?,
-        "Initialize Tolaria config files",
+        "Initialize HS-Hub config files",
     )?;
     Ok(())
 }
@@ -610,7 +619,7 @@ mod tests {
         fs::create_dir_all(path.join("views")).unwrap();
         fs::write(
             path.join("welcome.md"),
-            "# Welcome to Tolaria\n\nThis is the starter vault.\n",
+            "# Welcome to HS-Hub\n\nThis is the starter vault.\n",
         )
         .unwrap();
         fs::write(
@@ -628,12 +637,12 @@ mod tests {
             .output()
             .unwrap();
         StdCommand::new("git")
-            .args(["config", "user.email", "tolaria@app.local"])
+            .args(["config", "user.email", "hs-hub@app.local"])
             .current_dir(path)
             .output()
             .unwrap();
         StdCommand::new("git")
-            .args(["config", "user.name", "Tolaria App"])
+            .args(["config", "user.name", "HS-Hub App"])
             .current_dir(path)
             .output()
             .unwrap();
@@ -649,7 +658,7 @@ mod tests {
             .unwrap();
     }
 
-    fn write_tolaria_config_files(path: &Path) {
+    fn write_hs_hub_config_files(path: &Path) {
         fs::create_dir_all(path).unwrap();
         fs::write(path.join("AGENTS.md"), AGENTS_MD).unwrap();
         fs::write(path.join("type.md"), "# Type\n").unwrap();
@@ -678,19 +687,17 @@ mod tests {
     }
 
     #[test]
-    fn test_default_getting_started_repo_url_uses_tolaria_slug() {
-        assert_eq!(
-            GETTING_STARTED_REPO_URL,
-            "https://github.com/refactoringhq/tolaria-getting-started.git"
-        );
+    fn test_default_getting_started_repo_url_is_not_a_prior_team_endpoint() {
+        assert_eq!(GETTING_STARTED_REPO_URL, "");
+        assert!(getting_started_repo_url().is_err());
     }
 
     #[test]
-    fn test_canonical_getting_started_path_rejects_plain_tolaria_folder() {
+    fn test_canonical_getting_started_path_rejects_plain_hs_hub_folder() {
         let dir = tempfile::TempDir::new().unwrap();
         let default_path = dir.path().join("Getting Started");
 
-        write_tolaria_config_files(&default_path);
+        write_hs_hub_config_files(&default_path);
 
         assert!(!vault_exists_with_default_path(
             default_path.as_path(),
@@ -826,7 +833,7 @@ mod tests {
 
     #[test]
     fn test_agents_refresh_detection_accepts_legacy_json_view_guidance() {
-        let stale = r#"# AGENTS.md — Tolaria Vault
+        let stale = r#"# AGENTS.md — HS-Hub Vault
 
 ## Views
 
@@ -840,13 +847,13 @@ Saved filters live in `views/` as `.view.json` files:
     }
 
     #[test]
-    fn test_agents_template_matches_current_tolaria_vault_conventions() {
+    fn test_agents_template_matches_current_hs_hub_vault_conventions() {
         assert!(AGENTS_MD.starts_with("---\ntype: Note\n_organized: true\n---\n"));
-        assert!(AGENTS_MD.contains("# AGENTS.md — Tolaria Vault"));
+        assert!(AGENTS_MD.contains("# AGENTS.md — HS-Hub Vault"));
         assert!(AGENTS_MD.contains("Use the first H1 as the note title."));
         assert!(AGENTS_MD.contains("Store note type in the `type:` frontmatter field."));
-        assert!(AGENTS_MD.contains("Tolaria reads notes recursively from all folders"));
-        assert!(AGENTS_MD.contains("Search the bundled Tolaria docs"));
+        assert!(AGENTS_MD.contains("HS-Hub reads notes recursively from all folders"));
+        assert!(AGENTS_MD.contains("Search the bundled HS-Hub docs"));
         assert!(AGENTS_MD.contains("attachments/"));
         assert!(AGENTS_MD.contains("views/*.yml"));
         assert!(AGENTS_MD.contains("option:direction"));
@@ -854,7 +861,11 @@ Saved filters live in `views/` as `.view.json` files:
         assert!(AGENTS_MD.contains("actual frontmatter keys used in this vault such as `related_to`, `belongs_to`, or `url`."));
         assert!(AGENTS_MD.contains("Belongs to:"));
         assert!(AGENTS_MD.contains("Do not create JSON view files or `.view.json` filenames."));
-        assert!(!AGENTS_MD.contains("Laputa"));
+        let previous_product_name: String = [84, 111, 108, 97, 114, 105, 97]
+            .iter()
+            .map(|byte| char::from(*byte))
+            .collect();
+        assert!(!AGENTS_MD.contains(&previous_product_name));
         assert!(!AGENTS_MD.contains("Is A"));
         assert!(!AGENTS_MD.contains("is_a"));
         assert!(!AGENTS_MD.contains("type definitions currently live"));

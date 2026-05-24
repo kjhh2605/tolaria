@@ -4,7 +4,7 @@ use std::path::Path;
 #[test]
 fn test_scan_vault_folders_returns_tree() {
     let dir = TempDir::new().unwrap();
-    std::fs::create_dir_all(dir.path().join("projects/laputa")).unwrap();
+    std::fs::create_dir_all(dir.path().join("projects/hs-hub")).unwrap();
     std::fs::create_dir_all(dir.path().join("areas")).unwrap();
 
     let folders = scan_vault_folders(dir.path()).unwrap();
@@ -17,15 +17,15 @@ fn test_scan_vault_folders_returns_tree() {
         .find(|folder| folder.name == "projects")
         .unwrap();
     assert_eq!(projects.children.len(), 1);
-    assert_eq!(projects.children[0].name, "laputa");
-    assert_eq!(projects.children[0].path, "projects/laputa");
+    assert_eq!(projects.children[0].name, "hs-hub");
+    assert_eq!(projects.children[0].path, "projects/hs-hub");
 }
 
 #[test]
 fn test_scan_vault_folders_excludes_hidden() {
     let dir = TempDir::new().unwrap();
     std::fs::create_dir_all(dir.path().join(".git")).unwrap();
-    std::fs::create_dir_all(dir.path().join(".laputa")).unwrap();
+    std::fs::create_dir_all(dir.path().join(".hs-hub")).unwrap();
     std::fs::create_dir_all(dir.path().join("visible")).unwrap();
 
     let folders = scan_vault_folders(dir.path()).unwrap();

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NoteList } from './NoteList'
-import { APP_STORAGE_KEYS, LEGACY_APP_STORAGE_KEYS } from '../constants/appStorage'
+import { APP_STORAGE_KEYS } from '../constants/appStorage'
 import type { VaultEntry, SidebarSelection } from '../types'
 
 const localStorageMock = (() => {
@@ -149,8 +149,8 @@ describe('useNoteListSort (via NoteList)', () => {
     expectVisibleNoteOrder(['Alpha', 'Beta'])
   })
 
-  it('reads legacy list sort preferences when Tolaria key is absent', () => {
-    localStorageMock.setItem(LEGACY_APP_STORAGE_KEYS.sortPreferences, JSON.stringify({ '__list__': { option: 'title', direction: 'asc' } }))
+  it('reads HS-Hub list sort preferences', () => {
+    localStorageMock.setItem(APP_STORAGE_KEYS.sortPreferences, JSON.stringify({ '__list__': { option: 'title', direction: 'asc' } }))
     const entries = [
       makeEntry({ path: '/c.md', title: 'Charlie', modifiedAt: 3000 }),
       makeEntry({ path: '/a.md', title: 'Alpha', modifiedAt: 1000 }),

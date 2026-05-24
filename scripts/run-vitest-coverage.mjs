@@ -7,7 +7,7 @@ import { spawn } from 'node:child_process'
 
 const rootDir = process.cwd()
 const finalCoverageDir = resolve(rootDir, 'coverage')
-const coverageRunRoot = resolve(os.tmpdir(), 'tolaria-vitest-coverage-runs')
+const coverageRunRoot = resolve(os.tmpdir(), 'hs-hub-vitest-coverage-runs')
 const forwardedArgs = process.argv.slice(2)
 const hasFileParallelismOverride = forwardedArgs.some((arg) =>
   arg === '--fileParallelism' || arg === '--no-file-parallelism'

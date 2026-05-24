@@ -23,7 +23,7 @@ const ACTIVE_VAULT_ERROR = 'Note path must stay inside the active vault'
 const MCP_SERVER_DIR = path.dirname(fileURLToPath(import.meta.url))
 
 before(async () => {
-  tmpDir = await mkdtemp(path.join(os.tmpdir(), 'laputa-mcp-test-'))
+  tmpDir = await mkdtemp(path.join(os.tmpdir(), 'hs-hub-mcp-test-'))
 
   await mkdir(path.join(tmpDir, 'project'), { recursive: true })
   await mkdir(path.join(tmpDir, 'note'), { recursive: true })
@@ -115,12 +115,12 @@ describe('getNote', () => {
   })
 
   it('should reject absolute paths outside the vault', async () => {
-    await assertRejectsOutsideVault('laputa-mcp-outside-', outsideNote => outsideNote)
+    await assertRejectsOutsideVault('hs-hub-mcp-outside-', outsideNote => outsideNote)
   })
 
   it('should reject traversal paths outside the vault', async () => {
     await assertRejectsOutsideVault(
-      'laputa-mcp-traversal-',
+      'hs-hub-mcp-traversal-',
       outsideNote => path.relative(tmpDir, outsideNote),
     )
   })
@@ -259,8 +259,8 @@ describe('requireVaultPath', () => {
     )
   })
 
-  it('rejects missing vault paths instead of falling back to ~/Laputa', async () => {
-    const configDir = await mkdtemp(path.join(os.tmpdir(), 'tolaria-mcp-empty-config-'))
+  it('rejects missing vault paths instead of falling back to ~/HS-Hub', async () => {
+    const configDir = await mkdtemp(path.join(os.tmpdir(), 'hs-hub-mcp-empty-config-'))
     assert.throws(
       () => requireVaultPaths({}, { configDir }),
       /VAULT_PATH is required/,
@@ -278,12 +278,12 @@ describe('requireVaultPath', () => {
     )
   })
 
-  it('loads active mounted vault paths from Tolaria config when env is vault-neutral', async () => {
-    const configDir = await mkdtemp(path.join(os.tmpdir(), 'tolaria-mcp-config-'))
+  it('loads active mounted vault paths from HS-Hub config when env is vault-neutral', async () => {
+    const configDir = await mkdtemp(path.join(os.tmpdir(), 'hs-hub-mcp-config-'))
     const primaryVault = path.join(configDir, 'Primary Vault')
     const secondaryVault = path.join(configDir, 'Secondary Vault')
     const hiddenVault = path.join(configDir, 'Hidden Vault')
-    const configPath = path.join(configDir, 'com.tolaria.app', 'vaults.json')
+    const configPath = path.join(configDir, 'dev.kjhh2605.hs-hub', 'vaults.json')
 
     await mkdir(path.dirname(configPath), { recursive: true })
     await writeFile(configPath, JSON.stringify({
@@ -372,7 +372,7 @@ async function connectMcpClient() {
   })
   const stderr = collectTransportStderr(transport)
   const client = new Client(
-    { name: 'tolaria-mcp-test-client', version: '0.0.0' },
+    { name: 'hs-hub-mcp-test-client', version: '0.0.0' },
     { capabilities: {} },
   )
 

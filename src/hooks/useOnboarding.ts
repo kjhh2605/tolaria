@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import { isTauri, mockInvoke } from '../mock-tauri'
-import { APP_STORAGE_KEYS, LEGACY_APP_STORAGE_KEYS, getAppStorageItem } from '../constants/appStorage'
+import { APP_STORAGE_KEYS, getAppStorageItem } from '../constants/appStorage'
 import {
   buildGettingStartedVaultPath,
   formatGettingStartedCloneError,
@@ -72,7 +72,6 @@ function wasDismissed(): boolean {
 function markDismissed(): void {
   try {
     localStorage.setItem(APP_STORAGE_KEYS.welcomeDismissed, '1')
-    localStorage.removeItem(LEGACY_APP_STORAGE_KEYS.welcomeDismissed)
   } catch {
     // localStorage may be unavailable in some contexts
   }

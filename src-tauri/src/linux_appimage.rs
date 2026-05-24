@@ -28,10 +28,10 @@ const FCITX_ENV_HINT_KEYS: [&str; 4] = [
 const FCITX_GTK3_IM_MODULE_RELATIVE_PATH: &str =
     "usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-fcitx5.so";
 #[cfg(all(desktop, target_os = "linux"))]
-const TOLARIA_FCITX_IMMODULES_CACHE_FILE: &str = "tolaria-appimage-fcitx5-immodules.cache";
+const HS_HUB_FCITX_IMMODULES_CACHE_FILE: &str = "hs-hub-appimage-fcitx5-immodules.cache";
 const COLRV1_EMOJI_FONT_FILE: &str = "Noto-COLRv1.ttf";
 #[cfg(all(desktop, target_os = "linux"))]
-const TOLARIA_COLRV1_FONTCONFIG_FILE: &str = "tolaria-appimage-no-colrv1-emoji.conf";
+const HS_HUB_COLRV1_FONTCONFIG_FILE: &str = "hs-hub-appimage-no-colrv1-emoji.conf";
 
 const WAYLAND_CLIENT_PRELOAD_CANDIDATES: [&str; 7] = [
     "/usr/lib64/libwayland-client.so.0",
@@ -132,7 +132,7 @@ struct FcitxGtkModuleFileOverride {
 
 fn fcitx_immodules_cache_contents(module_path: &std::path::Path) -> String {
     format!(
-        r#"# Tolaria AppImage GTK input method modules
+        r#"# HS-Hub AppImage GTK input method modules
 "{}"
 "fcitx" "Fcitx 5" "fcitx" "" "ja:ko:zh:*"
 "#,
@@ -238,7 +238,7 @@ where
     }
 
     if has_non_empty_env(&mut get_var, "LD_PRELOAD")
-        || get_var("TOLARIA_APPIMAGE_WAYLAND_PRELOAD_ATTEMPTED").is_some_and(|value| value == "1")
+        || get_var("HS_HUB_APPIMAGE_WAYLAND_PRELOAD_ATTEMPTED").is_some_and(|value| value == "1")
     {
         return None;
     }
@@ -330,7 +330,7 @@ pub(crate) fn apply_startup_env_overrides() {
 #[cfg(all(desktop, target_os = "linux"))]
 fn apply_fcitx_gtk_im_module_file() {
     let Some(cache_path) = fcitx_immodules_cache_file_path() else {
-        eprintln!("Tolaria AppImage fcitx GTK module skipped: failed to resolve cache directory");
+        eprintln!("HS-Hub AppImage fcitx GTK module skipped: failed to resolve cache directory");
         return;
     };
     let Some(env_override) = fcitx_gtk_im_module_file_override_with(
@@ -345,12 +345,12 @@ fn apply_fcitx_gtk_im_module_file() {
     };
 
     if let Err(error) = std::fs::create_dir_all(parent) {
-        eprintln!("Tolaria AppImage fcitx GTK module skipped: failed to prepare cache ({error})");
+        eprintln!("HS-Hub AppImage fcitx GTK module skipped: failed to prepare cache ({error})");
         return;
     }
 
     if let Err(error) = std::fs::write(&env_override.cache_path, env_override.cache_contents) {
-        eprintln!("Tolaria AppImage fcitx GTK module skipped: failed to write cache ({error})");
+        eprintln!("HS-Hub AppImage fcitx GTK module skipped: failed to write cache ({error})");
         return;
     }
 
@@ -365,7 +365,7 @@ fn apply_colrv1_emoji_font_guard() {
         return;
     };
     let Some(config_path) = colrv1_fontconfig_file_path() else {
-        eprintln!("Tolaria AppImage COLRv1 font guard skipped: failed to resolve cache directory");
+        eprintln!("HS-Hub AppImage COLRv1 font guard skipped: failed to resolve cache directory");
         return;
     };
     let Some(parent) = config_path.parent() else {
@@ -373,12 +373,12 @@ fn apply_colrv1_emoji_font_guard() {
     };
 
     if let Err(error) = std::fs::create_dir_all(parent) {
-        eprintln!("Tolaria AppImage COLRv1 font guard skipped: failed to prepare cache ({error})");
+        eprintln!("HS-Hub AppImage COLRv1 font guard skipped: failed to prepare cache ({error})");
         return;
     }
 
     if let Err(error) = std::fs::write(&config_path, colrv1_emoji_fontconfig_contents(&font_path)) {
-        eprintln!("Tolaria AppImage COLRv1 font guard skipped: failed to write config ({error})");
+        eprintln!("HS-Hub AppImage COLRv1 font guard skipped: failed to write config ({error})");
         return;
     }
 
@@ -410,8 +410,8 @@ fn colrv1_fontconfig_file_path() -> Option<std::path::PathBuf> {
 
     Some(
         cache_dir
-            .join("tolaria")
-            .join(TOLARIA_COLRV1_FONTCONFIG_FILE),
+            .join("hs-hub")
+            .join(HS_HUB_COLRV1_FONTCONFIG_FILE),
     )
 }
 
@@ -422,8 +422,8 @@ fn fcitx_immodules_cache_file_path() -> Option<std::path::PathBuf> {
 
     Some(
         cache_dir
-            .join("tolaria")
-            .join(TOLARIA_FCITX_IMMODULES_CACHE_FILE),
+            .join("hs-hub")
+            .join(HS_HUB_FCITX_IMMODULES_CACHE_FILE),
     )
 }
 
@@ -467,7 +467,7 @@ fn apply_wayland_client_preload() {
     let exe = match launched_appimage_path() {
         Ok(exe) => exe,
         Err(e) => {
-            eprintln!("Tolaria AppImage Wayland preload skipped: {e}");
+            eprintln!("HS-Hub AppImage Wayland preload skipped: {e}");
             return;
         }
     };
@@ -475,9 +475,9 @@ fn apply_wayland_client_preload() {
     let error = std::process::Command::new(exe)
         .args(launched_process_args())
         .env("LD_PRELOAD", preload_path)
-        .env("TOLARIA_APPIMAGE_WAYLAND_PRELOAD_ATTEMPTED", "1")
+        .env("HS_HUB_APPIMAGE_WAYLAND_PRELOAD_ATTEMPTED", "1")
         .exec();
-    eprintln!("Tolaria AppImage Wayland preload skipped: failed to re-exec ({error})");
+    eprintln!("HS-Hub AppImage Wayland preload skipped: failed to re-exec ({error})");
 }
 
 #[cfg(test)]
@@ -512,7 +512,7 @@ mod tests {
 
     fn appimage_wayland_fcitx_env(key: &str, gtk_im_module: Option<&str>) -> Option<String> {
         match key {
-            "APPIMAGE" => Some("/tmp/Tolaria.AppImage".to_string()),
+            "APPIMAGE" => Some("/tmp/HS-Hub.AppImage".to_string()),
             "WAYLAND_DISPLAY" => Some("wayland-1".to_string()),
             "XMODIFIERS" => Some("@im=fcitx".to_string()),
             "GTK_IM_MODULE" => gtk_im_module.map(ToOwned::to_owned),
@@ -530,7 +530,7 @@ mod tests {
     #[test]
     fn startup_env_overrides_disable_unstable_webkit_rendering_for_appimage_launches() {
         let overrides = startup_env_overrides_with(|key| match key {
-            "APPIMAGE" => Some("/tmp/Tolaria.AppImage".to_string()),
+            "APPIMAGE" => Some("/tmp/HS-Hub.AppImage".to_string()),
             _ => None,
         });
 
@@ -550,7 +550,7 @@ mod tests {
     #[test]
     fn startup_env_overrides_preserve_explicit_user_setting_per_variable() {
         let overrides = startup_env_overrides_with(|key| match key {
-            "APPDIR" => Some("/tmp/.mount_Tolaria".to_string()),
+            "APPDIR" => Some("/tmp/.mount_HS-Hub".to_string()),
             "WEBKIT_DISABLE_DMABUF_RENDERER" => Some("0".to_string()),
             _ => None,
         });
@@ -574,7 +574,7 @@ mod tests {
     #[test]
     fn startup_env_overrides_enable_fcitx_gtk_module_for_x11_appimage() {
         let overrides = startup_env_overrides_with(|key| match key {
-            "APPIMAGE" => Some("/tmp/Tolaria.AppImage".to_string()),
+            "APPIMAGE" => Some("/tmp/HS-Hub.AppImage".to_string()),
             "XDG_SESSION_TYPE" => Some("x11".to_string()),
             "XMODIFIERS" => Some("@im=fcitx".to_string()),
             _ => None,
@@ -594,7 +594,7 @@ mod tests {
     #[test]
     fn startup_env_overrides_leave_non_fcitx_wayland_appimage_input_unchanged() {
         let overrides = startup_env_overrides_with(|key| match key {
-            "APPIMAGE" => Some("/tmp/Tolaria.AppImage".to_string()),
+            "APPIMAGE" => Some("/tmp/HS-Hub.AppImage".to_string()),
             "WAYLAND_DISPLAY" => Some("wayland-1".to_string()),
             _ => None,
         });
@@ -604,13 +604,13 @@ mod tests {
 
     #[test]
     fn fcitx_module_file_override_points_gtk_to_bundled_appimage_module() {
-        let appdir = std::path::Path::new("/tmp/.mount_Tolaria");
+        let appdir = std::path::Path::new("/tmp/.mount_HS-Hub");
         let module_path = appdir.join(FCITX_GTK3_IM_MODULE_RELATIVE_PATH);
-        let cache_path = std::path::PathBuf::from("/tmp/tolaria/immodules.cache");
+        let cache_path = std::path::PathBuf::from("/tmp/hs-hub/immodules.cache");
         let env_override = fcitx_gtk_im_module_file_override_with(
             &mut |key| match key {
                 "APPDIR" => Some(appdir.display().to_string()),
-                "APPIMAGE" => Some("/tmp/Tolaria.AppImage".to_string()),
+                "APPIMAGE" => Some("/tmp/HS-Hub.AppImage".to_string()),
                 "GTK_IM_MODULE" => Some("fcitx".to_string()),
                 "XDG_SESSION_TYPE" => Some("x11".to_string()),
                 _ => None,
@@ -633,14 +633,14 @@ mod tests {
     fn fcitx_module_file_override_preserves_explicit_module_cache() {
         let env_override = fcitx_gtk_im_module_file_override_with(
             &mut |key| match key {
-                "APPDIR" => Some("/tmp/.mount_Tolaria".to_string()),
-                "APPIMAGE" => Some("/tmp/Tolaria.AppImage".to_string()),
+                "APPDIR" => Some("/tmp/.mount_HS-Hub".to_string()),
+                "APPIMAGE" => Some("/tmp/HS-Hub.AppImage".to_string()),
                 "GTK_IM_MODULE" => Some("fcitx".to_string()),
                 "GTK_IM_MODULE_FILE" => Some("/tmp/custom-immodules.cache".to_string()),
                 _ => None,
             },
             |_| true,
-            std::path::PathBuf::from("/tmp/tolaria/immodules.cache"),
+            std::path::PathBuf::from("/tmp/hs-hub/immodules.cache"),
         );
 
         assert_eq!(env_override, None);
@@ -650,7 +650,7 @@ mod tests {
     fn colrv1_font_guard_targets_reported_appimage_emoji_font() {
         let font_path = colrv1_emoji_font_path_with(
             |key| match key {
-                "APPIMAGE" => Some("/tmp/Tolaria.AppImage".to_string()),
+                "APPIMAGE" => Some("/tmp/HS-Hub.AppImage".to_string()),
                 _ => None,
             },
             || Some("/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf".to_string()),
@@ -666,7 +666,7 @@ mod tests {
     fn colrv1_font_guard_preserves_explicit_fontconfig_settings() {
         let font_path = colrv1_emoji_font_path_with(
             |key| match key {
-                "APPDIR" => Some("/tmp/.mount_Tolaria".to_string()),
+                "APPDIR" => Some("/tmp/.mount_HS-Hub".to_string()),
                 "FONTCONFIG_FILE" => Some("/tmp/custom-fontconfig.conf".to_string()),
                 _ => None,
             },
@@ -680,7 +680,7 @@ mod tests {
     fn colrv1_font_guard_ignores_other_emoji_fonts() {
         let font_path = colrv1_emoji_font_path_with(
             |key| match key {
-                "APPIMAGE" => Some("/tmp/Tolaria.AppImage".to_string()),
+                "APPIMAGE" => Some("/tmp/HS-Hub.AppImage".to_string()),
                 _ => None,
             },
             || Some("/usr/share/fonts/noto/NotoColorEmoji.ttf".to_string()),
@@ -704,7 +704,7 @@ mod tests {
     fn wayland_preload_uses_first_available_system_library() {
         let preload_path = wayland_client_preload_path_with(
             |key| match key {
-                "APPIMAGE" => Some("/tmp/Tolaria.AppImage".to_string()),
+                "APPIMAGE" => Some("/tmp/HS-Hub.AppImage".to_string()),
                 "XDG_SESSION_TYPE" => Some("wayland".to_string()),
                 _ => None,
             },
@@ -721,7 +721,7 @@ mod tests {
     fn wayland_preload_prefers_fedora_lib64_over_usr_lib() {
         let preload_path = wayland_client_preload_path_with(
             |key| match key {
-                "APPIMAGE" => Some("/tmp/Tolaria.AppImage".to_string()),
+                "APPIMAGE" => Some("/tmp/HS-Hub.AppImage".to_string()),
                 "XDG_SESSION_TYPE" => Some("wayland".to_string()),
                 _ => None,
             },
@@ -758,7 +758,7 @@ mod tests {
     fn wayland_preload_preserves_explicit_ld_preload() {
         let preload_path = wayland_client_preload_path_with(
             |key| match key {
-                "APPDIR" => Some("/tmp/.mount_Tolaria".to_string()),
+                "APPDIR" => Some("/tmp/.mount_HS-Hub".to_string()),
                 "WAYLAND_DISPLAY" => Some("wayland-0".to_string()),
                 "LD_PRELOAD" => Some("/custom/libwayland-client.so".to_string()),
                 _ => None,
@@ -773,7 +773,7 @@ mod tests {
     fn wayland_preload_is_empty_for_x11_sessions() {
         let preload_path = wayland_client_preload_path_with(
             |key| match key {
-                "APPIMAGE" => Some("/tmp/Tolaria.AppImage".to_string()),
+                "APPIMAGE" => Some("/tmp/HS-Hub.AppImage".to_string()),
                 "XDG_SESSION_TYPE" => Some("x11".to_string()),
                 _ => None,
             },

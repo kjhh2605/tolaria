@@ -1,7 +1,7 @@
 import { beforeEach, describe, it, expect } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useLayoutPanels, COLUMN_MIN_WIDTHS } from './useLayoutPanels'
-import { APP_STORAGE_KEYS, LEGACY_APP_STORAGE_KEYS } from '../constants/appStorage'
+import { APP_STORAGE_KEYS } from '../constants/appStorage'
 
 const localStorageMock = (() => {
   let store: Record<string, string> = {}
@@ -133,8 +133,8 @@ describe('useLayoutPanels', () => {
     expectPanelWidths(result, { sidebar: 250, noteList: 300, inspector: 280 })
   })
 
-  it('persists resized panel widths with the Tolaria storage key', () => {
-    storePanelWidths(LEGACY_APP_STORAGE_KEYS.layoutPanels, {
+  it('persists resized panel widths with the HS-Hub storage key', () => {
+    storePanelWidths(APP_STORAGE_KEYS.layoutPanels, {
       sidebar: 260,
       noteList: 340,
       inspector: 300,
@@ -148,6 +148,5 @@ describe('useLayoutPanels', () => {
       noteList: 340,
       inspector: 300,
     })
-    expect(localStorage.getItem(LEGACY_APP_STORAGE_KEYS.layoutPanels)).toBeNull()
   })
 })

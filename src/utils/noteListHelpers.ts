@@ -1,5 +1,5 @@
 import type { VaultEntry, SidebarSelection, InboxPeriod, ViewFile } from '../types'
-import { APP_STORAGE_KEYS, LEGACY_APP_STORAGE_KEYS, getAppStorageItem } from '../constants/appStorage'
+import { APP_STORAGE_KEYS, getAppStorageItem } from '../constants/appStorage'
 import {
   orderInverseRelationshipLabels as sortInverseRelationshipLabels,
   resolveInverseRelationshipLabel,
@@ -265,7 +265,6 @@ export function loadSortPreferences(): Record<string, SortConfig> {
 export function saveSortPreferences(prefs: Record<string, SortConfig>) {
   try {
     localStorage.setItem(APP_STORAGE_KEYS.sortPreferences, JSON.stringify(prefs))
-    localStorage.removeItem(LEGACY_APP_STORAGE_KEYS.sortPreferences)
   } catch { /* ignore */ }
 }
 
@@ -278,10 +277,8 @@ export function clearListSortFromLocalStorage(): void {
     delete parsed['__list__']
     if (Object.keys(parsed).length === 0) {
       localStorage.removeItem(APP_STORAGE_KEYS.sortPreferences)
-      localStorage.removeItem(LEGACY_APP_STORAGE_KEYS.sortPreferences)
     } else {
       localStorage.setItem(APP_STORAGE_KEYS.sortPreferences, JSON.stringify(parsed))
-      localStorage.removeItem(LEGACY_APP_STORAGE_KEYS.sortPreferences)
     }
   } catch { /* ignore */ }
 }
@@ -300,7 +297,9 @@ function filenameStemFromEntry(entry: VaultEntry): string {
 
 function relativePathStemFromEntry(entry: VaultEntry): string {
   const normalizedPath = stringField(entry.path).replaceAll('\\', '/')
-  return normalizedPath.replace(/^.*\/Laputa\//, '').replace(/\.md$/, '')
+  const withoutExtension = normalizedPath.replace(/\.md$/, '')
+  const parts = withoutExtension.split('/').filter(Boolean)
+  return parts.slice(-2).join('/')
 }
 
 function linkTargetsForEntry(entry: VaultEntry): Set<string> {

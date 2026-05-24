@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  _defaultPostHogHostForTest as defaultPostHogHost,
   resolveFrontendTelemetryConfig,
   sanitizeTelemetryEnvValue,
 } from './telemetryConfig'
@@ -15,7 +14,7 @@ function resolveConfig(overrides: {
     VITE_SENTRY_DSN: 'https://public@example.ingest.sentry.io/123456',
     VITE_SENTRY_RELEASE: '2026.4.23',
     VITE_POSTHOG_KEY: 'phc_test_key',
-    VITE_POSTHOG_HOST: 'https://eu.i.posthog.com',
+    VITE_POSTHOG_HOST: 'https://analytics.hansung.example',
     ...overrides,
   })
 }
@@ -44,14 +43,14 @@ describe('resolveFrontendTelemetryConfig', () => {
         VITE_SENTRY_DSN: ' "https://public@example.ingest.sentry.io/123456" ',
         VITE_SENTRY_RELEASE: " '2026.4.23' ",
         VITE_POSTHOG_KEY: " 'phc_test_key' ",
-        VITE_POSTHOG_HOST: ' https://eu.i.posthog.com ',
+        VITE_POSTHOG_HOST: ' https://analytics.hansung.example ',
       },
       expected: {
         sentryDsn: 'https://public@example.ingest.sentry.io/123456',
         sentryBuildVersion: '2026.4.23',
         sentryRelease: '2026.4.23',
         posthogKey: 'phc_test_key',
-        posthogHost: 'https://eu.i.posthog.com',
+        posthogHost: 'https://analytics.hansung.example',
       },
     },
     {
@@ -59,22 +58,22 @@ describe('resolveFrontendTelemetryConfig', () => {
       overrides: {
         VITE_SENTRY_DSN: 'public@example.ingest.sentry.io/123456',
         VITE_POSTHOG_KEY: 'phc_test_key',
-        VITE_POSTHOG_HOST: 'eu.i.posthog.com',
+        VITE_POSTHOG_HOST: 'analytics.hansung.example',
       },
       expected: {
         sentryDsn: 'https://public@example.ingest.sentry.io/123456',
         sentryBuildVersion: '2026.4.23',
         sentryRelease: '2026.4.23',
         posthogKey: 'phc_test_key',
-        posthogHost: 'https://eu.i.posthog.com',
+        posthogHost: 'https://analytics.hansung.example',
       },
     },
   ])('$name', ({ overrides, expected }) => {
     expect(resolveConfig(overrides)).toEqual(expected)
   })
 
-  it('uses the default PostHog host when one is not configured', () => {
-    expect(resolveConfig({ VITE_POSTHOG_HOST: undefined }).posthogHost).toBe(defaultPostHogHost)
+  it('does not use a default PostHog host when one is not configured', () => {
+    expect(resolveConfig({ VITE_POSTHOG_HOST: undefined }).posthogHost).toBeNull()
   })
 
   it('drops invalid Sentry DSNs instead of passing them to the SDK', () => {

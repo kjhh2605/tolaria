@@ -68,7 +68,7 @@ function renderSync(overrides: Partial<Parameters<typeof useAutoSync>[0]> = {}) 
 
   const hook = renderHook(() =>
     useAutoSync({
-      vaultPath: '/Users/luca/Laputa',
+      vaultPath: '/Users/hansung/HS-Hub',
       intervalMinutes: 5,
       onVaultUpdated,
       onSyncUpdated,
@@ -120,7 +120,7 @@ describe('useAutoSync extra', () => {
     })
 
     await waitFor(() => {
-      expect(hook.onVaultUpdated).toHaveBeenCalledWith(['notes/today.md'], '/Users/luca/Laputa')
+      expect(hook.onVaultUpdated).toHaveBeenCalledWith(['notes/today.md'], '/Users/hansung/HS-Hub')
       expect(hook.onSyncUpdated).toHaveBeenCalledOnce()
       expect(hook.onToast).toHaveBeenCalledWith('Pulled and pushed successfully')
       expect(hook.result.current.syncStatus).toBe('idle')

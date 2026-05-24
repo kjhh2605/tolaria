@@ -45,9 +45,9 @@ export const makeEntry = (overrides: Partial<VaultEntry> = {}): VaultEntry => ({
 
 export const mockEntries: VaultEntry[] = [
   makeEntry({
-    path: '/Users/luca/Laputa/project/26q1-laputa-app.md',
-    filename: '26q1-laputa-app.md',
-    title: 'Build Laputa App',
+    path: '/Users/hansung/HS-Hub/project/26q1-hs-hub-project.md',
+    filename: '26q1-hs-hub-project.md',
+    title: 'Build HS-Hub Project',
     isA: 'Project',
     relatedTo: ['[[topic/software-development]]'],
     status: 'Active',
@@ -60,23 +60,23 @@ export const mockEntries: VaultEntry[] = [
     },
   }),
   makeEntry({
-    path: '/Users/luca/Laputa/note/facebook-ads-strategy.md',
+    path: '/Users/hansung/HS-Hub/note/facebook-ads-strategy.md',
     filename: 'facebook-ads-strategy.md',
     title: 'Facebook Ads Strategy',
     isA: 'Note',
-    belongsTo: ['[[project/26q1-laputa-app]]'],
+    belongsTo: ['[[project/26q1-hs-hub-project]]'],
     relatedTo: ['[[topic/growth]]'],
     modifiedAt: 1700000000,
     createdAt: null,
     fileSize: 847,
     snippet: 'Lookalike audiences convert 3x better.',
     relationships: {
-      'Belongs to': ['[[project/26q1-laputa-app]]'],
+      'Belongs to': ['[[project/26q1-hs-hub-project]]'],
       'Related to': ['[[topic/growth]]'],
     },
   }),
   makeEntry({
-    path: '/Users/luca/Laputa/person/matteo-cellini.md',
+    path: '/Users/hansung/HS-Hub/person/matteo-cellini.md',
     filename: 'matteo-cellini.md',
     title: 'Matteo Cellini',
     isA: 'Person',
@@ -86,7 +86,7 @@ export const mockEntries: VaultEntry[] = [
     snippet: 'Sponsorship manager.',
   }),
   makeEntry({
-    path: '/Users/luca/Laputa/event/2026-02-14-kickoff.md',
+    path: '/Users/hansung/HS-Hub/event/2026-02-14-kickoff.md',
     filename: '2026-02-14-kickoff.md',
     title: 'Kickoff Meeting',
     isA: 'Event',
@@ -96,7 +96,7 @@ export const mockEntries: VaultEntry[] = [
     snippet: 'Project kickoff meeting notes.',
   }),
   makeEntry({
-    path: '/Users/luca/Laputa/topic/software-development.md',
+    path: '/Users/hansung/HS-Hub/topic/software-development.md',
     filename: 'software-development.md',
     title: 'Software Development',
     isA: 'Topic',

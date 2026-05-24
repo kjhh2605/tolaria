@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * WebSocket bridge for Tolaria MCP tools.
+ * WebSocket bridge for HS-Hub MCP tools.
  *
- * Exposes vault operations over WebSocket so the Tolaria app frontend
+ * Exposes vault operations over WebSocket so the HS-Hub app frontend
  * can invoke MCP tools in real-time without going through stdio.
  *
  * Port 9710: Tool bridge — Claude/AI clients call vault tools here.
@@ -49,7 +49,7 @@ function requestedVaultPath(args = {}) {
   const requested = typeof args.vaultPath === 'string' ? args.vaultPath.trim() : ''
   if (!requested) return null
   if (!activeVaultPaths().includes(requested)) {
-    throw new Error(`Vault is not active in Tolaria: ${requested}`)
+    throw new Error(`Vault is not active in HS-Hub: ${requested}`)
   }
   return requested
 }
@@ -241,7 +241,7 @@ function verifyBridgeRequest(bridgeType) {
 /**
  * Attempt to start the UI bridge WebSocket server.
  * Returns a Promise that resolves to the WebSocketServer or null if the port
- * is unavailable (e.g. another Tolaria instance owns it).
+ * is unavailable (e.g. another HS-Hub instance owns it).
  */
 export function startUiBridge(port = WS_UI_PORT) {
   return new Promise((resolve) => {

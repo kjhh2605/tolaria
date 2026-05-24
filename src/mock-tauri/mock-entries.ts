@@ -9,11 +9,11 @@ const now = Date.now() / 1000
 
 export const MOCK_ENTRIES: VaultEntry[] = [
   {
-    path: '/Users/luca/Laputa/26q1-laputa-app.md',
-    filename: '26q1-laputa-app.md',
-    title: 'Build Laputa App',
+    path: '/Users/hansung/HS-Hub/26q1-hs-hub-project.md',
+    filename: '26q1-hs-hub-project.md',
+    title: 'Build HS-Hub Project',
     isA: 'Project',
-    aliases: ['Laputa App'],
+    aliases: ['HS-Hub Project'],
     belongsTo: ['[[q1-2026]]'],
     relatedTo: ['[[software-development]]'],
     status: 'Active',
@@ -38,7 +38,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/grow-newsletter.md',
+    path: '/Users/hansung/HS-Hub/grow-newsletter.md',
     filename: 'grow-newsletter.md',
     title: 'Grow Newsletter',
     isA: 'Responsibility',
@@ -72,7 +72,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/manage-sponsorships.md',
+    path: '/Users/hansung/HS-Hub/manage-sponsorships.md',
     filename: 'manage-sponsorships.md',
     title: 'Manage Sponsorships',
     isA: 'Responsibility',
@@ -100,7 +100,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/write-weekly-essays.md',
+    path: '/Users/hansung/HS-Hub/write-weekly-essays.md',
     filename: 'write-weekly-essays.md',
     title: 'Write Weekly Essays',
     isA: 'Procedure',
@@ -128,7 +128,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/run-sponsorships.md',
+    path: '/Users/hansung/HS-Hub/run-sponsorships.md',
     filename: 'run-sponsorships.md',
     title: 'Run Sponsorships',
     isA: 'Procedure',
@@ -156,7 +156,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/stock-screener.md',
+    path: '/Users/hansung/HS-Hub/stock-screener.md',
     filename: 'stock-screener.md',
     title: 'Stock Screener — EMA200 Wick Bounce',
     isA: 'Experiment',
@@ -185,12 +185,12 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/facebook-ads-strategy.md',
+    path: '/Users/hansung/HS-Hub/facebook-ads-strategy.md',
     filename: 'facebook-ads-strategy.md',
     title: 'Facebook Ads Strategy',
     isA: 'Note',
     aliases: [],
-    belongsTo: ['[[26q1-laputa-app]]'],
+    belongsTo: ['[[26q1-hs-hub-project]]'],
     relatedTo: ['[[growth]]', '[[ads]]'],
     status: null,
     archived: false,
@@ -200,7 +200,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     snippet: 'Lookalike audiences from newsletter subscribers convert 3x better than interest-based targeting Video ads outperform static images by 40% on engagement',
     wordCount: 267,
     relationships: {
-      'Belongs to': ['[[26q1-laputa-app]]'],
+      'Belongs to': ['[[26q1-hs-hub-project]]'],
       'Related to': ['[[growth]]', '[[ads]]'],
       'Type': ['[[note]]'],
     },
@@ -209,17 +209,17 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     order: null,
     sidebarLabel: null,
     template: null, sort: null, view: null, visible: null,
-    outgoingLinks: ['26q1-laputa-app', 'growth', 'ads'],
+    outgoingLinks: ['26q1-hs-hub-project', 'growth', 'ads'],
     properties: { Priority: 'Medium', Rating: 4 },
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/budget-allocation.md',
+    path: '/Users/hansung/HS-Hub/budget-allocation.md',
     filename: 'budget-allocation.md',
     title: 'Budget Allocation',
     isA: 'Note',
     aliases: [],
-    belongsTo: ['[[26q1-laputa-app]]'],
+    belongsTo: ['[[26q1-hs-hub-project]]'],
     relatedTo: [],
     status: null,
     archived: false,
@@ -229,7 +229,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     snippet: 'Under budget on ads due to improved targeting efficiency Consider reallocating savings to content production',
     wordCount: 150,
     relationships: {
-      'Belongs to': ['[[26q1-laputa-app]]'],
+      'Belongs to': ['[[26q1-hs-hub-project]]'],
       'Type': ['[[note]]'],
     },
     icon: null,
@@ -237,12 +237,12 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     order: null,
     sidebarLabel: null,
     template: null, sort: null, view: null, visible: null,
-    outgoingLinks: ['26q1-laputa-app'],
+    outgoingLinks: ['26q1-hs-hub-project'],
     properties: {},
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/matteo-cellini.md',
+    path: '/Users/hansung/HS-Hub/matteo-cellini.md',
     filename: 'matteo-cellini.md',
     title: 'Matteo Cellini',
     isA: 'Person',
@@ -269,7 +269,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/maria-bianchi.md',
+    path: '/Users/hansung/HS-Hub/maria-bianchi.md',
     filename: 'maria-bianchi.md',
     title: 'Maria Bianchi',
     isA: 'Person',
@@ -296,7 +296,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/marco-verdi.md',
+    path: '/Users/hansung/HS-Hub/marco-verdi.md',
     filename: 'marco-verdi.md',
     title: 'Marco Verdi',
     isA: 'Person',
@@ -323,7 +323,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/elena-russo.md',
+    path: '/Users/hansung/HS-Hub/elena-russo.md',
     filename: 'elena-russo.md',
     title: 'Elena Russo',
     isA: 'Person',
@@ -350,13 +350,13 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/2026-02-14-laputa-app-kickoff.md',
-    filename: '2026-02-14-laputa-app-kickoff.md',
-    title: 'Laputa App Design Session',
+    path: '/Users/hansung/HS-Hub/2026-02-14-hs-hub-project-kickoff.md',
+    filename: '2026-02-14-hs-hub-project-kickoff.md',
+    title: 'HS-Hub Design Session',
     isA: 'Event',
     aliases: [],
     belongsTo: [],
-    relatedTo: ['[[26q1-laputa-app]]', '[[matteo-cellini]]'],
+    relatedTo: ['[[26q1-hs-hub-project]]', '[[matteo-cellini]]'],
     status: null,
     archived: false,
     modifiedAt: now - 3600 * 2,
@@ -365,7 +365,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     snippet: 'Agreed on four-panel layout inspired by Bear Notes CodeMirror 6 for the editor — live preview is critical MVP by end of Q1.',
     wordCount: 310,
     relationships: {
-      'Related to': ['[[26q1-laputa-app]]', '[[matteo-cellini]]'],
+      'Related to': ['[[26q1-hs-hub-project]]', '[[matteo-cellini]]'],
       'Type': ['[[event]]'],
     },
     icon: null,
@@ -373,12 +373,12 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     order: null,
     sidebarLabel: null,
     template: null, sort: null, view: null, visible: null,
-    outgoingLinks: ['26q1-laputa-app', 'matteo-cellini'],
+    outgoingLinks: ['26q1-hs-hub-project', 'matteo-cellini'],
     properties: {},
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/software-development.md',
+    path: '/Users/hansung/HS-Hub/software-development.md',
     filename: 'software-development.md',
     title: 'Software Development',
     isA: 'Topic',
@@ -406,7 +406,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/trading.md',
+    path: '/Users/hansung/HS-Hub/trading.md',
     filename: 'trading.md',
     title: 'Trading',
     isA: 'Topic',
@@ -434,7 +434,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/on-writing-well.md',
+    path: '/Users/hansung/HS-Hub/on-writing-well.md',
     filename: 'on-writing-well.md',
     title: 'On Writing Well',
     isA: 'Essay',
@@ -462,7 +462,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/engineering-leadership-101.md',
+    path: '/Users/hansung/HS-Hub/engineering-leadership-101.md',
     filename: 'engineering-leadership-101.md',
     title: 'Engineering Leadership 101',
     isA: 'Essay',
@@ -491,7 +491,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/ai-agents-primer.md',
+    path: '/Users/hansung/HS-Hub/ai-agents-primer.md',
     filename: 'ai-agents-primer.md',
     title: 'AI Agents Primer',
     isA: 'Essay',
@@ -520,7 +520,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
   },
   // --- Type documents ---
   {
-    path: '/Users/luca/Laputa/project.md',
+    path: '/Users/hansung/HS-Hub/project.md',
     filename: 'project.md',
     title: 'Project',
     isA: 'Type',
@@ -545,7 +545,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/responsibility.md',
+    path: '/Users/hansung/HS-Hub/responsibility.md',
     filename: 'responsibility.md',
     title: 'Responsibility',
     isA: 'Type',
@@ -570,7 +570,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/procedure.md',
+    path: '/Users/hansung/HS-Hub/procedure.md',
     filename: 'procedure.md',
     title: 'Procedure',
     isA: 'Type',
@@ -595,7 +595,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/experiment.md',
+    path: '/Users/hansung/HS-Hub/experiment.md',
     filename: 'experiment.md',
     title: 'Experiment',
     isA: 'Type',
@@ -620,7 +620,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/person.md',
+    path: '/Users/hansung/HS-Hub/person.md',
     filename: 'person.md',
     title: 'Person',
     isA: 'Type',
@@ -645,7 +645,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/event.md',
+    path: '/Users/hansung/HS-Hub/event.md',
     filename: 'event.md',
     title: 'Event',
     isA: 'Type',
@@ -670,7 +670,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/topic.md',
+    path: '/Users/hansung/HS-Hub/topic.md',
     filename: 'topic.md',
     title: 'Topic',
     isA: 'Type',
@@ -695,7 +695,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/essay.md',
+    path: '/Users/hansung/HS-Hub/essay.md',
     filename: 'essay.md',
     title: 'Essay',
     isA: 'Type',
@@ -720,7 +720,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/note.md',
+    path: '/Users/hansung/HS-Hub/note.md',
     filename: 'note.md',
     title: 'Note',
     isA: 'Type',
@@ -746,7 +746,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
   },
   // --- Custom type documents ---
   {
-    path: '/Users/luca/Laputa/config.md',
+    path: '/Users/hansung/HS-Hub/config.md',
     filename: 'config.md',
     title: 'Config',
     isA: 'Type',
@@ -771,7 +771,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/recipe.md',
+    path: '/Users/hansung/HS-Hub/recipe.md',
     filename: 'recipe.md',
     title: 'Recipe',
     isA: 'Type',
@@ -796,7 +796,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/book.md',
+    path: '/Users/hansung/HS-Hub/book.md',
     filename: 'book.md',
     title: 'Book',
     isA: 'Type',
@@ -822,7 +822,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
   },
   // --- Instances of custom types ---
   {
-    path: '/Users/luca/Laputa/config/agents.md',
+    path: '/Users/hansung/HS-Hub/config/agents.md',
     filename: 'agents.md',
     title: 'Agent Instructions',
     isA: 'Config',
@@ -849,7 +849,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/pasta-carbonara.md',
+    path: '/Users/hansung/HS-Hub/pasta-carbonara.md',
     filename: 'pasta-carbonara.md',
     title: 'Pasta Carbonara',
     isA: 'Recipe',
@@ -876,7 +876,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/designing-data-intensive-applications.md',
+    path: '/Users/hansung/HS-Hub/designing-data-intensive-applications.md',
     filename: 'designing-data-intensive-applications.md',
     title: 'Designing Data-Intensive Applications',
     isA: 'Book',
@@ -904,7 +904,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
   },
   // --- Archived entries ---
   {
-    path: '/Users/luca/Laputa/25q3-website-redesign.md',
+    path: '/Users/hansung/HS-Hub/25q3-website-redesign.md',
     filename: '25q3-website-redesign.md',
     title: 'Website Redesign',
     isA: 'Project',
@@ -932,7 +932,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/twitter-thread-experiment.md',
+    path: '/Users/hansung/HS-Hub/twitter-thread-experiment.md',
     filename: 'twitter-thread-experiment.md',
     title: 'Twitter Thread Growth Experiment',
     isA: 'Experiment',
@@ -961,7 +961,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
   },
   // --- Refactoring entries for exact-match search testing ---
   {
-    path: '/Users/luca/Laputa/refactoring.md',
+    path: '/Users/hansung/HS-Hub/refactoring.md',
     filename: 'refactoring.md',
     title: 'Refactoring',
     isA: 'Area',
@@ -986,7 +986,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/refactoring-ideas.md',
+    path: '/Users/hansung/HS-Hub/refactoring-ideas.md',
     filename: 'refactoring-ideas.md',
     title: 'Refactoring Ideas',
     isA: 'Note',
@@ -1011,7 +1011,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/refactoring-key-ideas.md',
+    path: '/Users/hansung/HS-Hub/refactoring-key-ideas.md',
     filename: 'refactoring-key-ideas.md',
     title: 'Refactoring Key Ideas',
     isA: 'Note',
@@ -1036,7 +1036,7 @@ export const MOCK_ENTRIES: VaultEntry[] = [
     organized: false, favorite: false, favoriteIndex: null, listPropertiesDisplay: [], hasH1: false,
   },
   {
-    path: '/Users/luca/Laputa/refactoring-patterns.md',
+    path: '/Users/hansung/HS-Hub/refactoring-patterns.md',
     filename: 'refactoring-patterns.md',
     title: 'Refactoring Patterns',
     isA: 'Note',
@@ -1087,7 +1087,7 @@ function generateBulkEntries(count: number): VaultEntry[] {
     const title = `${adj} ${noun} ${i + 1}`
     const slug = title.toLowerCase().replace(/\s+/g, '-')
     entries.push({
-      path: `/Users/luca/Laputa/${slug}.md`,
+      path: `/Users/hansung/HS-Hub/${slug}.md`,
       filename: `${slug}.md`,
       title,
       isA: type,

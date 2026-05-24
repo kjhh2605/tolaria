@@ -141,7 +141,7 @@ describe('NoteList rendering', () => {
 
   it('renders all entries in the all-notes view', () => {
     renderNoteList()
-    expect(screen.getByText('Build Laputa App')).toBeInTheDocument()
+    expect(screen.getByText('Build HS-Hub Project')).toBeInTheDocument()
     expect(screen.getByText('Facebook Ads Strategy')).toBeInTheDocument()
     expect(screen.getByText('Matteo Cellini')).toBeInTheDocument()
   })
@@ -149,18 +149,18 @@ describe('NoteList rendering', () => {
   it('filters section groups by type', () => {
     renderNoteList({ selection: { kind: 'sectionGroup', type: 'Person' } })
     expect(screen.getByText('Matteo Cellini')).toBeInTheDocument()
-    expect(screen.queryByText('Build Laputa App')).not.toBeInTheDocument()
+    expect(screen.queryByText('Build HS-Hub Project')).not.toBeInTheDocument()
   })
 
   it('supports event sections', () => {
     renderNoteList({ selection: { kind: 'sectionGroup', type: 'Event' } })
     expect(screen.getByText('Kickoff Meeting')).toBeInTheDocument()
-    expect(screen.queryByText('Build Laputa App')).not.toBeInTheDocument()
+    expect(screen.queryByText('Build HS-Hub Project')).not.toBeInTheDocument()
   })
 
   it('supports project sections', () => {
     renderNoteList({ selection: { kind: 'sectionGroup', type: 'Project' } })
-    expect(screen.getByText('Build Laputa App')).toBeInTheDocument()
+    expect(screen.getByText('Build HS-Hub Project')).toBeInTheDocument()
     expect(screen.queryByText('Matteo Cellini')).not.toBeInTheDocument()
   })
 
@@ -178,7 +178,7 @@ describe('NoteList rendering', () => {
 
   it('pins the current entity and shows grouped children', () => {
     renderNoteList({ selection: { kind: 'entity', entry: mockEntries[0] } })
-    expect(screen.getAllByText('Build Laputa App').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Build HS-Hub Project').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Facebook Ads Strategy')).toBeInTheDocument()
     expect(screen.queryByText('Matteo Cellini')).not.toBeInTheDocument()
     expect(screen.getByText('Children')).toBeInTheDocument()
@@ -187,7 +187,7 @@ describe('NoteList rendering', () => {
 
   it('shows referenced-by groups for topic entities', () => {
     renderNoteList({ selection: { kind: 'entity', entry: mockEntries[4] } })
-    expect(screen.getByText('Build Laputa App')).toBeInTheDocument()
+    expect(screen.getByText('Build HS-Hub Project')).toBeInTheDocument()
     expect(screen.getByText('Referenced by')).toBeInTheDocument()
   })
 
@@ -202,7 +202,7 @@ describe('NoteList rendering', () => {
     renderNoteList()
     await searchNoteList('facebook')
     expect(screen.getByText('Facebook Ads Strategy')).toBeInTheDocument()
-    expect(screen.queryByText('Build Laputa App')).not.toBeInTheDocument()
+    expect(screen.queryByText('Build HS-Hub Project')).not.toBeInTheDocument()
   })
 
   it('filters by snippet text when the title does not match', async () => {
@@ -328,7 +328,7 @@ describe('NoteList rendering', () => {
 
   it('shows backlinks from outgoing links in entity view', () => {
     const entriesWithBacklink = mockEntries.map((entry) =>
-      entry.path === mockEntries[2].path ? { ...entry, outgoingLinks: ['Build Laputa App'] } : entry,
+      entry.path === mockEntries[2].path ? { ...entry, outgoingLinks: ['Build HS-Hub Project'] } : entry,
     )
 
     renderNoteList({
@@ -738,14 +738,14 @@ describe('NoteList rendering', () => {
 describe('NoteList click behavior', () => {
   it('opens the current tab on a regular click', () => {
     const { onReplaceActiveTab, onEnterNeighborhood } = renderNoteList()
-    fireEvent.click(screen.getByText('Build Laputa App'))
+    fireEvent.click(screen.getByText('Build HS-Hub Project'))
     expect(onReplaceActiveTab).toHaveBeenCalledWith(mockEntries[0])
     expect(onEnterNeighborhood).not.toHaveBeenCalled()
   })
 
   it('enters Neighborhood on Cmd+Click', async () => {
     const { onReplaceActiveTab, onEnterNeighborhood } = renderNoteList()
-    fireEvent.click(screen.getByText('Build Laputa App'), { metaKey: true })
+    fireEvent.click(screen.getByText('Build HS-Hub Project'), { metaKey: true })
     await waitFor(() => {
       expect(onReplaceActiveTab).toHaveBeenCalledWith(mockEntries[0])
       expect(onEnterNeighborhood).toHaveBeenCalledWith(mockEntries[0])
@@ -754,7 +754,7 @@ describe('NoteList click behavior', () => {
 
   it('enters Neighborhood on Ctrl+Click', async () => {
     const { onReplaceActiveTab, onEnterNeighborhood } = renderNoteList()
-    fireEvent.click(screen.getByText('Build Laputa App'), { ctrlKey: true })
+    fireEvent.click(screen.getByText('Build HS-Hub Project'), { ctrlKey: true })
     await waitFor(() => {
       expect(onReplaceActiveTab).toHaveBeenCalledWith(mockEntries[0])
       expect(onEnterNeighborhood).toHaveBeenCalledWith(mockEntries[0])
@@ -763,7 +763,7 @@ describe('NoteList click behavior', () => {
 
   it('supports Cmd+Click on the entity pinned card', async () => {
     const { onReplaceActiveTab, onEnterNeighborhood } = renderNoteList({ selection: { kind: 'entity', entry: mockEntries[0] } })
-    const titles = screen.getAllByText('Build Laputa App')
+    const titles = screen.getAllByText('Build HS-Hub Project')
     fireEvent.click(titles[titles.length - 1], { metaKey: true })
     await waitFor(() => {
       expect(onReplaceActiveTab).toHaveBeenCalledWith(mockEntries[0])
@@ -773,7 +773,7 @@ describe('NoteList click behavior', () => {
 
   it('opens the current tab from the entity pinned card on regular click', () => {
     const { onReplaceActiveTab, onEnterNeighborhood } = renderNoteList({ selection: { kind: 'entity', entry: mockEntries[0] } })
-    const titles = screen.getAllByText('Build Laputa App')
+    const titles = screen.getAllByText('Build HS-Hub Project')
     fireEvent.click(titles[titles.length - 1])
     expect(onReplaceActiveTab).toHaveBeenCalledWith(mockEntries[0])
     expect(onEnterNeighborhood).not.toHaveBeenCalled()
@@ -790,7 +790,7 @@ describe('NoteList click behavior', () => {
 describe('NoteList type sections', () => {
   const typeEntry = {
     ...makeEntry({
-      path: '/Users/luca/Laputa/types/project.md',
+      path: '/Users/hansung/HS-Hub/types/project.md',
       filename: 'project.md',
       title: 'Project',
       isA: 'Type',
@@ -809,7 +809,7 @@ describe('NoteList type sections', () => {
     })
 
     expect(screen.queryByText('Defines the Project type.')).not.toBeInTheDocument()
-    expect(screen.getByText('Build Laputa App')).toBeInTheDocument()
+    expect(screen.getByText('Build HS-Hub Project')).toBeInTheDocument()
   })
 
   it('renders a clickable type header that opens the type note', () => {

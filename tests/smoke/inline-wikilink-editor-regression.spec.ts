@@ -77,13 +77,13 @@ test.describe('Inline wikilink editor regression', () => {
     await expect(editor).toBeFocused()
 
     await page.keyboard.type('edit my [[b')
-    await expect(page.getByTestId('wikilink-menu')).toContainText('Build Laputa App')
+    await expect(page.getByTestId('wikilink-menu')).toContainText('Build HS-Hub Project')
 
-    await page.getByTestId('wikilink-menu').getByText('Build Laputa App').click()
-    await expect(editor.getByTestId('inline-wikilink-chip')).toContainText('Build Laputa App')
+    await page.getByTestId('wikilink-menu').getByText('Build HS-Hub Project').click()
+    await expect(editor.getByTestId('inline-wikilink-chip')).toContainText('Build HS-Hub Project')
 
     await page.keyboard.type(' essay')
-    await expectNormalizedEditorText(editor, 'edit my Build Laputa App essay')
+    await expectNormalizedEditorText(editor, 'edit my Build HS-Hub Project essay')
 
     await selectEditorTextRange(page, 'agent-input', 5)
     await page.keyboard.press('Backspace')

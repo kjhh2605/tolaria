@@ -11,7 +11,7 @@ const mockFolders: FolderNode[] = [
     name: 'projects',
     path: 'projects',
     children: [
-      { name: 'laputa', path: 'projects/laputa', children: [] },
+      { name: 'hs-hub', path: 'projects/hs-hub', children: [] },
       { name: 'portfolio', path: 'projects/portfolio', children: [] },
     ],
   },
@@ -20,7 +20,7 @@ const mockFolders: FolderNode[] = [
 ]
 
 const defaultSelection: SidebarSelection = { kind: 'filter', filter: 'all' }
-const vaultRootPath = '/Users/luca/Laputa'
+const vaultRootPath = '/Users/hansung/HS-Hub'
 
 describe('FolderTree', () => {
   it('renders nothing when folders is empty', () => {
@@ -48,8 +48,8 @@ describe('FolderTree', () => {
       />,
     )
 
-    expect(screen.getByText('Laputa')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Laputa' })).toBeInTheDocument()
+    expect(screen.getByText('HS-Hub')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'HS-Hub' })).toBeInTheDocument()
     expect(screen.getByText('projects')).toBeInTheDocument()
     expect(screen.getByText('areas')).toBeInTheDocument()
     expect(screen.getByText('journal')).toBeInTheDocument()
@@ -65,7 +65,7 @@ describe('FolderTree', () => {
       />,
     )
 
-    expect(screen.getByText('Laputa')).toBeInTheDocument()
+    expect(screen.getByText('HS-Hub')).toBeInTheDocument()
   })
 
   it('renders one scoped root per mounted workspace and selects folders inside that root', () => {
@@ -135,12 +135,12 @@ describe('FolderTree', () => {
   it('expands children when clicking a folder row', () => {
     vi.useFakeTimers()
     render(<FolderTree folders={mockFolders} selection={defaultSelection} onSelect={vi.fn()} />)
-    expect(screen.queryByText('laputa')).not.toBeInTheDocument()
+    expect(screen.queryByText('hs-hub')).not.toBeInTheDocument()
     fireEvent.click(screen.getByTestId('folder-row:projects'))
     act(() => {
       vi.advanceTimersByTime(FOLDER_ROW_SINGLE_CLICK_DELAY_MS)
     })
-    expect(screen.getByText('laputa')).toBeInTheDocument()
+    expect(screen.getByText('hs-hub')).toBeInTheDocument()
     expect(screen.getByText('portfolio')).toBeInTheDocument()
     vi.useRealTimers()
   })
@@ -197,7 +197,7 @@ describe('FolderTree', () => {
       vi.advanceTimersByTime(FOLDER_ROW_SINGLE_CLICK_DELAY_MS)
     })
 
-    expect(screen.getByText('laputa')).toBeInTheDocument()
+    expect(screen.getByText('hs-hub')).toBeInTheDocument()
     expect(screen.getByText('portfolio')).toBeInTheDocument()
 
     fireEvent.click(screen.getByTestId('folder-row:projects'))
@@ -205,7 +205,7 @@ describe('FolderTree', () => {
       vi.advanceTimersByTime(FOLDER_ROW_SINGLE_CLICK_DELAY_MS)
     })
 
-    expect(screen.queryByText('laputa')).not.toBeInTheDocument()
+    expect(screen.queryByText('hs-hub')).not.toBeInTheDocument()
     vi.useRealTimers()
   })
 
@@ -337,13 +337,13 @@ describe('FolderTree', () => {
       />,
     )
 
-    const wasExpanded = screen.queryByText('laputa') !== null
+    const wasExpanded = screen.queryByText('hs-hub') !== null
     fireEvent.click(screen.getByTestId('folder-row:projects'))
     act(() => {
       vi.advanceTimersByTime(FOLDER_ROW_SINGLE_CLICK_DELAY_MS)
     })
 
-    expect(screen.queryByText('laputa') !== null).toBe(!wasExpanded)
+    expect(screen.queryByText('hs-hub') !== null).toBe(!wasExpanded)
     vi.useRealTimers()
   })
 
@@ -425,7 +425,7 @@ describe('FolderTree', () => {
     expect(screen.queryByTestId('rename-folder-btn:')).not.toBeInTheDocument()
     expect(screen.queryByTestId('delete-folder-btn:')).not.toBeInTheDocument()
 
-    fireEvent.contextMenu(screen.getByText('Laputa'))
+    fireEvent.contextMenu(screen.getByText('HS-Hub'))
 
     expect(screen.getByTestId('reveal-folder-menu-item')).toBeInTheDocument()
     expect(screen.getByTestId('copy-folder-path-menu-item')).toBeInTheDocument()

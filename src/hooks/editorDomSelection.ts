@@ -47,6 +47,8 @@ function blurEditorEditableElements(): void {
 }
 
 export function clearEditorDomSelection(): void {
+  if (typeof document === 'undefined' || typeof window === 'undefined') return
+
   const containers = getEditorContainers()
   if (containers.length === 0) return
 

@@ -21,7 +21,7 @@ export const FIXED_LINUXDEPLOY_APPRUN_DIR_LINE =
   'this_dir="$(dirname "$(readlink -f "$0")")"'
 export const APPIMAGE_PLUGIN_WRAPPER_NAME = 'linuxdeploy-plugin-appimage.AppImage'
 export const REAL_APPIMAGE_PLUGIN_NAME =
-  'tolaria-real-linuxdeploy-plugin-appimage/linuxdeploy-plugin-appimage.AppImage'
+  'hs-hub-real-linuxdeploy-plugin-appimage/linuxdeploy-plugin-appimage.AppImage'
 export const APPIMAGE_FCITX_GTK3_IM_MODULE_PATH =
   'usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-fcitx5.so'
 export const APPIMAGE_FCITX_GCLIENT_LIBRARY_PATH =
@@ -29,7 +29,7 @@ export const APPIMAGE_FCITX_GCLIENT_LIBRARY_PATH =
 export const DEFAULT_APPIMAGE_PLUGIN_URL =
   'https://github.com/linuxdeploy/linuxdeploy-plugin-appimage/releases/download/continuous/linuxdeploy-plugin-appimage-x86_64.AppImage'
 
-const WRAPPER_MARKER = 'Tolaria AppImage symlink launcher shim'
+const WRAPPER_MARKER = 'HS-Hub AppImage symlink launcher shim'
 const REQUIRED_APPIMAGE_PATHS = [
   'AppRun',
   APPIMAGE_FCITX_GTK3_IM_MODULE_PATH,
@@ -37,8 +37,8 @@ const REQUIRED_APPIMAGE_PATHS = [
 ]
 
 export function tauriToolsCacheDir(env = process.env) {
-  if (env.TOLARIA_TAURI_TOOLS_DIR) {
-    return resolve(env.TOLARIA_TAURI_TOOLS_DIR)
+  if (env.HS_HUB_TAURI_TOOLS_DIR) {
+    return resolve(env.HS_HUB_TAURI_TOOLS_DIR)
   }
 
   if (env.XDG_CACHE_HOME) {
@@ -83,11 +83,11 @@ export function appImagePluginWrapperSource({
 set -euo pipefail
 
 # ${WRAPPER_MARKER}
-PLUGIN_URL="\${TOLARIA_APPIMAGE_PLUGIN_URL:-${pluginUrl}}"
+PLUGIN_URL="\${HS_HUB_APPIMAGE_PLUGIN_URL:-${pluginUrl}}"
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
-REAL_PLUGIN="\${TOLARIA_APPIMAGE_REAL_PLUGIN:-"$SCRIPT_DIR/${REAL_APPIMAGE_PLUGIN_NAME}"}"
-FCITX_GTK3_IM_MODULE="\${TOLARIA_FCITX_GTK3_IM_MODULE:-/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-fcitx5.so}"
-FCITX_LIBRARY_DIR="\${TOLARIA_FCITX_LIBRARY_DIR:-/usr/lib/x86_64-linux-gnu}"
+REAL_PLUGIN="\${HS_HUB_APPIMAGE_REAL_PLUGIN:-"$SCRIPT_DIR/${REAL_APPIMAGE_PLUGIN_NAME}"}"
+FCITX_GTK3_IM_MODULE="\${HS_HUB_FCITX_GTK3_IM_MODULE:-/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-fcitx5.so}"
+FCITX_LIBRARY_DIR="\${HS_HUB_FCITX_LIBRARY_DIR:-/usr/lib/x86_64-linux-gnu}"
 
 appdir_from_args() {
   local previous=""
@@ -271,7 +271,7 @@ export async function validateAppImages(paths) {
   }
 
   for (const appImage of paths.map((path) => resolve(path))) {
-    const tempDir = await mkdtemp(join(tmpdir(), 'tolaria-appimage-'))
+    const tempDir = await mkdtemp(join(tmpdir(), 'hs-hub-appimage-'))
     try {
       await validateExtractedAppImage(appImage, tempDir)
     } finally {

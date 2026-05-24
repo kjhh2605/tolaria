@@ -44,8 +44,8 @@ pub struct GitCommit {
     pub date: i64,
 }
 
-const DEFAULT_GITIGNORE: &str = "# Tolaria app files (machine-specific, never commit)\n\
-.laputa/settings.json\n\
+const DEFAULT_GITIGNORE: &str = "# HS-Hub app files (machine-specific, never commit)\n\
+.hs-hub/settings.json\n\
 \n\
 # macOS\n\
 .DS_Store\n\
@@ -294,7 +294,7 @@ fn git_command_label<'a>(args: &'a [&'a str]) -> &'a str {
 
 /// Set local user.name and user.email if not already configured.
 pub(crate) fn ensure_author_config(dir: &Path) -> Result<(), String> {
-    for (key, fallback) in [("user.name", "Tolaria"), ("user.email", "vault@tolaria.md")] {
+    for (key, fallback) in [("user.name", "HS-Hub"), ("user.email", "vault@hs-hub.md")] {
         let local = git_command()
             .args(["config", "--local", key])
             .current_dir(dir)
@@ -471,7 +471,7 @@ mod tests {
 
         let content = fs::read_to_string(dir.path().join(".gitignore")).unwrap();
         assert!(content.contains(".DS_Store"));
-        assert!(content.contains(".laputa/settings.json"));
+        assert!(content.contains(".hs-hub/settings.json"));
     }
 
     #[test]
@@ -559,7 +559,7 @@ mod tests {
             .output()
             .unwrap();
         git_command()
-            .args(["config", "gpg.program", "/missing/tolaria-test-gpg"])
+            .args(["config", "gpg.program", "/missing/hs-hub-test-gpg"])
             .current_dir(&vault)
             .output()
             .unwrap();
@@ -615,13 +615,13 @@ mod tests {
             ".gitignore should exclude .DS_Store"
         );
         assert!(
-            content.contains(".laputa/settings.json"),
+            content.contains(".hs-hub/settings.json"),
             ".gitignore should exclude settings.json"
         );
         // Cache is now stored outside the vault — no need for .gitignore entry
         assert!(
-            !content.contains(".laputa-cache.json"),
-            ".gitignore should NOT contain .laputa-cache.json (cache is external)"
+            !content.contains(".hs-hub-cache.json"),
+            ".gitignore should NOT contain .hs-hub-cache.json (cache is external)"
         );
     }
 

@@ -147,9 +147,9 @@ vi.mock('@blocknote/mantine', () => ({
 
 vi.mock('@blocknote/mantine/style.css', () => ({}))
 
-vi.mock('./tolariaEditorFormatting', () => ({
-  TolariaFormattingToolbar: ({ children }: PropsWithChildren) => <>{children}</>,
-  TolariaFormattingToolbarController: () => null,
+vi.mock('./hsHubEditorFormatting', () => ({
+  HsHubFormattingToolbar: ({ children }: PropsWithChildren) => <>{children}</>,
+  HsHubFormattingToolbarController: () => null,
 }))
 
 import { Editor } from './Editor'
@@ -1160,9 +1160,9 @@ describe('person @mention autocomplete', () => {
   }
   const nonPersonEntry: VaultEntry = {
     ...mockEntry,
-    title: 'Build Laputa App',
-    filename: 'laputa-app.md',
-    path: '/vault/project/laputa-app.md',
+    title: 'Build HS-Hub Project',
+    filename: 'hs-hub-project.md',
+    path: '/vault/project/hs-hub-app.md',
     isA: 'Project',
     aliases: [],
   }

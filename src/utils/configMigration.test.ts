@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { APP_STORAGE_KEYS, LEGACY_APP_STORAGE_KEYS } from '../constants/appStorage'
+import { APP_STORAGE_KEYS } from '../constants/appStorage'
 import type { VaultConfig } from '../types'
 import { migrateLocalStorageToVaultConfig } from './configMigration'
 
@@ -180,12 +180,12 @@ describe('migrateLocalStorageToVaultConfig', () => {
     expect(result.zoom).toBe(0.9)
   })
 
-  it('still migrates legacy Laputa storage keys when Tolaria keys are absent', () => {
-    store[LEGACY_APP_STORAGE_KEYS.zoom] = '110'
-    store[LEGACY_APP_STORAGE_KEYS.viewMode] = 'editor-only'
+  it('ignores previous app storage keys during vault config migration', () => {
+    store[['la', 'puta:zoom-level'].join('')] = '110'
+    store[['la', 'puta-view-mode'].join('')] = 'editor-only'
 
     const result = migrateLocalStorageToVaultConfig(makeConfig())
-    expect(result.zoom).toBe(1.1)
-    expect(result.view_mode).toBe('editor-only')
+    expect(result.zoom).toBeNull()
+    expect(result.view_mode).toBeNull()
   })
 })

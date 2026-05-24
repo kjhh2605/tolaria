@@ -6,7 +6,7 @@ use std::collections::HashMap;
 pub struct FolderNode {
     /// Folder name (last path component).
     pub name: String,
-    /// Path relative to the vault root, using `/` separators (e.g. "projects/laputa").
+    /// Path relative to the vault root, using `/` separators (e.g. "projects/hs-hub").
     pub path: String,
     /// Child folders (sorted alphabetically).
     pub children: Vec<FolderNode>,

@@ -131,7 +131,7 @@ describe('useMcpStatus', () => {
       name: 'connects external AI tools for the current vault on demand',
       overrideKey: 'register_mcp_tools' as const,
       overrideValue: 'registered',
-      toastFragment: 'Tolaria external AI tools connected successfully',
+      toastFragment: 'HS-Hub external AI tools connected successfully',
     },
     {
       action: 'connect' as const,
@@ -151,7 +151,7 @@ describe('useMcpStatus', () => {
       name: 'disconnects external AI tools explicitly',
       overrideKey: 'remove_mcp_tools' as const,
       overrideValue: 'removed',
-      toastFragment: 'Tolaria external AI tools disconnected successfully',
+      toastFragment: 'HS-Hub external AI tools disconnected successfully',
     },
     {
       action: 'disconnect' as const,
@@ -177,7 +177,7 @@ describe('useMcpStatus', () => {
   })
 
   it('loads the exact manual MCP config snippet for the active vault', async () => {
-    const snippet = JSON.stringify({ mcpServers: { tolaria: { type: 'stdio' } } })
+    const snippet = JSON.stringify({ mcpServers: { 'hs-hub': { type: 'stdio' } } })
     mockCommands({
       check_mcp_status: 'installed',
       get_mcp_config_snippet: snippet,
@@ -200,7 +200,7 @@ describe('useMcpStatus', () => {
   it('copies the manual MCP config snippet to the clipboard', async () => {
     const writeText = mockClipboard()
     const onToast = vi.fn()
-    const snippet = JSON.stringify({ mcpServers: { tolaria: { type: 'stdio' } } })
+    const snippet = JSON.stringify({ mcpServers: { 'hs-hub': { type: 'stdio' } } })
     mockCommands({
       check_mcp_status: 'not_installed',
       get_mcp_config_snippet: snippet,
@@ -216,14 +216,14 @@ describe('useMcpStatus', () => {
     })
 
     expect(writeText).toHaveBeenCalledWith(snippet)
-    expect(onToast).toHaveBeenCalledWith('Tolaria MCP config copied to clipboard')
+    expect(onToast).toHaveBeenCalledWith('HS-Hub MCP config copied to clipboard')
   })
 
   it('uses the native clipboard command inside the Tauri app', async () => {
     runtimeMock.isTauri = true
     const writeText = mockClipboard()
     const onToast = vi.fn()
-    const snippet = JSON.stringify({ mcpServers: { tolaria: { type: 'stdio' } } })
+    const snippet = JSON.stringify({ mcpServers: { 'hs-hub': { type: 'stdio' } } })
     invoke.mockImplementation((command: string) => {
       if (command === 'check_mcp_status') return Promise.resolve('not_installed')
       if (command === 'get_mcp_config_snippet') return Promise.resolve(snippet)
@@ -242,6 +242,6 @@ describe('useMcpStatus', () => {
 
     expect(invoke).toHaveBeenCalledWith('copy_text_to_clipboard', { text: snippet })
     expect(writeText).not.toHaveBeenCalled()
-    expect(onToast).toHaveBeenCalledWith('Tolaria MCP config copied to clipboard')
+    expect(onToast).toHaveBeenCalledWith('HS-Hub MCP config copied to clipboard')
   })
 })

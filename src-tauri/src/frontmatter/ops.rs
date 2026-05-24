@@ -221,7 +221,7 @@ mod tests {
             "---\r\n",
             "type: Note\r\n",
             "related_to:\r\n",
-            "  - \"[[tolaria]]\"\r\n",
+            "  - \"[[hs-hub]]\"\r\n",
             "---\r\n",
             "# Properties Panel\r\n",
         );
@@ -236,7 +236,7 @@ mod tests {
                 "---\r\n",
                 "type: Note\r\n",
                 "related_to:\r\n",
-                "  - \"[[tolaria]]\"\r\n",
+                "  - \"[[hs-hub]]\"\r\n",
                 "_organized: true\r\n",
                 "---\r\n",
                 "# Properties Panel\r\n",
@@ -249,7 +249,7 @@ mod tests {
         let content = concat!(
             "---\r\n",
             "type: Note\r\n",
-            "related_to: \"[[tolaria]]\"\r\n",
+            "related_to: \"[[hs-hub]]\"\r\n",
             "---\r\n",
             "# Properties Panel\r\n",
         );

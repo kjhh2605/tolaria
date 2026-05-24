@@ -16,7 +16,7 @@ test.afterEach(async () => {
 async function applyZoom(page: Page, percent: number) {
   await page.evaluate((pct) => {
     document.documentElement.style.setProperty('zoom', `${pct}%`)
-    window.dispatchEvent(new Event('laputa-zoom-change'))
+    window.dispatchEvent(new Event('hs-hub-zoom-change'))
   }, percent)
   await page.waitForTimeout(250)
 }

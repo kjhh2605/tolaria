@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { focusEditorWithRetries, type FocusableEditor } from './editorFocusUtils'
 
-const TAB_SWAP_EVENT_NAME = 'laputa:editor-tab-swapped'
-const FOCUS_EVENT_NAME = 'laputa:focus-editor'
+const TAB_SWAP_EVENT_NAME = 'hs-hub:editor-tab-swapped'
+const FOCUS_EVENT_NAME = 'hs-hub:focus-editor'
 const SWAP_WAIT_FALLBACK_MS = 250
 
 interface FocusEventDetail {

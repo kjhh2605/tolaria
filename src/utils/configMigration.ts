@@ -1,4 +1,4 @@
-import { APP_STORAGE_KEYS, copyLegacyAppStorageKeys, getAppStorageItem } from '../constants/appStorage'
+import { APP_STORAGE_KEYS, getAppStorageItem } from '../constants/appStorage'
 import type { VaultConfig } from '../types'
 
 const MIGRATION_FLAG = APP_STORAGE_KEYS.configMigrationFlag
@@ -81,10 +81,9 @@ function applyJsonRecordMigration(
   result: VaultConfig,
   field: JsonRecordConfigKey,
   primaryKey: string,
-  legacyKey: string,
 ) {
   if (result[field] !== null) return
-  const values = readJson<Record<string, string>>(primaryKey) ?? readJson<Record<string, string>>(legacyKey)
+  const values = readJson<Record<string, string>>(primaryKey)
   if (hasRecordValues(values)) result[field] = values
 }
 
@@ -96,7 +95,6 @@ function applyJsonRecordMigration(
 export function migrateLocalStorageToVaultConfig(loaded: VaultConfig | null): VaultConfig {
   const base = loaded ?? createDefaultVaultConfig()
 
-  copyLegacyAppStorageKeys()
 
   if (migrationAlreadyCompleted()) return base
 
@@ -104,9 +102,9 @@ export function migrateLocalStorageToVaultConfig(loaded: VaultConfig | null): Va
 
   applyZoomMigration(result)
   applyViewModeMigration(result)
-  applyJsonRecordMigration(result, 'tag_colors', LS_KEYS.tagColors, 'laputa:tag-color-overrides')
-  applyJsonRecordMigration(result, 'status_colors', LS_KEYS.statusColors, 'laputa:status-color-overrides')
-  applyJsonRecordMigration(result, 'property_display_modes', LS_KEYS.propertyModes, 'laputa:display-mode-overrides')
+  applyJsonRecordMigration(result, 'tag_colors', LS_KEYS.tagColors)
+  applyJsonRecordMigration(result, 'status_colors', LS_KEYS.statusColors)
+  applyJsonRecordMigration(result, 'property_display_modes', LS_KEYS.propertyModes)
   markMigrationCompleted()
 
   return result

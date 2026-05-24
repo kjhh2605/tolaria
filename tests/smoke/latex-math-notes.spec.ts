@@ -138,7 +138,7 @@ Malformed math $${MALFORMED_LATEX}$ stays visible.
   expect(rawAfterRichMode).toContain(`$${MALFORMED_LATEX}$`)
   expect(rawAfterRichMode).toContain(`$${TABLE_INLINE_LATEX}$`)
   expect(rawAfterRichMode).toContain(`$$${TABLE_DISPLAY_STYLE_LATEX}$$`)
-  expect(rawAfterRichMode).not.toContain('@@TOLARIA_MATH')
+  expect(rawAfterRichMode).not.toContain('@@HS_HUB_MATH')
 
   await toggleRawMode(page, '.bn-editor')
   await openNote(page, 'Note C')
@@ -151,7 +151,7 @@ Malformed math $${MALFORMED_LATEX}$ stays visible.
   expect(reopenedRaw).toContain(`$${MALFORMED_LATEX}$`)
   expect(reopenedRaw).toContain(`$${TABLE_INLINE_LATEX}$`)
   expect(reopenedRaw).toContain(`$$${TABLE_DISPLAY_STYLE_LATEX}$$`)
-  expect(reopenedRaw).not.toContain('@@TOLARIA_MATH')
+  expect(reopenedRaw).not.toContain('@@HS_HUB_MATH')
 })
 
 test('imported financial Markdown does not leak math placeholder tokens', async ({ page }) => {
@@ -164,10 +164,10 @@ test('imported financial Markdown does not leak math placeholder tokens', async 
   await toggleRawMode(page, '.bn-editor')
   await expect(page.locator('.bn-editor')).toContainText('$24.59M')
   await expect(page.locator('.bn-editor')).toContainText('($884M)')
-  await expect(page.locator('.bn-editor')).not.toContainText('TOLARIA_MATH_INLINE')
+  await expect(page.locator('.bn-editor')).not.toContainText('HS_HUB_MATH_INLINE')
 
   await toggleRawMode(page, '.cm-content')
   const rawAfterRichMode = await getRawEditorContent(page)
   expect(rawAfterRichMode).toContain(FINANCIAL_DOLLAR_PROSE)
-  expect(rawAfterRichMode).not.toContain('@@TOLARIA_MATH')
+  expect(rawAfterRichMode).not.toContain('@@HS_HUB_MATH')
 })

@@ -34,7 +34,7 @@ test.describe('Frontmatter parsing: type badge displays correctly', () => {
 
   test('project note shows type badge in Quick Open', async ({ page }) => {
     await openQuickOpen(page)
-    await page.locator(QUICK_OPEN_INPUT).fill('Laputa')
+    await page.locator(QUICK_OPEN_INPUT).fill('HS-Hub')
     await page.waitForTimeout(400)
     const badge = page.locator('.fixed.inset-0').locator('text=Project')
     await expect(badge.first()).toBeVisible({ timeout: 3000 })

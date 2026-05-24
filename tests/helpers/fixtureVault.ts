@@ -8,7 +8,7 @@ const FIXTURE_VAULT = path.resolve('tests/fixtures/test-vault')
 const FIXTURE_VAULT_READY_TIMEOUT = 30_000
 const FIXTURE_VAULT_REMOVE_RETRIES = 10
 const FIXTURE_VAULT_REMOVE_RETRY_DELAY_MS = 100
-const CLAUDE_CODE_ONBOARDING_DISMISSED_KEY = 'tolaria:claude-code-onboarding-dismissed'
+const CLAUDE_CODE_ONBOARDING_DISMISSED_KEY = 'hs-hub:claude-code-onboarding-dismissed'
 type FixtureCommandArgs = Record<string, unknown> | undefined
 
 interface FixtureVaultPageArgs {
@@ -49,7 +49,7 @@ function copyDirSync({ src, dest }: CopyDirArgs): void {
 }
 
 export function createFixtureVaultCopy(): string {
-  const tempVaultDir = fs.mkdtempSync(path.join(os.tmpdir(), 'laputa-test-vault-'))
+  const tempVaultDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hs-hub-test-vault-'))
   copyDirSync({ src: FIXTURE_VAULT, dest: tempVaultDir })
   return tempVaultDir
 }
@@ -278,10 +278,10 @@ async function installFixtureVaultInitScript({ page, vaultPath, isGitRepo }: Fix
       register_mcp_tools: () => null,
       get_mcp_config_snippet: () => JSON.stringify({
         mcpServers: {
-          tolaria: {
+          'hs-hub': {
             type: 'stdio',
             command: 'node',
-            args: ['/fixture/Tolaria/mcp-server/index.js'],
+            args: ['/fixture/HS-Hub/mcp-server/index.js'],
             env: {
               WS_UI_PORT: '9711',
             },

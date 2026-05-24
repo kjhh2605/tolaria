@@ -180,8 +180,8 @@ describe('relativePathStem', () => {
   it('normalizes Windows extended-length paths before extracting the vault-relative stem', () => {
     expect(
       relativePathStem(
-        '\\\\?\\C:\\Users\\lrfno\\Documents\\tolaria-vault\\application-design-and-build.md',
-        'C:\\Users\\lrfno\\Documents\\tolaria-vault',
+        '\\\\?\\C:\\Users\\lrfno\\Documents\\hs-hub-vault\\application-design-and-build.md',
+        'C:\\Users\\lrfno\\Documents\\hs-hub-vault',
       ),
     ).toBe('application-design-and-build')
   })
@@ -189,8 +189,8 @@ describe('relativePathStem', () => {
   it('keeps nested Windows note paths vault-relative with slash separators', () => {
     expect(
       relativePathStem(
-        'C:\\Users\\lrfno\\Documents\\Tolaria Vault\\projects\\application-design-and-build.md',
-        'c:/users/lrfno/documents/tolaria vault',
+        'C:\\Users\\lrfno\\Documents\\HS-Hub Vault\\projects\\application-design-and-build.md',
+        'c:/users/lrfno/documents/hs-hub vault',
       ),
     ).toBe('projects/application-design-and-build')
   })

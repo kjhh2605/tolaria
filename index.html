@@ -23,7 +23,7 @@
         color: inherit;
       }
     </style>
-    <title>Tolaria</title>
+    <title>HS-Hub</title>
   </head>
   <body>
     <script>
@@ -47,9 +47,8 @@
           }
         });
 
-        var key = 'tolaria-theme';
-        var legacyKey = 'laputa-theme';
-        var systemDarkQuery = '(prefers-color-scheme: dark)';
+        var key = 'hs-hub-theme';
+                var systemDarkQuery = '(prefers-color-scheme: dark)';
         function normalizeTheme(value) {
           return value === 'dark' || value === 'light' || value === 'system' ? value : null;
         }
@@ -71,10 +70,6 @@
         }
         try {
           var mode = normalizeTheme(localStorage.getItem(key));
-          if (mode === null) {
-            mode = normalizeTheme(localStorage.getItem(legacyKey));
-            if (mode !== null) localStorage.setItem(key, mode);
-          }
           applyTheme(mode);
         } catch (err) {
           applyTheme('light');
@@ -83,8 +78,8 @@
     </script>
     <script>
       (function () {
-        var readyEventName = 'tolaria:frontend-ready';
-        var reloadAttemptKey = 'tolaria:startup-reload-attempted';
+        var readyEventName = 'hs-hub:frontend-ready';
+        var reloadAttemptKey = 'hs-hub:startup-reload-attempted';
         var startupTimeoutMs = 10000;
         var isTauri = '__TAURI__' in window || '__TAURI_INTERNALS__' in window;
 
@@ -117,7 +112,7 @@
 
         window.addEventListener(readyEventName, clearReloadAttempt, { once: true });
         window.setTimeout(function () {
-          if (window.__tolariaFrontendReady === true) return;
+          if (window.__hsHubFrontendReady === true) return;
           if (hasReloadAttempted()) return;
           if (!markReloadAttempted()) return;
 

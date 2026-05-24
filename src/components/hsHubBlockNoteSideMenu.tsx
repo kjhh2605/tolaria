@@ -26,8 +26,8 @@ import {
   type ReactNode,
 } from 'react'
 
-type TolariaBlockNoteEditor = BlockNoteEditor<BlockSchema, InlineContentSchema, StyleSchema>
-type TolariaBlock = NonNullable<ReturnType<TolariaBlockNoteEditor['getBlock']>>
+type HsHubBlockNoteEditor = BlockNoteEditor<BlockSchema, InlineContentSchema, StyleSchema>
+type HsHubBlock = NonNullable<ReturnType<HsHubBlockNoteEditor['getBlock']>>
 type SideMenuBlock = {
   content?: unknown
   id: string
@@ -81,7 +81,7 @@ const BLOCK_CONTAINER_SELECTOR = '[data-node-type="blockContainer"][data-id]'
 const POINTER_REORDER_THRESHOLD_PX = 4
 const SIDE_MENU_ALIGNMENT_ATTEMPTS = 8
 
-function liveSideMenuBlock(editor: TolariaBlockNoteEditor, block: SideMenuBlock | undefined) {
+function liveSideMenuBlock(editor: HsHubBlockNoteEditor, block: SideMenuBlock | undefined) {
   if (!block) return undefined
   return editor.getBlock(block.id)
 }
@@ -107,7 +107,7 @@ function tableHeaderContent(block: unknown): TableHeaderContent | undefined {
   return block.content
 }
 
-function hasChildBlock(block: TolariaBlock, blockId: string): boolean {
+function hasChildBlock(block: HsHubBlock, blockId: string): boolean {
   for (const child of block.children) {
     if (child.id === blockId || hasChildBlock(child, blockId)) return true
   }
@@ -119,7 +119,7 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max)
 }
 
-function editorBlockElement(editor: TolariaBlockNoteEditor): HTMLElement | null {
+function editorBlockElement(editor: HsHubBlockNoteEditor): HTMLElement | null {
   const element = editor.domElement
   if (!(element instanceof HTMLElement)) return null
   return element.matches('.bn-editor')
@@ -290,7 +290,7 @@ function createSideMenuAlignmentCleanup({
   }
 }
 
-function createSideMenuAlignmentController(editor: TolariaBlockNoteEditor, blockId: string) {
+function createSideMenuAlignmentController(editor: HsHubBlockNoteEditor, blockId: string) {
   const editorElement = editorBlockElement(editor)
   const ownerWindow = editorElement?.ownerDocument.defaultView
   if (!editorElement || !ownerWindow) return undefined
@@ -326,7 +326,7 @@ function createSideMenuAlignmentController(editor: TolariaBlockNoteEditor, block
   })
 }
 
-function useSideMenuTextAlignment(editor: TolariaBlockNoteEditor, block: SideMenuBlock | undefined) {
+function useSideMenuTextAlignment(editor: HsHubBlockNoteEditor, block: SideMenuBlock | undefined) {
   const blockId = block?.id
 
   useLayoutEffect(() => {
@@ -441,7 +441,7 @@ function validDropTarget({
   x,
   y,
 }: {
-  editor: TolariaBlockNoteEditor
+  editor: HsHubBlockNoteEditor
   state: PointerReorderState
   x: number
   y: number
@@ -474,7 +474,7 @@ function moveBlockByPointerDrop({
   targetBlockId,
   placement,
 }: {
-  editor: TolariaBlockNoteEditor
+  editor: HsHubBlockNoteEditor
   draggedBlockId: string
   targetBlockId: string
   placement: DropPlacement
@@ -517,7 +517,7 @@ function useSideMenuBlock() {
   return { block, editor }
 }
 
-function TolariaAddBlockButton() {
+function HsHubAddBlockButton() {
   const Components = useComponentsContext()!
   const dict = useDictionary()
   const suggestionMenu = useExtension(SuggestionMenu)
@@ -553,7 +553,7 @@ function TolariaAddBlockButton() {
   )
 }
 
-function TolariaDragHandleButton({
+function HsHubDragHandleButton({
   children,
   dragHandleMenu,
 }: SideMenuProps & { children?: ReactNode }) {
@@ -692,7 +692,7 @@ function TolariaDragHandleButton({
     >
       <Components.Generic.Menu.Trigger>
         <span
-          className="tolaria-block-drag-handle"
+          className="hs-hub-block-drag-handle"
           onPointerDown={onPointerDown}
           onClickCapture={onClickCapture}
         >
@@ -711,7 +711,7 @@ function TolariaDragHandleButton({
   )
 }
 
-function TolariaRemoveBlockItem({ children }: { children: ReactNode }) {
+function HsHubRemoveBlockItem({ children }: { children: ReactNode }) {
   const Components = useComponentsContext()!
   const { block, editor } = useSideMenuBlock()
 
@@ -733,7 +733,7 @@ function TolariaRemoveBlockItem({ children }: { children: ReactNode }) {
   )
 }
 
-function TolariaTableHeaderItem({
+function HsHubTableHeaderItem({
   children,
   header,
 }: {
@@ -775,26 +775,26 @@ function TolariaTableHeaderItem({
   )
 }
 
-function TolariaDragHandleMenu() {
+function HsHubDragHandleMenu() {
   const dict = useDictionary()
 
   return (
     <DragHandleMenu>
-      <TolariaRemoveBlockItem>{dict.drag_handle.delete_menuitem}</TolariaRemoveBlockItem>
-      <TolariaTableHeaderItem header="row">{dict.drag_handle.header_row_menuitem}</TolariaTableHeaderItem>
-      <TolariaTableHeaderItem header="column">{dict.drag_handle.header_column_menuitem}</TolariaTableHeaderItem>
+      <HsHubRemoveBlockItem>{dict.drag_handle.delete_menuitem}</HsHubRemoveBlockItem>
+      <HsHubTableHeaderItem header="row">{dict.drag_handle.header_row_menuitem}</HsHubTableHeaderItem>
+      <HsHubTableHeaderItem header="column">{dict.drag_handle.header_column_menuitem}</HsHubTableHeaderItem>
     </DragHandleMenu>
   )
 }
 
-export function TolariaSideMenu(props: SideMenuProps) {
+export function HsHubSideMenu(props: SideMenuProps) {
   const { block, editor } = useSideMenuBlock()
   useSideMenuTextAlignment(editor, block)
 
   return (
     <SideMenu {...props}>
-      <TolariaAddBlockButton />
-      <TolariaDragHandleButton dragHandleMenu={TolariaDragHandleMenu} />
+      <HsHubAddBlockButton />
+      <HsHubDragHandleButton dragHandleMenu={HsHubDragHandleMenu} />
     </SideMenu>
   )
 }

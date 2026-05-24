@@ -15,8 +15,8 @@ export function NoteIcon({ icon, editable = true }: NoteIconProps) {
   useEffect(() => {
     if (!editable) return
     const handler = () => focusNoteIconPropertyEditor()
-    window.addEventListener('laputa:open-icon-picker', handler)
-    return () => window.removeEventListener('laputa:open-icon-picker', handler)
+    window.addEventListener('hs-hub:open-icon-picker', handler)
+    return () => window.removeEventListener('hs-hub:open-icon-picker', handler)
   }, [editable])
 
   const handleActivate = useCallback(() => {

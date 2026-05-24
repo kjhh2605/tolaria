@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use crate::commands::expand_tilde;
 
-const APP_CONFIG_DIR: &str = "dev.kjhh2605.hs-tolaria";
+const APP_CONFIG_DIR: &str = "dev.kjhh2605.hs-hub";
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct VaultEntry {
@@ -114,7 +114,7 @@ mod tests {
             vaults: vec![
                 VaultEntry {
                     label: "My Vault".to_string(),
-                    path: "/Users/luca/Laputa".to_string(),
+                    path: "/Users/hansung/HS-Hub".to_string(),
                     ..Default::default()
                 },
                 VaultEntry {
@@ -123,16 +123,16 @@ mod tests {
                     ..Default::default()
                 },
             ],
-            active_vault: Some("/Users/luca/Laputa".to_string()),
+            active_vault: Some("/Users/hansung/HS-Hub".to_string()),
             default_workspace_path: None,
             hidden_defaults: vec![],
         };
         let loaded = save_and_reload(&list);
         assert_eq!(loaded.vaults.len(), 2);
         assert_eq!(loaded.vaults[0].label, "My Vault");
-        assert_eq!(loaded.vaults[0].path, "/Users/luca/Laputa");
+        assert_eq!(loaded.vaults[0].path, "/Users/hansung/HS-Hub");
         assert_eq!(loaded.vaults[1].label, "Work");
-        assert_eq!(loaded.active_vault.as_deref(), Some("/Users/luca/Laputa"));
+        assert_eq!(loaded.active_vault.as_deref(), Some("/Users/hansung/HS-Hub"));
     }
 
     #[test]
@@ -179,18 +179,18 @@ mod tests {
         assert!(result.is_ok());
         let path = result.unwrap();
         let path = path.to_str().unwrap();
-        assert!(path.contains("dev.kjhh2605.hs-tolaria"));
+        assert!(path.contains("dev.kjhh2605.hs-hub"));
     }
 
     #[test]
-    fn preferred_vault_list_path_uses_hs_tolaria_namespace() {
+    fn preferred_vault_list_path_uses_hs_hs_hub_namespace() {
         let result = preferred_app_config_path("vaults.json");
         assert!(result.is_ok());
         assert!(result
             .unwrap()
             .to_str()
             .unwrap()
-            .contains("dev.kjhh2605.hs-tolaria"));
+            .contains("dev.kjhh2605.hs-hub"));
     }
 
     #[test]
@@ -249,7 +249,7 @@ mod tests {
     fn loaded_vault_list_expands_tilde_paths() {
         let home = dirs::home_dir().unwrap();
         let expected_vault = home.join("Workspace/refactoring-vault");
-        let expected_hidden = home.join("Workspace/tolaria/demo-vault-v2");
+        let expected_hidden = home.join("Workspace/hs-hub/demo-vault-v2");
         let list = VaultList {
             vaults: vec![VaultEntry {
                 label: "Refactoring".to_string(),
@@ -258,7 +258,7 @@ mod tests {
             }],
             active_vault: Some("~/Workspace/refactoring-vault".to_string()),
             default_workspace_path: Some("~/Workspace/refactoring-vault".to_string()),
-            hidden_defaults: vec!["~/Workspace/tolaria/demo-vault-v2".to_string()],
+            hidden_defaults: vec!["~/Workspace/hs-hub/demo-vault-v2".to_string()],
         };
 
         let loaded = expand_vault_list_paths(list);

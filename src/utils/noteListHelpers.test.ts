@@ -144,13 +144,13 @@ describe('filterEntries', () => {
 
   it('shows only direct root-level files when selecting the vault root folder', () => {
     const entries = [
-      makeEntry({ path: '/Users/luca/Laputa/root-note.md', title: 'Root Note', fileKind: 'markdown' }),
-      makeEntry({ path: '/Users/luca/Laputa/config.json', title: 'config.json', fileKind: 'text' }),
-      makeEntry({ path: '/Users/luca/Laputa/projects/nested.md', title: 'Nested Note', fileKind: 'markdown' }),
-      makeEntry({ path: '/Users/luca/Laputa/assets/logo.png', title: 'Logo', fileKind: 'binary' }),
+      makeEntry({ path: '/Users/hansung/HS-Hub/root-note.md', title: 'Root Note', fileKind: 'markdown' }),
+      makeEntry({ path: '/Users/hansung/HS-Hub/config.json', title: 'config.json', fileKind: 'text' }),
+      makeEntry({ path: '/Users/hansung/HS-Hub/projects/nested.md', title: 'Nested Note', fileKind: 'markdown' }),
+      makeEntry({ path: '/Users/hansung/HS-Hub/assets/logo.png', title: 'Logo', fileKind: 'binary' }),
     ]
 
-    const result = filterEntries(entries, { kind: 'folder', path: '', rootPath: '/Users/luca/Laputa' })
+    const result = filterEntries(entries, { kind: 'folder', path: '', rootPath: '/Users/hansung/HS-Hub' })
 
     expect(result.map((entry) => entry.title)).toEqual(['Root Note', 'config.json'])
   })
@@ -269,14 +269,14 @@ describe('buildRelationshipGroups', () => {
   it('keeps stale entity views usable when a rapidly switched entry lacks filename metadata', () => {
     const staleEntity = {
       ...makeEntry({
-        path: 'C:\\Users\\luca\\Laputa\\project\\alpha.md',
+        path: 'C:\\Users\\luca\\HS-Hub\\project\\alpha.md',
         title: 'Alpha project',
         isA: 'Project',
       }),
       filename: undefined,
     } as unknown as ReturnType<typeof makeEntry>
     const backlink = makeEntry({
-      path: '/Users/luca/Laputa/note/backlink.md',
+      path: '/Users/hansung/HS-Hub/note/backlink.md',
       filename: 'backlink.md',
       title: 'Backlink',
       outgoingLinks: ['project/alpha'],

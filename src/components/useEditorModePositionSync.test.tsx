@@ -151,7 +151,7 @@ describe('useEditorModePositionSync', () => {
       await Promise.resolve()
     })
     act(() => {
-      window.dispatchEvent(new CustomEvent('laputa:editor-tab-swapped', {
+      window.dispatchEvent(new CustomEvent('hs-hub:editor-tab-swapped', {
         detail: { path: 'note.md' },
       }))
     })
@@ -200,7 +200,7 @@ describe('useEditorModePositionSync', () => {
     })
     rerender({ rawMode: false })
     act(() => {
-      window.dispatchEvent(new CustomEvent('laputa:editor-tab-swapped', {
+      window.dispatchEvent(new CustomEvent('hs-hub:editor-tab-swapped', {
         detail: { path: 'note.md' },
       }))
     })

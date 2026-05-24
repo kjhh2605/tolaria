@@ -4,7 +4,7 @@ import {
   type RefObject,
 } from 'react'
 import type { VaultEntry } from '../../types'
-import { APP_STORAGE_KEYS, LEGACY_APP_STORAGE_KEYS, getAppStorageItem } from '../../constants/appStorage'
+import { APP_STORAGE_KEYS, getAppStorageItem } from '../../constants/appStorage'
 import { buildTypeEntryMap } from '../../utils/typeColors'
 import { countAllNotesByFilter } from '../../utils/noteListHelpers'
 import { buildDynamicSections, sortSections } from '../../utils/sidebarSections'
@@ -189,7 +189,6 @@ export function useSidebarCollapsed() {
       const next = { ...prev }
       Reflect.set(next, key, !(Reflect.get(prev, key) as boolean))
       localStorage.setItem(APP_STORAGE_KEYS.sidebarCollapsed, JSON.stringify(next))
-      localStorage.removeItem(LEGACY_APP_STORAGE_KEYS.sidebarCollapsed)
       return next
     })
   }, [])

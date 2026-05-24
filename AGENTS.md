@@ -10,8 +10,6 @@
 
 Run `/laputa-next-task` — fetches next task (To Rework first, then Open), moves to In Progress, returns full description.
 
-**Before writing a single line of code:** run `mcp__codescene__code_health_score` to check the current codebase health against `.codescene-thresholds`. If the score is already below the threshold, **stop and refactor first** — find the worst files with the MCP, improve them, commit, then start the task. Never start feature work on a codebase that is already below the gate.
-
 - Read task description and all comments fully
 - For To Rework: the ❌ QA failed comment tells you exactly what to fix
 - Check `docs/adr/` for relevant architecture decisions before structural choices
@@ -51,11 +49,9 @@ After both phases pass, add a **completion comment** to the Todoist task. The co
 - What was implemented (a few lines covering logic and UX/UI)
 - QA: what was tested and how (Playwright / native screenshot / osascript)
 - Tests/coverage: commands run and final coverage result
-- CodeScene: before/after touched-file checks plus final Hotspot and Average scores after push
-- Codacy: MCP/CLI scan summary; confirm no new Critical/High findings
 - Localization: `pnpm l10n:translate` + `pnpm l10n:validate` result, or "no UI copy changes"
 - PostHog: event name(s) added, or why no event was needed
-- Refactoring: any files refactored to meet the CodeScene gate (or "none needed")
+- Refactoring: any files refactored to improve maintainability (or "none needed")
 - ADRs: any new/updated ADRs (or "none")
 - Docs: any updated docs (ARCHITECTURE.md, ABSTRACTIONS.md, etc.) (or "none")
 
@@ -66,8 +62,8 @@ After both phases pass, add a **completion comment** to the Todoist task. The co
 ### Commits & pushes
 
 - Push directly to `main` — no PRs, no branches. Pre-push blocks non-`main` pushes.
-- Pre-push hook runs full check suite (build + tests + core Playwright smoke + CodeScene)
-- **A task is NOT done until `git push origin main` succeeds.** If the hook blocks: read the error, fix it (clippy, tests, CodeScene, build), commit the fix, push again. **⛔ NEVER use --no-verify**
+- Pre-push hook runs the full local check suite (build + tests + core Playwright smoke)
+- **A task is NOT done until `git push origin main` succeeds.** If the hook blocks: read the error, fix it (clippy, tests, coverage, build), commit the fix, push again. **⛔ NEVER use --no-verify**
 
 ### TDD (mandatory)
 
@@ -89,35 +85,13 @@ Use `pnpm l10n:translate:force` only when intentionally regenerating existing tr
 
 New features should almost always emit a PostHog event so we can see whether users actually discover and use them. Skip instrumentation only for very small changes where a dedicated event would create noise. Use clear, stable event names, avoid PII or note content, and include only safe metadata that helps evaluate adoption and failures.
 
-When adding or changing a meaningful user-facing feature, include the event name(s) in the Todoist completion comment alongside QA, docs, and code health. If intentionally not instrumenting a feature, explain why in the completion comment.
+When adding or changing a meaningful user-facing feature, include the event name(s) in the Todoist completion comment alongside QA, docs, and quality checks. If intentionally not instrumenting a feature, explain why in the completion comment.
 
-### Code health (mandatory)
+### Maintainability (mandatory)
 
-Pre-commit and pre-push hooks enforce **Hotspot Code Health** and **Average Code Health** ≥ thresholds in `.codescene-thresholds`. Both gates block commit/push. Thresholds are a **ratchet** — only go up. When pre-push sees improved remote scores, it updates `.codescene-thresholds`, stages it, and stops so you can commit the new floor with normal verified hooks before pushing again. Never add `// eslint-disable`, `#[allow(...)]`, or `as any`.
+Keep code maintainable through small, reviewable diffs, regression tests for changed behavior, and local lint/type/test/coverage gates. Prefer deletion and simplification over adding layers, and never silence lint or compiler findings just to pass the suite.
 
-**Release rule:** CodeScene is a before/after gate, not just a final score. Every task must record the starting CodeScene state before edits and the final state after edits. If touched code gets worse, refactor before committing.
-
-**⛔ NEVER edit `.codescene-thresholds` to lower the values.** If the gate blocks you, improve the code — do not lower the bar.
-
-**CodeScene access order:** use CodeScene MCP tools if available. If MCP is unavailable, use the installed `cs` CLI for file-level review/delta work, and use the CodeScene API (`CODESCENE_PAT` + `CODESCENE_PROJECT_ID`) for project-wide Hotspot/Average threshold checks from `.codescene-thresholds`.
-
-**Before editing any existing code file:** capture its current file-level CodeScene score. After your edits, re-run the same file-level review and verify the score is higher. If the file already starts at `10.0`, it must remain `10.0`.
-
-**New files:** every new **scorable code file** must reach CodeScene score `10.0` before commit. If CodeScene reports `null` / "no scorable code" for a new file, it must still have zero CodeScene findings/warnings.
-
-**Before every commit:** run CodeScene file-level review on every touched or newly created code file and verify the rule above. **Boy Scout Rule:** every file you touch must leave with a higher score, unless it was already `10.0`, in which case it must stay `10.0`.
-
-**If CodeScene gate blocks your push:** use `mcp__codescene__code_health_score` to find the worst file, refactor it, commit, push again. Do NOT stop or wait for laputa-refactor — that is a background loop, not a substitute for fixing your own regressions.
-
-### Security scan with Codacy (mandatory)
-
-Use Codacy as a security and static-analysis gate before a task is considered releasable.
-
-- Prefer the Codacy MCP inside Codex to inspect repository/file issues for every touched code file.
-- If MCP is unavailable, use the local CLI wrapper, e.g. `.codacy/cli.sh analyze <path> --format sarif`; choose the relevant tool when useful (`eslint`, `opengrep`, `trivy`, `lizard`).
-- **Always fix Critical and High severity findings introduced by your change.** Do not move the task to In Review with new Critical/High Codacy issues.
-- Review Medium findings. Fix them when they are real defects or security-sensitive; otherwise explain why they are acceptable in the completion comment.
-- Never silence a Codacy rule just to pass the scan. Prefer small code changes that remove the finding.
+Before committing, review touched files for avoidable complexity, duplicated logic, stale abstractions, and unclear names. If a touched file becomes harder to understand, refactor it before committing.
 
 ### Check suite (runs on every push)
 ```bash
@@ -135,9 +109,7 @@ Coverage is a release gate, not a vanity metric:
 
 Before pushing or moving a task to In Review, verify and mention the result in the Todoist completion comment:
 
-- CodeScene before/after checked for every touched/new scorable file; final Hotspot and Average pass `.codescene-thresholds`.
 - Coverage commands passed (`pnpm test:coverage` and `cargo llvm-cov ... --fail-under-lines 85`) or the change is docs-only.
-- Codacy checked via MCP or `.codacy/cli.sh`; all new Critical/High issues fixed.
 - Localization checked: any user-facing copy lives in `src/lib/locales/en.json`, `pnpm l10n:translate` was run, and `pnpm l10n:validate` passes. If no copy changed, say “Localization: no UI copy changes”.
 - PostHog checked: meaningful new user actions/events are instrumented with safe metadata; noisy/minor changes explicitly say “PostHog: no event needed because …”.
 - Docs/ADRs checked under the rules below.

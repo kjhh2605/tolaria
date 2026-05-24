@@ -45,7 +45,7 @@ function TooltipContent({
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
         className={cn(
-          "z-50 w-fit max-w-[min(var(--radix-tooltip-content-available-width,22rem),22rem)] origin-(--radix-tooltip-content-transform-origin) [zoom:var(--tolaria-overlay-zoom-inverse,1)]"
+          "z-50 w-fit max-w-[min(var(--radix-tooltip-content-available-width,22rem),22rem)] origin-(--radix-tooltip-content-transform-origin) [zoom:var(--hs-hub-overlay-zoom-inverse,1)]"
         )}
         style={style}
         {...props}
@@ -53,7 +53,7 @@ function TooltipContent({
         <div
           data-slot="tooltip-visual-scale"
           className={cn(
-            "bg-foreground text-background max-w-[inherit] rounded-md px-3 py-1.5 text-xs text-balance [zoom:var(--tolaria-overlay-zoom-factor,1)]",
+            "bg-foreground text-background max-w-[inherit] rounded-md px-3 py-1.5 text-xs text-balance [zoom:var(--hs-hub-overlay-zoom-factor,1)]",
             className
           )}
         >

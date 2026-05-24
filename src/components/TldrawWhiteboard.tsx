@@ -23,7 +23,7 @@ import type { ResolvedThemeMode } from '../lib/themeMode'
 import { installTldrawTextMeasurementGuard } from './tldrawTextMeasurementGuard'
 
 const EMPTY_TLDRAW_TRANSLATION_URL = 'data:application/json;base64,e30K'
-const TOLARIA_TLDRAW_USER_ID = 'tolaria-whiteboard'
+const HS_HUB_TLDRAW_USER_ID = 'hs-hub-whiteboard'
 
 function resolveTldrawAssetUrl(assetUrl: string | undefined): string {
   return assetUrl ?? EMPTY_TLDRAW_TRANSLATION_URL
@@ -92,7 +92,7 @@ function cssSize({ height, width }: PixelSize): CSSProperties {
 function tldrawUserPreferences(themeMode: ResolvedThemeMode): TLUserPreferences {
   return {
     ...defaultUserPreferences,
-    id: TOLARIA_TLDRAW_USER_ID,
+    id: HS_HUB_TLDRAW_USER_ID,
     colorScheme: themeMode,
   }
 }
@@ -193,10 +193,10 @@ function installZoomAwareViewport(editor: Editor): () => void {
   }
 
   scheduleViewportUpdate()
-  window.addEventListener('laputa-zoom-change', scheduleViewportUpdate)
+  window.addEventListener('hs-hub:zoom-change', scheduleViewportUpdate)
 
   return () => {
-    window.removeEventListener('laputa-zoom-change', scheduleViewportUpdate)
+    window.removeEventListener('hs-hub:zoom-change', scheduleViewportUpdate)
     animationFrameIds.forEach((id) => window.cancelAnimationFrame(id))
     timeoutIds.forEach((id) => window.clearTimeout(id))
     editor.updateViewportScreenBounds = updateViewportScreenBounds
@@ -214,13 +214,13 @@ function installWhiteboardRuntimeGuards(editor: Editor): () => void {
   }
 }
 
-interface TolariaTldrawDialogProps {
+interface HsHubTldrawDialogProps {
   dialog: TLUiDialog
   onClose: (id: string) => void
 }
 
 const DIALOG_OPEN_DISMISS_GRACE_MS = 250
-let retainedTolariaTldrawDialogs: TLUiDialog[] = []
+let retainedHsHubTldrawDialogs: TLUiDialog[] = []
 
 function useDeferredDialogOpen() {
   const openedAtRef = useRef(0)
@@ -253,17 +253,17 @@ function shouldCloseFromOverlayClick(
   return isOverlayEvent(event) && !dialog.preventBackgroundClose && !mouseDownInsideContent
 }
 
-interface TolariaTldrawDialogContentProps {
+interface HsHubTldrawDialogContentProps {
   dialog: TLUiDialog
   mouseDownInsideContentRef: MutableRefObject<boolean>
   onClose: () => void
 }
 
-function TolariaTldrawDialogContent({
+function HsHubTldrawDialogContent({
   dialog,
   mouseDownInsideContentRef,
   onClose,
-}: TolariaTldrawDialogContentProps) {
+}: HsHubTldrawDialogContentProps) {
   const ModalContent = dialog.component
   const handleClose = () => {
     mouseDownInsideContentRef.current = false
@@ -290,7 +290,7 @@ function TolariaTldrawDialogContent({
   )
 }
 
-const TolariaTldrawDialog = memo(function TolariaTldrawDialog({ dialog, onClose }: TolariaTldrawDialogProps) {
+const HsHubTldrawDialog = memo(function HsHubTldrawDialog({ dialog, onClose }: HsHubTldrawDialogProps) {
   const mouseDownInsideContentRef = useRef(false)
   const { openedAtRef, readyToOpen } = useDeferredDialogOpen()
 
@@ -319,7 +319,7 @@ const TolariaTldrawDialog = memo(function TolariaTldrawDialog({ dialog, onClose 
           }
         }}
       >
-        <TolariaTldrawDialogContent
+        <HsHubTldrawDialogContent
           dialog={dialog}
           mouseDownInsideContentRef={mouseDownInsideContentRef}
           onClose={closeDialogNow}
@@ -329,16 +329,16 @@ const TolariaTldrawDialog = memo(function TolariaTldrawDialog({ dialog, onClose 
   )
 })
 
-function TolariaTldrawDialogs() {
+function HsHubTldrawDialogs() {
   const { dialogs, removeDialog } = useDialogs()
-  const requestedDialogs = useValue('tolaria tldraw dialogs', () => dialogs.get(), [dialogs])
+  const requestedDialogs = useValue('hs-hub tldraw dialogs', () => dialogs.get(), [dialogs])
   const [visibleDialogs, setVisibleDialogs] = useState<TLUiDialog[]>(() =>
-    retainedTolariaTldrawDialogs.length > 0 ? retainedTolariaTldrawDialogs : dialogs.get()
+    retainedHsHubTldrawDialogs.length > 0 ? retainedHsHubTldrawDialogs : dialogs.get()
   )
 
   const closeVisibleDialog = useCallback((id: string) => {
-    const nextDialogs = retainedTolariaTldrawDialogs.filter((dialog) => dialog.id !== id)
-    retainedTolariaTldrawDialogs = nextDialogs
+    const nextDialogs = retainedHsHubTldrawDialogs.filter((dialog) => dialog.id !== id)
+    retainedHsHubTldrawDialogs = nextDialogs
     setVisibleDialogs(nextDialogs)
     removeDialog(id)
   }, [removeDialog])
@@ -346,14 +346,14 @@ function TolariaTldrawDialogs() {
   useEffect(() => {
     if (requestedDialogs.length === 0) return
     // tldraw clears the dialog atom while Radix closes the menu; keep the last requested dialog mounted locally.
-    retainedTolariaTldrawDialogs = requestedDialogs
+    retainedHsHubTldrawDialogs = requestedDialogs
     queueMicrotask(() => {
       setVisibleDialogs(requestedDialogs)
     })
   }, [requestedDialogs])
 
   return visibleDialogs.map((dialog) => (
-    <TolariaTldrawDialog
+    <HsHubTldrawDialog
       key={dialog.id}
       dialog={dialog}
       onClose={closeVisibleDialog}
@@ -383,7 +383,7 @@ export function TldrawWhiteboard({
     setUserPreferences: ignoreTldrawUserPreferencesUpdate,
     userPreferences,
   })
-  const tldrawUiComponents = useMemo(() => ({ Dialogs: TolariaTldrawDialogs }), [])
+  const tldrawUiComponents = useMemo(() => ({ Dialogs: HsHubTldrawDialogs }), [])
 
   useEffect(() => {
     onSnapshotChangeRef.current = onSnapshotChange

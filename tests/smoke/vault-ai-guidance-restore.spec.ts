@@ -6,7 +6,7 @@ test('vault guidance restore command recovers missing managed guidance', async (
     localStorage.clear()
     Object.defineProperty(window, 'prompt', {
       configurable: true,
-      value: () => '/Users/luca/Laputa',
+      value: () => '/Users/hansung/HS-Hub',
     })
 
     let ref: Record<string, unknown> | null = null
@@ -27,8 +27,8 @@ test('vault guidance restore command recovers missing managed guidance', async (
           default_ai_agent: 'codex',
         })
 
-        ref.get_default_vault_path = () => '/Users/luca/Laputa'
-        ref.check_vault_exists = (args: { path: string }) => args.path === '/Users/luca/Laputa'
+        ref.get_default_vault_path = () => '/Users/hansung/HS-Hub'
+        ref.check_vault_exists = (args: { path: string }) => args.path === '/Users/hansung/HS-Hub'
         ref.get_ai_agents_status = () => ({
           claude_code: { installed: false, version: null },
           codex: { installed: true, version: '1.2.3' },
@@ -58,19 +58,19 @@ test('vault guidance restore command recovers missing managed guidance', async (
   await expect(page.getByTestId('note-list-container')).toBeVisible({ timeout: 5_000 })
 
   const aiBadge = page.getByTestId('status-ai-agents')
-  await expect(aiBadge).toHaveAttribute('title', /Tolaria guidance missing or broken/)
+  await expect(aiBadge).toHaveAttribute('title', /HS-Hub guidance missing or broken/)
 
   await openCommandPalette(page)
-  expect(await findCommand(page, 'Restore Tolaria AI Guidance')).toBe(true)
+  expect(await findCommand(page, 'Restore HS-Hub AI Guidance')).toBe(true)
   await page.keyboard.press('Enter')
 
-  await expect(page.getByText('Tolaria AI guidance restored')).toBeVisible()
+  await expect(page.getByText('HS-Hub AI guidance restored')).toBeVisible()
 
   await aiBadge.click()
-  await expect(page.getByTestId('status-ai-guidance-summary')).toHaveText('Tolaria guidance ready')
+  await expect(page.getByTestId('status-ai-guidance-summary')).toHaveText('HS-Hub guidance ready')
   await expect(page.getByTestId('status-ai-guidance-restore')).toHaveCount(0)
   await page.keyboard.press('Escape')
 
   await openCommandPalette(page)
-  expect(await findCommand(page, 'Restore Tolaria AI Guidance')).toBe(false)
+  expect(await findCommand(page, 'Restore HS-Hub AI Guidance')).toBe(false)
 })

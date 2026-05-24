@@ -16,7 +16,7 @@ test.describe('Move vault cache smoke tests', () => {
     await expect(noteListContainer).toBeVisible({ timeout: 5_000 })
   })
 
-  test('no .laputa-cache.json text visible in the sidebar', async ({
+  test('no .hs-hub-cache.json text visible in the sidebar', async ({
     page,
   }) => {
     // The cache file should NOT appear anywhere in the sidebar.
@@ -27,7 +27,7 @@ test.describe('Move vault cache smoke tests', () => {
     await expect(sidebar).toBeVisible({ timeout: 5_000 })
 
     // No element in the sidebar should contain cache-related text
-    const cacheText = sidebar.locator('text=.laputa-cache')
+    const cacheText = sidebar.locator('text=.hs-hub-cache')
     await expect(cacheText).toHaveCount(0)
   })
 })

@@ -64,7 +64,7 @@ describe('NoteIcon', () => {
     window.addEventListener(FOCUS_NOTE_ICON_PROPERTY_EVENT, handler)
 
     render(<NoteIcon icon={null} />)
-    act(() => { window.dispatchEvent(new CustomEvent('laputa:open-icon-picker')) })
+    act(() => { window.dispatchEvent(new CustomEvent('hs-hub:open-icon-picker')) })
 
     expect(handler).toHaveBeenCalledOnce()
     window.removeEventListener(FOCUS_NOTE_ICON_PROPERTY_EVENT, handler)

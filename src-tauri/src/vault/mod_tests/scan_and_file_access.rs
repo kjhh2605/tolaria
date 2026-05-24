@@ -86,7 +86,7 @@ fn test_scan_vault_includes_all_protected_folders() {
 fn test_scan_vault_skips_hidden_folders() {
     let dir = TempDir::new().unwrap();
     create_test_file(dir.path(), "root.md", "# Root\n");
-    create_test_file(dir.path(), ".laputa/cache.md", "# Cache\n");
+    create_test_file(dir.path(), ".hs-hub/cache.md", "# Cache\n");
     create_test_file(dir.path(), ".git/objects.md", "# Git\n");
 
     let entries = scan_vault(dir.path(), &HashMap::new()).unwrap();

@@ -148,7 +148,7 @@ describe('buildContextualPrompt', () => {
   it('includes the system preamble', () => {
     const active = makeEntry({ path: '/vault/a.md', title: 'Alpha' })
     const prompt = buildContextualPrompt(active, [])
-    expect(prompt).toContain('AI assistant integrated into Tolaria')
+    expect(prompt).toContain('AI assistant integrated into HS-Hub')
   })
 })
 
@@ -171,7 +171,7 @@ describe('buildContextSnapshot', () => {
 
   it('includes system preamble', () => {
     const result = buildContextSnapshot({ activeEntry: active, entries })
-    expect(result).toContain('AI assistant integrated into Tolaria')
+    expect(result).toContain('AI assistant integrated into HS-Hub')
     expect(result).toContain('Context Snapshot')
   })
 

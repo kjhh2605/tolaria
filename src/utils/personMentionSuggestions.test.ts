@@ -5,7 +5,7 @@ import type { WikilinkBaseItem } from './wikilinkSuggestions'
 const items: WikilinkBaseItem[] = [
   { title: 'Matteo Cellini', aliases: ['Matteo'], group: 'Person', entryTitle: 'Matteo Cellini', path: '/person/matteo.md' },
   { title: 'Maria Bianchi', aliases: ['Maria'], group: 'Person', entryTitle: 'Maria Bianchi', path: '/person/maria.md' },
-  { title: 'Build Laputa App', aliases: ['Laputa'], group: 'Project', entryTitle: 'Build Laputa App', path: '/project/laputa.md' },
+  { title: 'Build HS-Hub Project', aliases: ['HS-Hub'], group: 'Project', entryTitle: 'Build HS-Hub Project', path: '/project/hs-hub.md' },
   { title: 'Grow Newsletter', aliases: [], group: 'Responsibility', entryTitle: 'Grow Newsletter', path: '/resp/newsletter.md' },
   { title: 'Elena Russo', aliases: ['Elena'], group: 'Person', entryTitle: 'Elena Russo', path: '/person/elena.md' },
 ]

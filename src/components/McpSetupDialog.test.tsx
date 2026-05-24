@@ -4,10 +4,10 @@ import { McpSetupDialog } from './McpSetupDialog'
 
 const MANUAL_CONFIG = JSON.stringify({
   mcpServers: {
-    tolaria: {
+    'hs-hub': {
       type: 'stdio',
       command: 'node',
-      args: ['/Applications/Tolaria.app/Contents/Resources/mcp-server/index.js'],
+      args: ['/Applications/HS-Hub.app/Contents/Resources/mcp-server/index.js'],
       env: {
         WS_UI_PORT: '9711',
       },

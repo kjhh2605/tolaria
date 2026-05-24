@@ -29,7 +29,7 @@ afterEach(() => {
 
 describe('telemetry scrubPaths', () => {
   it('redacts macOS absolute paths', () => {
-    expect(scrubPaths('Error in /Users/luca/Laputa/note.md')).toBe(
+    expect(scrubPaths('Error in /Users/hansung/HS-Hub/note.md')).toBe(
       'Error in [redacted-path]'
     )
   })
@@ -86,8 +86,8 @@ describe('initSentry', () => {
       release: sentryRelease,
     }))
     expect(sentryMocks.setUser).toHaveBeenCalledWith({ id: 'anonymous-user' })
-    expect(sentryMocks.setTag).toHaveBeenCalledWith('tolaria.build_version', buildVersion)
-    expect(sentryMocks.setTag).toHaveBeenCalledWith('tolaria.release_kind', releaseKind)
+    expect(sentryMocks.setTag).toHaveBeenCalledWith('hs-hub.build_version', buildVersion)
+    expect(sentryMocks.setTag).toHaveBeenCalledWith('hs-hub.release_kind', releaseKind)
   })
 })
 

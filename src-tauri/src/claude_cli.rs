@@ -1274,7 +1274,7 @@ mod tests {
             .arg("stdin_probe_parent_child")
             .arg("--ignored")
             .arg("--nocapture")
-            .env("TOLARIA_STDIN_PROBE_CHILD", "1")
+            .env("HS_HUB_STDIN_PROBE_CHILD", "1")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -1312,7 +1312,7 @@ mod tests {
     #[ignore = "spawned by run_subprocess_closes_stdin_even_when_parent_stdin_pipe_is_open"]
     #[test]
     fn stdin_probe_parent_child() {
-        if std::env::var_os("TOLARIA_STDIN_PROBE_CHILD").is_none() {
+        if std::env::var_os("HS_HUB_STDIN_PROBE_CHILD").is_none() {
             return;
         }
 
@@ -1322,7 +1322,7 @@ mod tests {
             "--ignored".to_string(),
             "--nocapture".to_string(),
         ];
-        std::env::set_var("TOLARIA_STDIN_PROBE_MOCK_CLAUDE_CHILD", "1");
+        std::env::set_var("HS_HUB_STDIN_PROBE_MOCK_CLAUDE_CHILD", "1");
         let mut events = vec![];
         let result = run_claude_subprocess(
             ClaudeSubprocessRequest {
@@ -1334,7 +1334,7 @@ mod tests {
             },
             &mut |event| events.push(event),
         );
-        std::env::remove_var("TOLARIA_STDIN_PROBE_MOCK_CLAUDE_CHILD");
+        std::env::remove_var("HS_HUB_STDIN_PROBE_MOCK_CLAUDE_CHILD");
 
         assert_eq!(result.unwrap(), "stdin-ok");
         assert!(matches!(
@@ -1348,7 +1348,7 @@ mod tests {
     #[ignore = "spawned by stdin_probe_parent_child"]
     #[test]
     fn stdin_probe_mock_claude_child() {
-        if std::env::var_os("TOLARIA_STDIN_PROBE_MOCK_CLAUDE_CHILD").is_none() {
+        if std::env::var_os("HS_HUB_STDIN_PROBE_MOCK_CLAUDE_CHILD").is_none() {
             return;
         }
 

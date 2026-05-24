@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * Tolaria MCP Server — lightweight vault tools for AI agents.
+ * HS-Hub MCP Server — lightweight vault tools for AI agents.
  *
- * These MCP tools provide Tolaria-specific capabilities alongside each
+ * These MCP tools provide HS-Hub-specific capabilities alongside each
  * app-managed agent's own Safe / Power User permission profile:
  *
  *   - search_notes: full-text search across vault notes
  *   - get_vault_context: vault structure overview (types, note count, folders)
  *   - get_note: parsed frontmatter + content (convenience over raw cat)
- *   - open_note: signal Tolaria UI to open a note as a tab
+ *   - open_note: signal HS-Hub UI to open a note as a tab
  *   - highlight_editor: visually highlight a UI element (editor, tab, etc.)
  *   - refresh_vault: trigger vault rescan so new/modified files appear
  */
@@ -125,7 +125,7 @@ const TOOLS = [
   },
   {
     name: 'get_vault_context',
-    description: 'Get vault orientation for the active Tolaria vaults: entity types, AGENTS.md instructions, note count, folders, and recent notes.',
+    description: 'Get vault orientation for the active HS-Hub vaults: entity types, AGENTS.md instructions, note count, folders, and recent notes.',
     annotations: LOCAL_READ_ONLY_TOOL_ANNOTATIONS,
     inputSchema: {
       type: 'object',
@@ -136,7 +136,7 @@ const TOOLS = [
   },
   {
     name: 'list_vaults',
-    description: 'List the current active Tolaria vaults available to MCP tools, including whether each vault has AGENTS.md instructions.',
+    description: 'List the current active HS-Hub vaults available to MCP tools, including whether each vault has AGENTS.md instructions.',
     annotations: LOCAL_READ_ONLY_TOOL_ANNOTATIONS,
     inputSchema: {
       type: 'object',
@@ -158,7 +158,7 @@ const TOOLS = [
   },
   {
     name: 'open_note',
-    description: 'Open a note in the Tolaria UI as a new tab. Use after creating or editing a note so the user can see it.',
+    description: 'Open a note in the HS-Hub UI as a new tab. Use after creating or editing a note so the user can see it.',
     annotations: LOCAL_READ_ONLY_TOOL_ANNOTATIONS,
     inputSchema: {
       type: 'object',
@@ -171,7 +171,7 @@ const TOOLS = [
   },
   {
     name: 'highlight_editor',
-    description: 'Visually highlight a UI element in Tolaria (editor, tab, properties panel, or note list). The highlight auto-clears after a short delay.',
+    description: 'Visually highlight a UI element in HS-Hub (editor, tab, properties panel, or note list). The highlight auto-clears after a short delay.',
     annotations: LOCAL_READ_ONLY_TOOL_ANNOTATIONS,
     inputSchema: {
       type: 'object',
@@ -184,7 +184,7 @@ const TOOLS = [
   },
   {
     name: 'refresh_vault',
-    description: 'Trigger a vault rescan so new or modified files appear immediately in the Tolaria note list.',
+    description: 'Trigger a vault rescan so new or modified files appear immediately in the HS-Hub note list.',
     annotations: LOCAL_READ_ONLY_TOOL_ANNOTATIONS,
     inputSchema: {
       type: 'object',
@@ -200,7 +200,7 @@ function requestedVaultPath(args = {}) {
   const requested = typeof args.vaultPath === 'string' ? args.vaultPath.trim() : ''
   if (!requested) return null
   if (!activeVaultPaths().includes(requested)) {
-    throw new Error(`Vault is not active in Tolaria: ${requested}`)
+    throw new Error(`Vault is not active in HS-Hub: ${requested}`)
   }
   return requested
 }
@@ -306,7 +306,7 @@ function handleOpenNote(args) {
   const targetPath = uiPath(args)
   broadcastUiAction('vault_changed', { path: targetPath })
   broadcastUiAction('open_tab', { path: targetPath })
-  return { content: [{ type: 'text', text: `Opening ${targetPath} in Tolaria` }] }
+  return { content: [{ type: 'text', text: `Opening ${targetPath} in HS-Hub` }] }
 }
 
 function handleHighlightEditor(args) {
@@ -338,7 +338,7 @@ function callToolHandler(name, args) {
 // --- Server setup ---
 
 const server = new Server(
-  { name: 'tolaria-mcp-server', version: '0.3.0' },
+  { name: 'hs-hub-mcp-server', version: '0.3.0' },
   { capabilities: { tools: {} } },
 )
 
@@ -395,7 +395,7 @@ async function main() {
 
   connectUiBridge()
   await server.connect(transport)
-  console.error('Tolaria MCP server running (vaults resolved per call)')
+  console.error('HS-Hub MCP server running (vaults resolved per call)')
 }
 
 main().catch((error) => {

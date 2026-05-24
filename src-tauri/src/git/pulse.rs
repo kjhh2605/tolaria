@@ -477,7 +477,7 @@ mod tests {
                 "remote",
                 "add",
                 "origin",
-                "https://github.com/lucaong/laputa-vault.git",
+                "https://github.com/lucaong/hs-hub-vault.git",
             ])
             .current_dir(vault)
             .output()
@@ -486,6 +486,6 @@ mod tests {
         let info = get_last_commit_info(vp).unwrap().unwrap();
         assert!(info.commit_url.is_some());
         let url = info.commit_url.unwrap();
-        assert!(url.starts_with("https://github.com/lucaong/laputa-vault/commit/"));
+        assert!(url.starts_with("https://github.com/lucaong/hs-hub-vault/commit/"));
     }
 }

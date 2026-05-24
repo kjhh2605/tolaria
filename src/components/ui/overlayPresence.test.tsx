@@ -33,8 +33,8 @@ function expectNoPresenceAnimationClasses(element: HTMLElement) {
 
 describe('overlay presence stability', () => {
   beforeEach(() => {
-    document.documentElement.style.removeProperty('--tolaria-overlay-zoom-factor')
-    document.documentElement.style.removeProperty('--tolaria-overlay-zoom-inverse')
+    document.documentElement.style.removeProperty('--hs-hub-overlay-zoom-factor')
+    document.documentElement.style.removeProperty('--hs-hub-overlay-zoom-inverse')
   })
 
   it('keeps tooltip content free of Radix presence animation classes', () => {
@@ -59,13 +59,13 @@ describe('overlay presence stability', () => {
       result.current.zoomIn()
     })
 
-    expect(document.documentElement.style.getPropertyValue('--tolaria-overlay-zoom-factor')).toBe(String(110 / 100))
-    expect(document.documentElement.style.getPropertyValue('--tolaria-overlay-zoom-inverse')).toBe(String(100 / 110))
+    expect(document.documentElement.style.getPropertyValue('--hs-hub-overlay-zoom-factor')).toBe(String(110 / 100))
+    expect(document.documentElement.style.getPropertyValue('--hs-hub-overlay-zoom-inverse')).toBe(String(100 / 110))
   })
 
   it('compensates tooltip portal positioning without cancelling content zoom', () => {
-    document.documentElement.style.setProperty('--tolaria-overlay-zoom-factor', '1.4')
-    document.documentElement.style.setProperty('--tolaria-overlay-zoom-inverse', String(1 / 1.4))
+    document.documentElement.style.setProperty('--hs-hub-overlay-zoom-factor', '1.4')
+    document.documentElement.style.setProperty('--hs-hub-overlay-zoom-inverse', String(1 / 1.4))
 
     render(
       <TooltipProvider>
@@ -80,8 +80,8 @@ describe('overlay presence stability', () => {
 
     const positionShell = document.querySelector('[data-slot="tooltip-content"]') as HTMLElement
     const visualShell = document.querySelector('[data-slot="tooltip-visual-scale"]') as HTMLElement
-    expect(positionShell.className).toContain('[zoom:var(--tolaria-overlay-zoom-inverse,1)]')
-    expect(visualShell.className).toContain('[zoom:var(--tolaria-overlay-zoom-factor,1)]')
+    expect(positionShell.className).toContain('[zoom:var(--hs-hub-overlay-zoom-inverse,1)]')
+    expect(visualShell.className).toContain('[zoom:var(--hs-hub-overlay-zoom-factor,1)]')
   })
 
   it('keeps popover content free of Radix presence animation classes', () => {

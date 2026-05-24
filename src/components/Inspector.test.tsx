@@ -216,26 +216,26 @@ Status: Evergreened
   })
 
   it('infers the current workspace for untagged default-vault notes before moving them', () => {
-    const laputaWorkspace = makeWorkspace('/Users/luca/Laputa', 'Laputa')
+    const hsHubWorkspace = makeWorkspace('/Users/hansung/HS-Hub', 'HS-Hub')
     const refactoringWorkspace = makeWorkspace('/Users/luca/Refactoring', 'Refactoring')
     const entry = {
       ...mockEntry,
-      path: '/Users/luca/Laputa/project/test.md',
+      path: '/Users/hansung/HS-Hub/project/test.md',
       workspace: undefined,
     }
     const onChangeWorkspace = vi.fn()
 
     renderSelectedInspector({
       entry,
-      workspaces: [laputaWorkspace, refactoringWorkspace],
+      workspaces: [hsHubWorkspace, refactoringWorkspace],
       onChangeWorkspace,
     })
 
-    fireEvent.pointerDown(screen.getByRole('combobox', { name: 'Laputa' }), { button: 0, pointerType: 'mouse' })
+    fireEvent.pointerDown(screen.getByRole('combobox', { name: 'HS-Hub' }), { button: 0, pointerType: 'mouse' })
     fireEvent.click(screen.getByRole('option', { name: 'Refactoring' }))
 
     expect(onChangeWorkspace).toHaveBeenCalledWith(
-      expect.objectContaining({ path: entry.path, workspace: laputaWorkspace }),
+      expect.objectContaining({ path: entry.path, workspace: hsHubWorkspace }),
       refactoringWorkspace,
     )
   })
@@ -401,7 +401,7 @@ This is a test note with some words to count.
 
   describe('Referenced By (bidirectional relationships)', () => {
     const targetEntry: VaultEntry = {
-      path: '/Users/luca/Laputa/responsibility/grow-newsletter.md',
+      path: '/Users/hansung/HS-Hub/responsibility/grow-newsletter.md',
       filename: 'grow-newsletter.md',
       title: 'Grow Newsletter',
       isA: 'Responsibility',
@@ -426,7 +426,7 @@ This is a test note with some words to count.
     }
 
     const essayEntry: VaultEntry = {
-      path: '/Users/luca/Laputa/essay/on-writing.md',
+      path: '/Users/hansung/HS-Hub/essay/on-writing.md',
       filename: 'on-writing.md',
       title: 'On Writing Well',
       isA: 'Essay',
@@ -451,7 +451,7 @@ This is a test note with some words to count.
     }
 
     const procedureEntry: VaultEntry = {
-      path: '/Users/luca/Laputa/procedure/write-essays.md',
+      path: '/Users/hansung/HS-Hub/procedure/write-essays.md',
       filename: 'write-essays.md',
       title: 'Write Weekly Essays',
       isA: 'Procedure',
@@ -476,7 +476,7 @@ This is a test note with some words to count.
     }
 
     const experimentEntry: VaultEntry = {
-      path: '/Users/luca/Laputa/experiment/seo.md',
+      path: '/Users/hansung/HS-Hub/experiment/seo.md',
       filename: 'seo.md',
       title: 'SEO Experiment',
       isA: 'Experiment',
@@ -563,7 +563,7 @@ Status: Active
     it('skips Type relationships in referenced-by computation', () => {
       const typeEntry: VaultEntry = {
         ...targetEntry,
-        path: '/Users/luca/Laputa/responsibility.md',
+        path: '/Users/hansung/HS-Hub/responsibility.md',
         filename: 'responsibility.md',
         title: 'Responsibility',
         isA: 'Type',
@@ -609,7 +609,7 @@ Status: Active
 
     it('excludes entries from backlinks when already shown in referenced-by', () => {
       const noteA: VaultEntry = {
-        path: '/Users/luca/Laputa/essay/on-writing.md',
+        path: '/Users/hansung/HS-Hub/essay/on-writing.md',
         filename: 'on-writing.md',
         title: 'On Writing Well',
         isA: 'Essay',

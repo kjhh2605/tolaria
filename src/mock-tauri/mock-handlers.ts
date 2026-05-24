@@ -36,10 +36,10 @@ function mockFileHistory(path: string) {
 
 function mockModifiedFiles(): ModifiedFile[] {
   return [
-    { path: '/Users/luca/Laputa/26q1-laputa-app.md', relativePath: '26q1-laputa-app.md', status: 'modified' },
-    { path: '/Users/luca/Laputa/facebook-ads-strategy.md', relativePath: 'facebook-ads-strategy.md', status: 'modified' },
-    { path: '/Users/luca/Laputa/ai-agents-primer.md', relativePath: 'ai-agents-primer.md', status: 'added' },
-    { path: '/Users/luca/Laputa/old-draft.md', relativePath: 'old-draft.md', status: 'deleted' },
+    { path: '/Users/hansung/HS-Hub/26q1-hs-hub-project.md', relativePath: '26q1-hs-hub-project.md', status: 'modified' },
+    { path: '/Users/hansung/HS-Hub/facebook-ads-strategy.md', relativePath: 'facebook-ads-strategy.md', status: 'modified' },
+    { path: '/Users/hansung/HS-Hub/ai-agents-primer.md', relativePath: 'ai-agents-primer.md', status: 'added' },
+    { path: '/Users/hansung/HS-Hub/old-draft.md', relativePath: 'old-draft.md', status: 'deleted' },
   ]
 }
 
@@ -409,7 +409,7 @@ export const mockHandlers: Record<string, (args: any) => any> = {
     const basePaths = new Set(base.map(f => f.path))
     const extra: ModifiedFile[] = [...mockSavedSinceCommit]
       .filter(p => !basePaths.has(p))
-      .map(p => ({ path: p, relativePath: p.replace(/^.*?\/Laputa\//, ''), status: 'modified' as const }))
+      .map(p => ({ path: p, relativePath: p.replace(/^.*?\/HS-Hub\//, ''), status: 'modified' as const }))
     return [...base, ...extra]
   },
   get_file_diff: (args: { path: string }) => mockFileDiff(args.path),
@@ -423,7 +423,7 @@ export const mockHandlers: Record<string, (args: any) => any> = {
   },
   get_build_number: () => 'bDEV',
   should_use_external_media_preview: () => false,
-  get_last_commit_info: (): LastCommitInfo => ({ shortHash: 'a1b2c3d', commitUrl: 'https://github.com/lucaong/laputa-vault/commit/a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0' }),
+  get_last_commit_info: (): LastCommitInfo => ({ shortHash: 'a1b2c3d', commitUrl: 'https://github.com/lucaong/hs-hub-vault/commit/a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0' }),
   is_git_repo: () => true,
   init_git_repo: () => null,
   git_pull: (): GitPullResult => ({ status: 'up_to_date', message: 'Already up to date', updatedFiles: [], conflictFiles: [] }),
@@ -450,8 +450,8 @@ export const mockHandlers: Record<string, (args: any) => any> = {
     const limit = args.limit ?? 30
     const ts = Math.floor(Date.now() / 1000)
     const commits: PulseCommit[] = [
-      { hash: 'a1b2c3d4e5f6', shortHash: 'a1b2c3d', message: 'Update project notes and add new experiment', date: ts - 3600, githubUrl: 'https://github.com/lucaong/laputa-vault/commit/a1b2c3d4e5f6', files: [{ path: '26q1-laputa-app.md', status: 'modified', title: '26q1 laputa app' }, { path: 'ai-search.md', status: 'added', title: 'ai search' }], added: 1, modified: 1, deleted: 0 },
-      { hash: 'b2c3d4e5f6g7', shortHash: 'b2c3d4e', message: 'Reorganize people notes', date: ts - 86400, githubUrl: 'https://github.com/lucaong/laputa-vault/commit/b2c3d4e5f6g7', files: [{ path: 'alice-johnson.md', status: 'modified', title: 'alice johnson' }, { path: 'bob-smith.md', status: 'modified', title: 'bob smith' }, { path: 'old-contact.md', status: 'deleted', title: 'old contact' }], added: 0, modified: 2, deleted: 1 },
+      { hash: 'a1b2c3d4e5f6', shortHash: 'a1b2c3d', message: 'Update project notes and add new experiment', date: ts - 3600, githubUrl: 'https://github.com/lucaong/hs-hub-vault/commit/a1b2c3d4e5f6', files: [{ path: '26q1-hs-hub-project.md', status: 'modified', title: '26q1 hs-hub app' }, { path: 'ai-search.md', status: 'added', title: 'ai search' }], added: 1, modified: 1, deleted: 0 },
+      { hash: 'b2c3d4e5f6g7', shortHash: 'b2c3d4e', message: 'Reorganize people notes', date: ts - 86400, githubUrl: 'https://github.com/lucaong/hs-hub-vault/commit/b2c3d4e5f6g7', files: [{ path: 'alice-johnson.md', status: 'modified', title: 'alice johnson' }, { path: 'bob-smith.md', status: 'modified', title: 'bob smith' }, { path: 'old-contact.md', status: 'deleted', title: 'old contact' }], added: 0, modified: 2, deleted: 1 },
       { hash: 'c3d4e5f6g7h8', shortHash: 'c3d4e5f', message: 'Add daily journal entry', date: ts - 172800, githubUrl: null, files: [{ path: '2026-03-03.md', status: 'added', title: '2026 03 03' }], added: 1, modified: 0, deleted: 0 },
     ]
     return commits.slice(0, limit)
@@ -467,7 +467,7 @@ export const mockHandlers: Record<string, (args: any) => any> = {
     gemini: { installed: false, version: null },
     kiro: { installed: false, version: null },
   }),
-  get_agent_docs_path: () => '/mock/Tolaria/resources/agent-docs',
+  get_agent_docs_path: () => '/mock/HS-Hub/resources/agent-docs',
   get_vault_ai_guidance_status: () => ({ ...mockVaultAiGuidanceStatus }),
   restore_vault_ai_guidance: () => {
     mockVaultAiGuidanceStatus = {
@@ -487,11 +487,11 @@ export const mockHandlers: Record<string, (args: any) => any> = {
     return null
   },
   save_image: (args: { vault_path?: string; filename: string; data: string }) => {
-    const vault = args.vault_path ?? '/Users/luca/Laputa'
+    const vault = args.vault_path ?? '/Users/hansung/HS-Hub'
     return `${vault}/attachments/${Date.now()}-${args.filename}`
   },
   copy_image_to_vault: (args: { vault_path?: string; source_path: string }) => {
-    const vault = args.vault_path ?? '/Users/luca/Laputa'
+    const vault = args.vault_path ?? '/Users/hansung/HS-Hub'
     const filename = args.source_path.split('/').pop() ?? 'image.png'
     return `${vault}/attachments/${Date.now()}-${filename}`
   },
@@ -580,10 +580,10 @@ export const mockHandlers: Record<string, (args: any) => any> = {
   check_mcp_status: () => 'installed',
   get_mcp_config_snippet: () => JSON.stringify({
     mcpServers: {
-      tolaria: {
+      'hs-hub': {
         type: 'stdio',
         command: 'node',
-        args: ['/mock/Tolaria/mcp-server/index.js'],
+        args: ['/mock/HS-Hub/mcp-server/index.js'],
         env: {
           WS_UI_PORT: '9711',
         },

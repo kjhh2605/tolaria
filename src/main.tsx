@@ -75,7 +75,7 @@ function dispatchDeterministicShortcutEvent(init: AppCommandShortcutEventInit) {
   target.dispatchEvent(new KeyboardEvent('keydown', init))
 }
 
-window.__laputaTest = {
+window.__hsHubTest = {
   dispatchAppCommand(id: string) {
     if (!isAppCommandId(id)) {
       throw new Error(`Unknown app command: ${id}`)
@@ -95,11 +95,11 @@ window.__laputaTest = {
       return invoke('trigger_menu_command', { id })
     }
 
-    if (!window.__laputaTest?.dispatchBrowserMenuCommand) {
-      throw new Error('Tolaria test bridge is missing dispatchBrowserMenuCommand')
+    if (!window.__hsHubTest?.dispatchBrowserMenuCommand) {
+      throw new Error('HS-Hub test bridge is missing dispatchBrowserMenuCommand')
     }
 
-    window.__laputaTest.dispatchBrowserMenuCommand(id)
+    window.__hsHubTest.dispatchBrowserMenuCommand(id)
     return undefined
   },
   triggerShortcutCommand(id: string, options?: AppCommandShortcutEventOptions) {
@@ -128,9 +128,9 @@ function showFatalRenderError(
   error: unknown,
   errorInfo: { componentStack?: string },
 ): void {
-  const existing = document.getElementById('tolaria-fatal-render-error')
+  const existing = document.getElementById('hs-hub-fatal-render-error')
   const overlay = existing ?? document.createElement('pre')
-  overlay.id = 'tolaria-fatal-render-error'
+  overlay.id = 'hs-hub-fatal-render-error'
   overlay.style.cssText = [
     'position:fixed',
     'inset:24px',
@@ -147,7 +147,7 @@ function showFatalRenderError(
 
   const message = error instanceof Error ? error.stack ?? error.message : String(error)
   overlay.textContent = [
-    'Tolaria render error',
+    'HS-Hub render error',
     '',
     message,
     '',

@@ -91,14 +91,14 @@ fn vault_path_hash(vault: &Path) -> String {
     format!("{:016x}", hasher.finish())
 }
 
-/// Return the cache directory. Override with `LAPUTA_CACHE_DIR` env var (for tests).
+/// Return the cache directory. Override with `HS_HUB_CACHE_DIR` env var (for tests).
 fn cache_dir() -> PathBuf {
-    if let Ok(dir) = std::env::var("LAPUTA_CACHE_DIR") {
+    if let Ok(dir) = std::env::var("HS_HUB_CACHE_DIR") {
         return PathBuf::from(dir);
     }
     dirs::home_dir()
         .unwrap_or_else(|| PathBuf::from("~"))
-        .join(".laputa")
+        .join(".hs-hub")
         .join("cache")
 }
 
@@ -120,7 +120,7 @@ fn cache_temp_path(final_path: &Path) -> PathBuf {
 
 /// Legacy cache path inside the vault directory (pre-migration).
 fn legacy_cache_path(vault: &Path) -> PathBuf {
-    vault.join(".laputa-cache.json")
+    vault.join(".hs-hub-cache.json")
 }
 
 fn git_head_hash(vault: &Path) -> Option<String> {
@@ -510,7 +510,7 @@ fn migrate_legacy_cache(vault: &Path) {
             "--cached",
             "--quiet",
             "--ignore-unmatch",
-            ".laputa-cache.json",
+            ".hs-hub-cache.json",
         ])
         .current_dir(vault)
         .output();
@@ -706,14 +706,14 @@ mod tests {
     use std::sync::Mutex;
     use tempfile::TempDir;
 
-    /// Serialize all cache tests that mutate the LAPUTA_CACHE_DIR env var.
+    /// Serialize all cache tests that mutate the HS_HUB_CACHE_DIR env var.
     /// `std::env::set_var` is process-global, so parallel tests would race.
     static ENV_LOCK: Mutex<()> = Mutex::new(());
 
     /// Set up a temporary cache directory for test isolation.
     /// Caller MUST hold `ENV_LOCK` for the duration of the test.
     fn set_test_cache_dir(dir: &Path) {
-        std::env::set_var("LAPUTA_CACHE_DIR", dir.to_string_lossy().as_ref());
+        std::env::set_var("HS_HUB_CACHE_DIR", dir.to_string_lossy().as_ref());
     }
 
     fn create_test_file(dir: &Path, name: &str, content: &str) {
@@ -811,8 +811,8 @@ mod tests {
     fn test_to_relative_path_normalizes_aliases_and_separators() {
         assert_eq!(
             to_relative_path(
-                "/tmp/tolaria-vault/projects\\active.md",
-                Path::new("/private/tmp/tolaria-vault")
+                "/tmp/hs-hub-vault/projects\\active.md",
+                Path::new("/private/tmp/hs-hub-vault")
             ),
             "projects/active.md"
         );
