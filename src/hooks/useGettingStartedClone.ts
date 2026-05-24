@@ -24,9 +24,9 @@ export function useGettingStartedClone({
   return useCallback(async () => {
     let parentPath: string | null
     try {
-      parentPath = await pickFolder('Choose a parent folder for the Getting Started vault')
+      parentPath = await pickFolder('시작 가이드 볼트를 만들 상위 폴더 선택')
     } catch (err) {
-      onError(formatFolderPickerActionError('Could not choose a parent folder', err))
+      onError(formatFolderPickerActionError('상위 폴더를 선택할 수 없습니다', err))
       return
     }
 

@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { APP_STORAGE_KEYS } from '../constants/appStorage'
 
-const DEFAULT_GETTING_STARTED_PATH = '/mock/Documents/Getting Started'
+const DEFAULT_GETTING_STARTED_PATH = '/mock/Documents/시작 가이드'
 const DEFAULT_PARENT_PATH = '/mock/Documents'
 const MISSING_VAULT_PATH = '/vault/missing'
 
@@ -235,7 +235,7 @@ describe('useOnboarding', () => {
     })
     expect(registerVault).toHaveBeenCalledWith(
       DEFAULT_GETTING_STARTED_PATH,
-      'Getting Started',
+      '시작 가이드',
       { verifyAvailability: false },
     )
     expect(onTemplateVaultReady).toHaveBeenCalledWith(DEFAULT_GETTING_STARTED_PATH)
@@ -262,7 +262,7 @@ describe('useOnboarding', () => {
       await result.current.handleCreateVault()
     })
 
-    expect(result.current.error).toBe('Could not download Getting Started vault: git clone failed: fatal: unable to access')
+    expect(result.current.error).toBe('시작 가이드 볼트를 다운로드할 수 없습니다: git clone failed: fatal: unable to access')
     expect(result.current.state.status).toBe('welcome')
   })
 
@@ -350,7 +350,7 @@ describe('useOnboarding', () => {
     })
 
     expect(result.current.state).toEqual({ status: 'welcome', defaultPath: DEFAULT_GETTING_STARTED_PATH })
-    expect(result.current.error).toBe('Could not open vault: Failed to write vault list')
+    expect(result.current.error).toBe('볼트를 열 수 없습니다: Failed to write vault list')
   })
 
   it('does nothing when the open-folder picker is cancelled', async () => {

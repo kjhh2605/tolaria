@@ -3,7 +3,7 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { useVaultSwitcher, DEFAULT_VAULTS } from './useVaultSwitcher'
 import type { PersistedVaultList } from './useVaultSwitcher'
 
-const mockDefaultVaultPath = '/mock/Documents/Getting Started'
+const mockDefaultVaultPath = '/mock/Documents/시작 가이드'
 const expectedDefaultVaultPath = DEFAULT_VAULTS[0].path || mockDefaultVaultPath
 
 let mockVaultListStore: PersistedVaultList = { vaults: [], active_vault: null, hidden_defaults: [] }
@@ -97,7 +97,7 @@ describe('useVaultSwitcher', () => {
   it('loads the default vault when the resolved path exists', async () => {
     const { result } = await renderLoadedVaultSwitcher()
 
-    expect(result.current.allVaults).toEqual([{ label: 'Getting Started', path: expectedDefaultVaultPath, managedDefault: true }])
+    expect(result.current.allVaults).toEqual([{ label: '시작 가이드', path: expectedDefaultVaultPath, managedDefault: true }])
     expect(result.current.vaultPath).toBe(expectedDefaultVaultPath)
   })
 
@@ -209,7 +209,7 @@ describe('useVaultSwitcher', () => {
     })
   })
 
-  it('registers the canonical Getting Started vault without persisting a duplicate entry', async () => {
+  it('registers the canonical 시작 가이드 vault without persisting a duplicate entry', async () => {
     setMockInvokeBehavior({
       checkVaultExists: ({ path }) => path === expectedDefaultVaultPath,
     })
@@ -217,12 +217,12 @@ describe('useVaultSwitcher', () => {
     const { result } = await renderLoadedVaultSwitcher()
 
     await act(async () => {
-      await result.current.registerVaultSelection(expectedDefaultVaultPath, 'Getting Started')
+      await result.current.registerVaultSelection(expectedDefaultVaultPath, '시작 가이드')
     })
 
     expect(result.current.vaultPath).toBe(expectedDefaultVaultPath)
     expect(result.current.selectedVaultPath).toBe(expectedDefaultVaultPath)
-    expect(result.current.allVaults).toEqual([{ label: 'Getting Started', path: expectedDefaultVaultPath, managedDefault: true }])
+    expect(result.current.allVaults).toEqual([{ label: '시작 가이드', path: expectedDefaultVaultPath, managedDefault: true }])
     expect(mockVaultListStore).toEqual({
       vaults: [],
       active_vault: expectedDefaultVaultPath,
@@ -315,10 +315,10 @@ describe('useVaultSwitcher', () => {
     expect(result.current.isGettingStartedHidden).toBe(false)
   })
 
-  it('drops stale canonical Getting Started entries when the starter path is missing', async () => {
+  it('drops stale canonical 시작 가이드 entries when the starter path is missing', async () => {
     mockVaultListStore = {
       vaults: [
-        { label: 'Getting Started', path: expectedDefaultVaultPath },
+        { label: '시작 가이드', path: expectedDefaultVaultPath },
         { label: 'Work', path: '/work/vault' },
       ],
       active_vault: '/work/vault',
@@ -358,9 +358,9 @@ describe('useVaultSwitcher', () => {
     })
   })
 
-  it('clears a stale canonical Getting Started selection when the starter path is missing', async () => {
+  it('clears a stale canonical 시작 가이드 selection when the starter path is missing', async () => {
     mockVaultListStore = {
-      vaults: [{ label: 'Getting Started', path: expectedDefaultVaultPath }],
+      vaults: [{ label: '시작 가이드', path: expectedDefaultVaultPath }],
       active_vault: expectedDefaultVaultPath,
       hidden_defaults: [],
     }
@@ -396,7 +396,7 @@ describe('useVaultSwitcher', () => {
 
     // Should fall back to defaults
     expect(result.current.allVaults).toHaveLength(1)
-    expect(result.current.allVaults[0].label).toBe('Getting Started')
+    expect(result.current.allVaults[0].label).toBe('시작 가이드')
     expect(result.current.allVaults[0].path).toBe(expectedDefaultVaultPath)
     warnSpy.mockRestore()
   })
@@ -428,7 +428,7 @@ describe('useVaultSwitcher', () => {
     })
 
     expect(result.current.allVaults.some(v => v.path === '/Users/luca/MyVault')).toBe(true)
-    expect(onToast).toHaveBeenCalledWith('Vault "MyVault" opened')
+    expect(onToast).toHaveBeenCalledWith('볼트 "MyVault"을 열었습니다')
   })
 
   it('creates an empty vault and switches to it', async () => {
@@ -564,7 +564,7 @@ describe('useVaultSwitcher', () => {
   })
 
   describe('restoreGettingStarted', () => {
-    it('un-hides the Getting Started vault', async () => {
+    it('un-hides the 시작 가이드 vault', async () => {
       setWorkVaultWithHiddenGettingStarted()
 
       const { result } = renderHook(() => useVaultSwitcher({ onSwitch, onToast }))
@@ -580,7 +580,7 @@ describe('useVaultSwitcher', () => {
       expect(result.current.allVaults.some(v => v.path === expectedDefaultVaultPath)).toBe(true)
     })
 
-    it('switches to the Getting Started vault after restoring', async () => {
+    it('switches to the 시작 가이드 vault after restoring', async () => {
       setWorkVaultWithHiddenGettingStarted()
 
       const { result } = renderHook(() => useVaultSwitcher({ onSwitch, onToast }))
@@ -591,7 +591,7 @@ describe('useVaultSwitcher', () => {
       })
 
       expect(result.current.vaultPath).toBe(expectedDefaultVaultPath)
-      expect(onToast).toHaveBeenCalledWith('Getting Started vault ready')
+      expect(onToast).toHaveBeenCalledWith('시작 가이드 볼트가 준비되었습니다')
     })
 
     it('attempts to create vault on disk if it does not exist', async () => {
@@ -626,7 +626,7 @@ describe('useVaultSwitcher', () => {
 
       expect(result.current.vaultPath).toBe('/work/vault')
       expect(result.current.isGettingStartedHidden).toBe(true)
-      expect(onToast).toHaveBeenCalledWith('Getting Started requires internet. Clone it later.')
+      expect(onToast).toHaveBeenCalledWith('시작 가이드는 인터넷 연결이 필요합니다. 나중에 복제하세요.')
     })
   })
 
@@ -673,7 +673,7 @@ describe('useVaultSwitcher', () => {
       expect(result.current.isGettingStartedHidden).toBe(false)
     })
 
-    it('is true when Getting Started path is in hidden_defaults', async () => {
+    it('is true when 시작 가이드 path is in hidden_defaults', async () => {
       mockVaultListStore = {
         vaults: [],
         active_vault: null,

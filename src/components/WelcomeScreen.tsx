@@ -275,25 +275,25 @@ function getWelcomeScreenPresentation(
   if (mode === 'welcome') {
     return {
       heroBackground: 'transparent',
-      heroIcon: <img src={hsHubIcon} alt="HS-Hub icon" style={BRAND_ICON_STYLE} />,
-      openFolderLabel: 'Open existing vault',
-      subtitle: 'Markdown knowledge management for the age of AI',
+      heroIcon: <img src={hsHubIcon} alt="HS-Hub 아이콘" style={BRAND_ICON_STYLE} />,
+      openFolderLabel: '기존 볼트 열기',
+      subtitle: '한성대학교를 위한 AI 시대의 마크다운 지식 관리',
       templateDescription: isOffline
-        ? `Requires internet — clone later. Suggested path: ${defaultVaultPath}`
-        : 'Download the getting started vault',
-      title: 'Welcome to HS-Hub',
+        ? `인터넷 연결이 필요합니다 — 나중에 복제할 수 있습니다. 권장 위치: ${defaultVaultPath}`
+        : '시작 가이드 볼트를 다운로드합니다',
+      title: 'HS-Hub에 오신 것을 환영합니다',
     }
   }
 
   return {
     heroBackground: 'var(--accent-yellow-light)',
     heroIcon: <AlertTriangle size={28} style={{ color: 'var(--accent-orange)' }} />,
-    openFolderLabel: 'Choose a different folder',
-    subtitle: 'The vault folder could not be found on disk.\nIt may have been moved or deleted.',
+    openFolderLabel: '다른 폴더 선택',
+    subtitle: '볼트 폴더를 디스크에서 찾을 수 없습니다.\n이동되었거나 삭제되었을 수 있습니다.',
     templateDescription: isOffline
-      ? `Requires internet — clone later. Suggested path: ${defaultVaultPath}`
-      : 'Download the getting started vault',
-    title: 'Vault not found',
+      ? `인터넷 연결이 필요합니다 — 나중에 복제할 수 있습니다. 권장 위치: ${defaultVaultPath}`
+      : '시작 가이드 볼트를 다운로드합니다',
+    title: '볼트를 찾을 수 없습니다',
   }
 }
 
@@ -420,10 +420,10 @@ export function WelcomeScreen({
           <OptionButton
             icon={<Rocket size={18} style={{ color: 'var(--accent-purple)' }} />}
             iconBg="var(--accent-purple-light)"
-            label="Get started with a template"
+            label="시작 가이드로 시작하기"
             description={presentation.templateDescription}
-            loadingLabel="Downloading template…"
-            loadingDescription="Cloning the Getting Started vault template"
+            loadingLabel="시작 가이드 다운로드 중…"
+            loadingDescription="시작 가이드 볼트 템플릿을 복제하는 중"
             onClick={onCreateVault}
             disabled={busy || isOffline}
             loading={creatingAction === 'template'}
@@ -435,10 +435,10 @@ export function WelcomeScreen({
           <OptionButton
             icon={<Plus size={18} style={{ color: 'var(--accent-blue)' }} />}
             iconBg="var(--accent-blue-light)"
-            label="Create empty vault"
-            description="Start fresh in an empty folder with HS-Hub defaults"
-            loadingLabel="Creating vault…"
-            loadingDescription="Preparing HS-Hub defaults in the selected folder"
+            label="빈 볼트 만들기"
+            description="빈 폴더에 HS-Hub 기본 설정으로 새로 시작합니다"
+            loadingLabel="볼트 생성 중…"
+            loadingDescription="선택한 폴더에 HS-Hub 기본 설정을 준비하는 중"
             onClick={onCreateEmptyVault}
             disabled={busy}
             loading={creatingAction === 'empty'}
@@ -450,7 +450,7 @@ export function WelcomeScreen({
             icon={<FolderOpen size={18} style={{ color: 'var(--accent-green)' }} />}
             iconBg="var(--accent-green-light)"
             label={presentation.openFolderLabel}
-            description="Point to a folder you already have"
+            description="이미 사용 중인 폴더를 선택합니다"
             onClick={onOpenFolder}
             disabled={busy}
             testId="welcome-open-folder"
@@ -460,7 +460,7 @@ export function WelcomeScreen({
 
         {creatingAction === 'template' && (
           <p style={STATUS_STYLE} data-testid="welcome-status" role="status" aria-live="polite">
-            Downloading the Getting Started vault template…
+            시작 가이드 볼트 템플릿을 다운로드하는 중…
           </p>
         )}
 
@@ -478,7 +478,7 @@ export function WelcomeScreen({
                 data-testid="welcome-retry-template"
                 className="shadow-none"
               >
-                Retry download
+                다운로드 다시 시도
               </Button>
             )}
           </div>

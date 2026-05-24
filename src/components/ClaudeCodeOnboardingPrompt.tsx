@@ -15,26 +15,26 @@ function getPromptCopy(status: ClaudeCodeStatus) {
   if (status === 'installed') {
     return {
       accentClassName: 'bg-[var(--feedback-success-bg)] text-[var(--feedback-success-text)]',
-      description: "HS-Hub's AI features are ready to use.",
+      description: 'HS-Hub의 AI 기능을 사용할 준비가 되었습니다.',
       icon: <CheckCircle2 className="size-7" />,
-      title: 'Claude Code detected',
+      title: 'Claude Code가 감지되었습니다',
     }
   }
 
   if (status === 'missing') {
     return {
       accentClassName: 'bg-[var(--feedback-warning-bg)] text-[var(--feedback-warning-text)]',
-      description: 'HS-Hub works best with an AI coding agent installed.',
+      description: 'AI 코딩 에이전트를 설치하면 HS-Hub를 더 효과적으로 사용할 수 있습니다.',
       icon: <Bot className="size-7" />,
-      title: 'Claude Code not detected',
+      title: 'Claude Code를 찾을 수 없습니다',
     }
   }
 
   return {
     accentClassName: 'bg-muted text-muted-foreground',
-    description: 'Checking whether Claude Code is available on this machine.',
+    description: '이 기기에서 Claude Code를 사용할 수 있는지 확인하는 중입니다.',
     icon: <Loader2 className="size-7 animate-spin" />,
-    title: 'Checking for Claude Code',
+    title: 'Claude Code 확인 중',
   }
 }
 
@@ -69,7 +69,7 @@ export function ClaudeCodeOnboardingPrompt({
         <CardContent className="space-y-3 text-center">
           {status === 'missing' && (
             <p className="text-sm leading-6 text-muted-foreground">
-              Install Claude Code to enable AI-powered note management.
+              AI 기반 노트 관리를 사용하려면 Claude Code를 설치하세요.
             </p>
           )}
         </CardContent>
@@ -82,7 +82,7 @@ export function ClaudeCodeOnboardingPrompt({
               onClick={() => void openExternalUrl(CLAUDE_CODE_INSTALL_URL)}
               data-testid="claude-onboarding-install"
             >
-              Install Claude Code
+              Claude Code 설치
               <ArrowUpRight className="size-4" />
             </Button>
           )}
@@ -92,7 +92,7 @@ export function ClaudeCodeOnboardingPrompt({
             disabled={status === 'checking'}
             data-testid="claude-onboarding-continue"
           >
-            {status === 'missing' ? 'Continue without it' : status === 'installed' ? 'Continue' : 'Checking…'}
+            {status === 'missing' ? '설치 없이 계속' : status === 'installed' ? '계속' : '확인 중…'}
           </Button>
         </CardFooter>
       </Card>

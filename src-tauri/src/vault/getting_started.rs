@@ -1,16 +1,16 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-/// Optional starter vault cloned when the user chooses Getting Started.
+/// Optional starter vault cloned when the user chooses the 시작 가이드 vault.
 /// HS-Hub does not ship the previous starter endpoint; configure this
 /// through `HS_HUB_GETTING_STARTED_REPO_URL` when a Hansung-owned starter vault exists.
 pub const GETTING_STARTED_REPO_URL: &str = "";
 
-/// Default location for the Getting Started vault.
+/// Default location for the 시작 가이드 vault.
 pub fn default_vault_path() -> Result<PathBuf, String> {
     dirs::document_dir()
-        .map(|d| d.join("Getting Started"))
-        .ok_or_else(|| "Could not determine Documents directory".to_string())
+        .map(|d| d.join("시작 가이드"))
+        .ok_or_else(|| "문서 폴더 위치를 확인할 수 없습니다".to_string())
 }
 
 const GETTING_STARTED_REQUIRED_CONFIG_FILES: [&str; 2] = ["type.md", "note.md"];
@@ -541,7 +541,7 @@ fn getting_started_repo_url() -> Result<String, String> {
         .unwrap_or_else(|| GETTING_STARTED_REPO_URL.to_string());
 
     if repo_url.trim().is_empty() {
-        return Err("Getting Started vault is not configured for this HS-Hub build".to_string());
+        return Err("이 HS-Hub 빌드에는 시작 가이드 볼트가 설정되어 있지 않습니다".to_string());
     }
 
     Ok(repo_url)
@@ -619,7 +619,7 @@ mod tests {
         fs::create_dir_all(path.join("views")).unwrap();
         fs::write(
             path.join("welcome.md"),
-            "# Welcome to HS-Hub\n\nThis is the starter vault.\n",
+            "# HS-Hub에 오신 것을 환영합니다\n\nThis is the starter vault.\n",
         )
         .unwrap();
         fs::write(
@@ -668,7 +668,7 @@ mod tests {
     fn assert_getting_started_vault_replaces_template(agents_content: &str) {
         let dir = tempfile::TempDir::new().unwrap();
         let source = dir.path().join("starter");
-        let dest = dir.path().join("Getting Started");
+        let dest = dir.path().join("시작 가이드");
         init_source_repo(&source, Some(agents_content));
 
         create_getting_started_vault_from_repo(dest.as_path(), source.to_str().unwrap()).unwrap();
@@ -683,7 +683,7 @@ mod tests {
     fn test_default_vault_path_appends_getting_started() {
         let path = default_vault_path().unwrap();
         let path_str = path.to_string_lossy();
-        assert!(path_str.ends_with("Getting Started"));
+        assert!(path_str.ends_with("시작 가이드"));
     }
 
     #[test]
@@ -695,7 +695,7 @@ mod tests {
     #[test]
     fn test_canonical_getting_started_path_rejects_plain_hs_hub_folder() {
         let dir = tempfile::TempDir::new().unwrap();
-        let default_path = dir.path().join("Getting Started");
+        let default_path = dir.path().join("시작 가이드");
 
         write_hs_hub_config_files(&default_path);
 
@@ -708,7 +708,7 @@ mod tests {
     #[test]
     fn test_non_canonical_vault_path_stays_permissive() {
         let dir = tempfile::TempDir::new().unwrap();
-        let default_path = dir.path().join("Getting Started");
+        let default_path = dir.path().join("시작 가이드");
         let other_vault_path = dir.path().join("Existing Vault");
 
         fs::create_dir_all(&other_vault_path).unwrap();
@@ -723,7 +723,7 @@ mod tests {
     fn test_create_getting_started_vault_clones_repo() {
         let dir = tempfile::TempDir::new().unwrap();
         let source = dir.path().join("starter");
-        let dest = dir.path().join("Getting Started");
+        let dest = dir.path().join("시작 가이드");
         init_source_repo(&source, None);
 
         let result =
@@ -746,7 +746,7 @@ mod tests {
     fn test_canonical_getting_started_path_accepts_cloned_starter_vault() {
         let dir = tempfile::TempDir::new().unwrap();
         let source = dir.path().join("starter");
-        let default_path = dir.path().join("Getting Started");
+        let default_path = dir.path().join("시작 가이드");
         init_source_repo(&source, None);
 
         create_getting_started_vault_from_repo(default_path.as_path(), source.to_str().unwrap())
@@ -762,7 +762,7 @@ mod tests {
     fn test_create_getting_started_vault_rejects_nonempty_destination() {
         let dir = tempfile::TempDir::new().unwrap();
         let source = dir.path().join("starter");
-        let dest = dir.path().join("Getting Started");
+        let dest = dir.path().join("시작 가이드");
         init_source_repo(&source, None);
         fs::create_dir_all(&dest).unwrap();
         fs::write(dest.join("existing.md"), "# Existing\n").unwrap();
@@ -777,7 +777,7 @@ mod tests {
     fn test_create_getting_started_vault_cleans_partial_clone_on_failure() {
         let dir = tempfile::TempDir::new().unwrap();
         let missing_repo = dir.path().join("missing");
-        let dest = dir.path().join("Getting Started");
+        let dest = dir.path().join("시작 가이드");
 
         let err =
             create_getting_started_vault_from_repo(dest.as_path(), missing_repo.to_str().unwrap())
@@ -791,7 +791,7 @@ mod tests {
     fn test_create_getting_started_vault_leaves_clean_worktree() {
         let dir = tempfile::TempDir::new().unwrap();
         let source = dir.path().join("starter");
-        let dest = dir.path().join("Getting Started");
+        let dest = dir.path().join("시작 가이드");
         init_source_repo(&source, None);
 
         create_getting_started_vault_from_repo(dest.as_path(), source.to_str().unwrap()).unwrap();
@@ -808,7 +808,7 @@ mod tests {
     fn test_create_getting_started_vault_removes_the_starter_remote() {
         let dir = tempfile::TempDir::new().unwrap();
         let source = dir.path().join("starter");
-        let dest = dir.path().join("Getting Started");
+        let dest = dir.path().join("시작 가이드");
         init_source_repo(&source, None);
 
         create_getting_started_vault_from_repo(dest.as_path(), source.to_str().unwrap()).unwrap();

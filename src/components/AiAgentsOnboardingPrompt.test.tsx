@@ -58,20 +58,20 @@ describe('AiAgentsOnboardingPrompt', () => {
       claude_code: { status: 'installed', version: '1.0.20' },
     })
 
-    expect(screen.getByText('AI is ready')).toBeInTheDocument()
+    expect(screen.getByText('AI 사용 준비 완료')).toBeInTheDocument()
     expectMissingAgentInstallLinks()
-    expect(screen.getByTestId('ai-agents-onboarding-continue')).toHaveTextContent('Continue')
+    expect(screen.getByTestId('ai-agents-onboarding-continue')).toHaveTextContent('계속')
   })
 
   it('shows the missing state when no agents are installed', () => {
     renderPrompt()
 
-    expect(screen.getByText('Choose how HS-Hub should use AI')).toBeInTheDocument()
+    expect(screen.getByText('HS-Hub에서 AI를 사용할 방식을 선택하세요')).toBeInTheDocument()
     expect(screen.getByTestId('claude-onboarding-screen')).toBeInTheDocument()
-    expect(screen.getByText('Claude Code not detected')).toBeInTheDocument()
+    expect(screen.getByText('Claude Code를 찾을 수 없습니다')).toBeInTheDocument()
     expect(screen.getByTestId('ai-agents-onboarding-install-claude_code')).toBeInTheDocument()
     expectMissingAgentInstallLinks()
-    expect(screen.getByTestId('ai-agents-onboarding-continue')).toHaveTextContent('Set up later')
+    expect(screen.getByTestId('ai-agents-onboarding-continue')).toHaveTextContent('나중에 설정')
   })
 
   it('opens the agent install links', () => {
@@ -98,7 +98,7 @@ describe('AiAgentsOnboardingPrompt', () => {
       'overflow-y-auto',
       'overscroll-contain',
     )
-    expect(screen.getByTestId('ai-agents-onboarding-continue')).toHaveTextContent('Set up later')
+    expect(screen.getByTestId('ai-agents-onboarding-continue')).toHaveTextContent('나중에 설정')
   })
 
   it('uses the surrounding surface as a drag region and excludes the card', () => {

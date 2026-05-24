@@ -1,4 +1,4 @@
-export const GETTING_STARTED_VAULT_NAME = 'Getting Started'
+export const GETTING_STARTED_VAULT_NAME = '시작 가이드'
 
 const CLONE_PATH_ERRORS = [
   'already exists and is not empty',
@@ -60,21 +60,21 @@ export function formatGettingStartedCloneError(err: unknown): string {
 
   const lower = message.toLowerCase()
   if (GIT_NOT_FOUND_ERRORS.some(fragment => lower.includes(fragment))) {
-    return 'Git is required to download the Getting Started vault. Install Git and try again.'
+    return '시작 가이드 볼트를 다운로드하려면 Git이 필요합니다. Git을 설치한 뒤 다시 시도하세요.'
   }
   if (AUTH_ERRORS.some(fragment => lower.includes(fragment))) {
-    return 'Could not download Getting Started vault. Check your GitHub access and try again.'
+    return '시작 가이드 볼트를 다운로드할 수 없습니다. GitHub 접근 권한을 확인한 뒤 다시 시도하세요.'
   }
   if (NETWORK_ERRORS.some(fragment => lower.includes(fragment))) {
-    return 'Could not download Getting Started vault. Check your connection and try again.'
+    return '시작 가이드 볼트를 다운로드할 수 없습니다. 인터넷 연결을 확인한 뒤 다시 시도하세요.'
   }
 
-  return `Could not download Getting Started vault: ${firstCloneErrorLine(message)}`
+  return `시작 가이드 볼트를 다운로드할 수 없습니다: ${firstCloneErrorLine(message)}`
 }
 
 function firstCloneErrorLine(message: string): string {
   return message
     .split(/\r?\n/)
     .map(line => line.trim())
-    .find(Boolean) ?? 'git reported an unknown error'
+    .find(Boolean) ?? 'git에서 알 수 없는 오류를 반환했습니다'
 }

@@ -13,7 +13,7 @@ import { sanitizeDefaultWorkspacePath } from './vaultSwitcherSanitization'
 
 export type { PersistedVaultList } from '../utils/vaultListStore'
 
-export const GETTING_STARTED_LABEL = 'Getting Started'
+export const GETTING_STARTED_LABEL = '시작 가이드'
 
 declare const __DEMO_VAULT_PATH__: string | undefined
 
@@ -582,10 +582,10 @@ function formatGettingStartedRestoreError(err: unknown): string {
   ]
 
   if (networkErrors.some(fragment => message.includes(fragment))) {
-    return 'Getting Started requires internet. Clone it later.'
+    return '시작 가이드는 인터넷 연결이 필요합니다. 나중에 복제하세요.'
   }
 
-  return `Could not prepare Getting Started vault: ${message}`
+  return `시작 가이드 볼트를 준비할 수 없습니다: ${message}`
 }
 
 function formatCreateEmptyVaultError(err: unknown): string {
@@ -600,7 +600,7 @@ function formatCreateEmptyVaultError(err: unknown): string {
     return message
   }
 
-  return `Could not create empty vault: ${message}`
+  return `빈 볼트를 만들 수 없습니다: ${message}`
 }
 
 async function ensureGettingStartedVaultReady(path: string): Promise<void> {
@@ -989,9 +989,9 @@ function useOpenLocalFolderAction(
   return useCallback(async () => {
     let path: string | null
     try {
-      path = await pickFolder('Open vault folder')
+      path = await pickFolder('볼트 폴더 열기')
     } catch (err) {
-      onToastRef.current(formatFolderPickerActionError('Could not open vault folder', err))
+      onToastRef.current(formatFolderPickerActionError('볼트 폴더를 열 수 없습니다', err))
       return
     }
 
@@ -999,7 +999,7 @@ function useOpenLocalFolderAction(
 
     const label = labelFromPath({ path })
     addAndSwitch(path, label)
-    onToastRef.current(`Vault "${label}" opened`)
+    onToastRef.current(`볼트 "${label}"을 열었습니다`)
   }, [addAndSwitch, onToastRef])
 }
 
@@ -1010,9 +1010,9 @@ function useCreateEmptyVaultAction(
   return useCallback(async () => {
     let targetPath: string | null
     try {
-      targetPath = await pickFolder('Choose where to create your vault')
+      targetPath = await pickFolder('볼트를 만들 위치 선택')
     } catch (err) {
-      onToastRef.current(formatFolderPickerActionError('Could not choose where to create your vault', err))
+      onToastRef.current(formatFolderPickerActionError('볼트를 만들 위치를 선택할 수 없습니다', err))
       return
     }
 
@@ -1196,7 +1196,7 @@ async function restoreGettingStartedVault({
   switchVault,
 }: RestoreGettingStartedOptions) {
   if (!defaultPath) {
-    onToastRef.current('Could not resolve the Getting Started vault path')
+    onToastRef.current('시작 가이드 볼트 경로를 확인할 수 없습니다')
     return
   }
 
@@ -1205,7 +1205,7 @@ async function restoreGettingStartedVault({
     setDefaultAvailable(true)
     setHiddenDefaults(previousHidden => previousHidden.filter(path => path !== defaultPath))
     switchVault(defaultPath)
-    onToastRef.current('Getting Started vault ready')
+    onToastRef.current('시작 가이드 볼트가 준비되었습니다')
   } catch (err) {
     onToastRef.current(formatGettingStartedRestoreError(err))
   }

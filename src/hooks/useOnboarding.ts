@@ -172,7 +172,7 @@ function useTemplateVaultCreation(
         await registerVaultSelection(options.registerVault, vaultPath, { verifyAvailability: false })
       } catch (err) {
         options.setError(formatOnboardingRegistrationError({
-          action: 'Could not register the Getting Started vault',
+          action: '시작 가이드 볼트를 등록할 수 없습니다',
           err,
         }))
         return
@@ -193,9 +193,9 @@ function useCreateVaultHandler(
 ) {
   return useCallback(async () => {
     const parentPath = await pickFolderWithOnboardingError({
-      action: 'Could not choose a parent folder',
+      action: '상위 폴더를 선택할 수 없습니다',
       setError,
-      title: 'Choose a parent folder for the Getting Started vault',
+      title: '시작 가이드 볼트를 만들 상위 폴더 선택',
     })
     if (!parentPath) return
 
@@ -208,9 +208,9 @@ function useCreateEmptyVaultHandler(
 ) {
   return useCallback(async () => {
     const path = await pickFolderWithOnboardingError({
-      action: 'Could not choose where to create your vault',
+      action: '볼트를 만들 위치를 선택할 수 없습니다',
       setError: options.setError,
-      title: 'Choose where to create your vault',
+      title: '볼트를 만들 위치 선택',
     })
     if (!path) return
 
@@ -221,7 +221,7 @@ function useCreateEmptyVaultHandler(
         await registerVaultSelection(options.registerVault, vaultPath, { verifyAvailability: false })
       } catch (err) {
         options.setError(formatOnboardingRegistrationError({
-          action: 'Could not register the new vault',
+          action: '새 볼트를 등록할 수 없습니다',
           err,
         }))
         return
@@ -229,7 +229,7 @@ function useCreateEmptyVaultHandler(
       markVaultReady(options.setState, vaultPath)
       options.onVaultReady?.(vaultPath, 'empty')
     } catch (err) {
-      options.setError(typeof err === 'string' ? err : `Failed to create vault: ${err}`)
+      options.setError(typeof err === 'string' ? err : `볼트를 만들 수 없습니다: ${err}`)
     } finally {
       options.setCreatingAction(null)
     }
@@ -241,9 +241,9 @@ function useOpenFolderHandler(
 ) {
   return useCallback(async () => {
     const path = await pickFolderWithOnboardingError({
-      action: 'Failed to open folder',
+      action: '폴더를 열 수 없습니다',
       setError: options.setError,
-      title: 'Open vault folder',
+      title: '볼트 폴더 열기',
     })
     if (!path) return
 
@@ -251,7 +251,7 @@ function useOpenFolderHandler(
       await registerVaultSelection(options.registerVault, path)
     } catch (err) {
       options.setError(formatOnboardingRegistrationError({
-        action: 'Could not open vault',
+        action: '볼트를 열 수 없습니다',
         err,
       }))
       return

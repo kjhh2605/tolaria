@@ -642,7 +642,7 @@ describe('App', () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByText('AI is ready')).toBeInTheDocument()
+      expect(screen.getByText('AI 사용 준비 완료')).toBeInTheDocument()
     }, { timeout: SLOW_APP_READY_TIMEOUT_MS })
 
     await waitFor(() => {
@@ -657,7 +657,7 @@ describe('App', () => {
       expect(screen.getByText('Manage External AI Tools')).toBeInTheDocument()
     })
     expect(screen.getByTestId('mcp-setup-dialog')).toBeInTheDocument()
-    expect(screen.queryByText('AI is ready')).not.toBeInTheDocument()
+    expect(screen.queryByText('AI 사용 준비 완료')).not.toBeInTheDocument()
   })
 
   it('routes right-panel AI chat messages to the selected default agent', async () => {
@@ -750,7 +750,7 @@ describe('App', () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByText('Help improve HS-Hub')).toBeInTheDocument()
+      expect(screen.getByText('HS-Hub 개선에 참여하기')).toBeInTheDocument()
     }, { timeout: SLOW_APP_READY_TIMEOUT_MS })
 
     fireEvent.click(screen.getByTestId('telemetry-accept'))
@@ -758,12 +758,12 @@ describe('App', () => {
     await waitFor(() => {
       expect(screen.getByTestId('welcome-screen')).toBeInTheDocument()
     }, { timeout: SLOW_APP_READY_TIMEOUT_MS })
-    expect(screen.getByTestId('welcome-open-folder')).toHaveTextContent('Open existing vault')
+    expect(screen.getByTestId('welcome-open-folder')).toHaveTextContent('기존 볼트 열기')
   })
 
   it.each([
-    ['telemetry-accept', 'Allow anonymous reporting'],
-    ['telemetry-decline', 'No thanks'],
+    ['telemetry-accept', '익명 보고 허용'],
+    ['telemetry-decline', '괜찮습니다'],
   ])('ignores a remembered default vault after %s when onboarding was never completed', async (buttonTestId) => {
     const rememberedDefaultVaultPath = expectedDefaultVaultPath
     localStorage.setItem('hs-hub_welcome_dismissed', '1')
@@ -779,7 +779,7 @@ describe('App', () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByText('Help improve HS-Hub')).toBeInTheDocument()
+      expect(screen.getByText('HS-Hub 개선에 참여하기')).toBeInTheDocument()
     }, { timeout: SLOW_APP_READY_TIMEOUT_MS })
 
     fireEvent.click(screen.getByTestId(buttonTestId))
@@ -787,7 +787,7 @@ describe('App', () => {
     await waitFor(() => {
       expect(screen.getByTestId('welcome-screen')).toBeInTheDocument()
     }, { timeout: SLOW_APP_READY_TIMEOUT_MS })
-    expect(screen.getByTestId('welcome-open-folder')).toHaveTextContent('Open existing vault')
+    expect(screen.getByTestId('welcome-open-folder')).toHaveTextContent('기존 볼트 열기')
   })
 
   it('uses the app shell loading state while the last vault is still resolving', async () => {
@@ -815,7 +815,7 @@ describe('App', () => {
     expect(screen.getByTestId('breadcrumb-title-skeleton')).toBeInTheDocument()
     expect(screen.getByTestId('editor-content-skeleton')).toBeInTheDocument()
     expect(screen.getByTestId('status-vault-reloading')).toHaveAccessibleName('Reloading vault from disk')
-    expect(screen.queryByText('Vault not found')).not.toBeInTheDocument()
+    expect(screen.queryByText('볼트를 찾을 수 없습니다')).not.toBeInTheDocument()
 
     await act(async () => {
       resolveVaultList?.({
@@ -829,7 +829,7 @@ describe('App', () => {
     await waitFor(() => {
       expect(screen.getByTestId('status-vault-trigger')).toHaveTextContent('Work Vault')
     })
-    expect(screen.queryByText('Vault not found')).not.toBeInTheDocument()
+    expect(screen.queryByText('볼트를 찾을 수 없습니다')).not.toBeInTheDocument()
   })
 
   it('shows the missing-vault screen once the resolved active vault is confirmed missing', async () => {
@@ -844,9 +844,9 @@ describe('App', () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByText('Vault not found')).toBeInTheDocument()
+      expect(screen.getByText('볼트를 찾을 수 없습니다')).toBeInTheDocument()
     })
-    expect(screen.getByTestId('welcome-open-folder')).toHaveTextContent('Choose a different folder')
+    expect(screen.getByTestId('welcome-open-folder')).toHaveTextContent('다른 폴더 선택')
   })
 
   it('shows welcome instead of vault-missing when the missing path was not a persisted active vault', async () => {
@@ -861,10 +861,10 @@ describe('App', () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByText('Welcome to HS-Hub')).toBeInTheDocument()
+      expect(screen.getByText('HS-Hub에 오신 것을 환영합니다')).toBeInTheDocument()
     })
-    expect(screen.queryByText('Vault not found')).not.toBeInTheDocument()
-    expect(screen.getByTestId('welcome-open-folder')).toHaveTextContent('Open existing vault')
+    expect(screen.queryByText('볼트를 찾을 수 없습니다')).not.toBeInTheDocument()
+    expect(screen.getByTestId('welcome-open-folder')).toHaveTextContent('기존 볼트 열기')
   })
 
   it('persists and opens an existing vault chosen from onboarding', async () => {
@@ -920,7 +920,7 @@ describe('App', () => {
     let templateExists = false
     const saveVaultList = vi.fn()
     const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue('file:///Users/mock/Documents')
-    const expectedLabel = 'Getting Started'
+    const expectedLabel = '시작 가이드'
 
     mockCommandResults.load_vault_list = { vaults: [], active_vault: null, hidden_defaults: [] }
     mockCommandResults.check_vault_exists = (args?: { path?: string }) => {

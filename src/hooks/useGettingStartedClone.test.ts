@@ -40,9 +40,9 @@ describe('useGettingStartedClone', () => {
     expect(onError).not.toHaveBeenCalled()
   })
 
-  it('clones into a child Getting Started folder and reports the canonical path', async () => {
+  it('clones into a child 시작 가이드 folder and reports the canonical path', async () => {
     vi.mocked(pickFolder).mockResolvedValue('/Users/luca/Documents')
-    mockInvokeFn.mockResolvedValue('/Users/luca/Documents/Getting Started')
+    mockInvokeFn.mockResolvedValue('/Users/luca/Documents/시작 가이드')
 
     const onSuccess = vi.fn()
     const onError = vi.fn()
@@ -53,9 +53,9 @@ describe('useGettingStartedClone', () => {
     })
 
     expect(mockInvokeFn).toHaveBeenCalledWith('create_getting_started_vault', {
-      targetPath: '/Users/luca/Documents/Getting Started',
+      targetPath: '/Users/luca/Documents/시작 가이드',
     })
-    expect(onSuccess).toHaveBeenCalledWith('/Users/luca/Documents/Getting Started', 'Getting Started')
+    expect(onSuccess).toHaveBeenCalledWith('/Users/luca/Documents/시작 가이드', '시작 가이드')
     expect(onError).not.toHaveBeenCalled()
   })
 
@@ -72,7 +72,7 @@ describe('useGettingStartedClone', () => {
     })
 
     expect(onSuccess).not.toHaveBeenCalled()
-    expect(onError).toHaveBeenCalledWith('Could not download Getting Started vault: git clone failed: fatal: unable to access')
+    expect(onError).toHaveBeenCalledWith('시작 가이드 볼트를 다운로드할 수 없습니다: git clone failed: fatal: unable to access')
   })
 
 })

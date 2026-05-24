@@ -21,26 +21,26 @@ function getPromptCopy(statuses: AiAgentsStatus) {
   if (isAiAgentsStatusChecking(statuses)) {
     return {
       accentClassName: 'bg-muted text-muted-foreground',
-      description: 'Checking coding agents. You can also use a local model or API provider.',
+      description: '코딩 에이전트를 확인하는 중입니다. 로컬 모델이나 API 제공자도 사용할 수 있습니다.',
       icon: <Loader2 className="size-7 animate-spin" />,
-      title: 'Checking AI agents',
+      title: 'AI 에이전트 확인 중',
     }
   }
 
   if (!hasAnyInstalledAiAgent(statuses)) {
     return {
       accentClassName: 'bg-[var(--feedback-warning-bg)] text-[var(--feedback-warning-text)]',
-      description: 'Connect a local model, an API provider, or a desktop coding agent.',
+      description: '로컬 모델, API 제공자 또는 데스크톱 코딩 에이전트를 연결하세요.',
       icon: <Bot className="size-7" />,
-      title: 'Choose how HS-Hub should use AI',
+      title: 'HS-Hub에서 AI를 사용할 방식을 선택하세요',
     }
   }
 
   return {
     accentClassName: 'bg-[var(--feedback-success-bg)] text-[var(--feedback-success-text)]',
-    description: 'You can use the detected coding agents, or add local/API models in Settings.',
+    description: '감지된 코딩 에이전트를 사용하거나 설정에서 로컬/API 모델을 추가할 수 있습니다.',
     icon: <CheckCircle2 className="size-7" />,
-    title: 'AI is ready',
+    title: 'AI 사용 준비 완료',
   }
 }
 
@@ -48,18 +48,18 @@ function AiModeChoices() {
   const choices = [
     {
       icon: <HardDrive className="size-4" />,
-      title: 'Local model',
-      description: 'Use Ollama, LM Studio, or another local OpenAI-compatible endpoint. API keys are usually not needed.',
+      title: '로컬 모델',
+      description: 'Ollama, LM Studio 또는 OpenAI 호환 로컬 엔드포인트를 사용합니다. 보통 API 키가 필요하지 않습니다.',
     },
     {
       icon: <Cloud className="size-4" />,
-      title: 'API provider',
-      description: 'Use OpenAI, Anthropic, OpenRouter, or a gateway. API keys are read from environment variables, not saved in settings.',
+      title: 'API 제공자',
+      description: 'OpenAI, Anthropic, OpenRouter 또는 게이트웨이를 사용합니다. API 키는 설정에 저장하지 않고 환경 변수에서 읽습니다.',
     },
     {
       icon: <Terminal className="size-4" />,
-      title: 'Coding agent',
-      description: 'Use Claude Code, Codex, OpenCode, Gemini CLI, or Pi for tool-capable vault editing on desktop.',
+      title: '코딩 에이전트',
+      description: 'Claude Code, Codex, OpenCode, Gemini CLI 또는 Pi로 데스크톱에서 도구 기반 볼트 편집을 사용합니다.',
     },
   ]
 
@@ -93,14 +93,14 @@ function AgentStatusList({ statuses }: { statuses: AiAgentsStatus }) {
               <div className="font-medium text-foreground">{definition.label}</div>
               <div className="text-xs text-muted-foreground">
                 {ready
-                  ? `${definition.label}${status.version ? ` ${status.version}` : ''} is ready.`
-                  : `${definition.label} is not installed yet.`}
+                  ? `${definition.label}${status.version ? ` ${status.version}` : ''} 사용 준비가 완료되었습니다.`
+                  : `${definition.label}이 아직 설치되지 않았습니다.`}
               </div>
             </div>
             <span
               className={`rounded-full px-2 py-1 text-[11px] font-medium ${ready ? 'bg-[var(--feedback-success-bg)] text-[var(--feedback-success-text)]' : 'bg-[var(--feedback-warning-bg)] text-[var(--feedback-warning-text)]'}`}
             >
-              {ready ? 'Installed' : 'Missing'}
+              {ready ? '설치됨' : '미설치'}
             </span>
           </div>
         )
@@ -151,9 +151,9 @@ export function AiAgentsOnboardingPrompt({
               className="rounded-lg border border-[var(--feedback-warning-border)] bg-[var(--feedback-warning-bg)] px-4 py-3 text-left"
               data-testid="claude-onboarding-screen"
             >
-              <div className="text-sm font-medium text-[var(--feedback-warning-text)]">Claude Code not detected</div>
+              <div className="text-sm font-medium text-[var(--feedback-warning-text)]">Claude Code를 찾을 수 없습니다</div>
               <p className="mt-1 text-xs leading-5 text-[var(--feedback-warning-text)]">
-                Install Claude Code or continue without it.
+                Claude Code를 설치하거나 설치 없이 계속할 수 있습니다.
               </p>
             </div>
           ) : null}
@@ -169,7 +169,7 @@ export function AiAgentsOnboardingPrompt({
               onClick={() => void openExternalUrl(getAiAgentDefinition(definition.id).installUrl)}
               data-testid={`ai-agents-onboarding-install-${definition.id}`}
             >
-              Install {definition.label}
+              {definition.label} 설치
               <ArrowUpRight className="size-4" />
             </Button>
           ))}
@@ -180,7 +180,7 @@ export function AiAgentsOnboardingPrompt({
               disabled={isAiAgentsStatusChecking(statuses)}
               data-testid={showLegacyClaudeCompatibility ? 'claude-onboarding-continue' : undefined}
             >
-              {hasAnyInstalledAiAgent(statuses) ? 'Continue' : 'Set up later'}
+              {hasAnyInstalledAiAgent(statuses) ? '계속' : '나중에 설정'}
             </Button>
           </div>
         </CardFooter>

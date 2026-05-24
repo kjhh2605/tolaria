@@ -30,14 +30,14 @@ describe('WelcomeScreen', () => {
   describe('welcome mode', () => {
     it('renders welcome title and subtitle', () => {
       render(<WelcomeScreen {...defaultProps} />)
-      expect(screen.getByText('Welcome to HS-Hub')).toBeInTheDocument()
-      expect(screen.getByText('Markdown knowledge management for the age of AI')).toBeInTheDocument()
+      expect(screen.getByText('HS-Hub에 오신 것을 환영합니다')).toBeInTheDocument()
+      expect(screen.getByText('한성대학교를 위한 AI 시대의 마크다운 지식 관리')).toBeInTheDocument()
     })
 
     it('renders the local HS-Hub branding icon', () => {
       render(<WelcomeScreen {...defaultProps} />)
 
-      const brandIcon = screen.getByAltText('HS-Hub icon')
+      const brandIcon = screen.getByAltText('HS-Hub 아이콘')
       expect(brandIcon).toHaveAttribute('src', hsHubIcon)
     })
 
@@ -57,14 +57,14 @@ describe('WelcomeScreen', () => {
 
     it('shows the simplified template option description', () => {
       render(<WelcomeScreen {...defaultProps} />)
-      expect(screen.getByText('Download the getting started vault')).toBeInTheDocument()
+      expect(screen.getByText('시작 가이드 볼트를 다운로드합니다')).toBeInTheDocument()
       expect(screen.queryByText(/~\/Documents\/HS-Hub/)).not.toBeInTheDocument()
     })
 
     it('shows offline guidance and disables the template option when offline', () => {
       render(<WelcomeScreen {...defaultProps} isOffline={true} />)
       expect(screen.getByTestId('welcome-create-vault')).toBeDisabled()
-      expect(screen.getByText(/Requires internet — clone later/)).toBeInTheDocument()
+      expect(screen.getByText(/인터넷 연결이 필요합니다 — 나중에 복제할 수 있습니다/)).toBeInTheDocument()
     })
 
     it('calls onCreateEmptyVault when create empty button is clicked', () => {
@@ -129,13 +129,13 @@ describe('WelcomeScreen', () => {
 
     it('shows loading text on template button while creating', () => {
       render(<WelcomeScreen {...defaultProps} creatingAction="template" />)
-      expect(screen.getByTestId('welcome-create-vault')).toHaveTextContent(/Downloading template/)
+      expect(screen.getByTestId('welcome-create-vault')).toHaveTextContent(/시작 가이드 다운로드 중/)
       expect(screen.getByTestId('welcome-status')).toHaveAttribute('aria-live', 'polite')
     })
 
     it('shows loading text on create-new button while creating an empty vault', () => {
       render(<WelcomeScreen {...defaultProps} creatingAction="empty" />)
-      expect(screen.getByTestId('welcome-create-new')).toHaveTextContent(/Creating vault/)
+      expect(screen.getByTestId('welcome-create-new')).toHaveTextContent(/볼트 생성 중/)
     })
 
     it('shows error message when error is set', () => {
@@ -154,7 +154,7 @@ describe('WelcomeScreen', () => {
       render(
         <WelcomeScreen
           {...defaultProps}
-          error="Could not download Getting Started vault. Check your connection and try again."
+          error="시작 가이드 볼트를 다운로드할 수 없습니다. 인터넷 연결을 확인한 뒤 다시 시도하세요."
           canRetryTemplate={true}
           onRetryCreateVault={onRetryCreateVault}
         />,
@@ -179,8 +179,8 @@ describe('WelcomeScreen', () => {
 
     it('renders vault not found title', () => {
       render(<WelcomeScreen {...missingProps} />)
-      expect(screen.getByText('Vault not found')).toBeInTheDocument()
-      expect(screen.getByText(/could not be found on disk/)).toBeInTheDocument()
+      expect(screen.getByText('볼트를 찾을 수 없습니다')).toBeInTheDocument()
+      expect(screen.getByText(/디스크에서 찾을 수 없습니다/)).toBeInTheDocument()
     })
 
     it('does not show the missing vault path in a badge', () => {
@@ -188,9 +188,9 @@ describe('WelcomeScreen', () => {
       expect(screen.queryByText('~/HS-Hub')).not.toBeInTheDocument()
     })
 
-    it('shows "Choose a different folder" instead of "Open existing vault"', () => {
+    it('shows "다른 폴더 선택" instead of "Open existing vault"', () => {
       render(<WelcomeScreen {...missingProps} />)
-      expect(screen.getByTestId('welcome-open-folder')).toHaveTextContent('Choose a different folder')
+      expect(screen.getByTestId('welcome-open-folder')).toHaveTextContent('다른 폴더 선택')
     })
   })
 
