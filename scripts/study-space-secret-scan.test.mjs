@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
@@ -9,6 +9,7 @@ import {
   loadStudySpaceSecretFixtures,
   scanFiles,
   scanTextForForbiddenValues,
+  trackedFiles,
 } from './study-space-secret-scan.mjs'
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
@@ -24,9 +25,7 @@ test('sanitized study-space fixture does not contain unsafe fixture values', () 
 })
 
 test('secret scanner reports labels and paths without echoing secret values', () => {
-  const tempRoot = path.join(os.tmpdir(), `study-space-secret-scan-${process.pid}`)
-  rmSync(tempRoot, { recursive: true, force: true })
-  mkdirSync(tempRoot, { recursive: true })
+  const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'study-space-secret-scan-'))
 
   const [fixtureValue] = loadStudySpaceSecretFixtures(root)
   const leakPath = path.join(tempRoot, 'leaky-log.txt')
@@ -47,4 +46,28 @@ test('secret scanner reports labels and paths without echoing secret values', ()
   assert.equal(formatted.includes(fixtureValue.value), false)
 
   rmSync(tempRoot, { recursive: true, force: true })
+})
+
+test('tracked repository scan keeps unsafe fixture scoped to its allowlist', () => {
+  const fixtureRelativePath = 'tests/fixtures/security/study-space-secret-input.json'
+  const values = loadStudySpaceSecretFixtures(root)
+  const fixtureFiles = trackedFiles(root)
+    .filter((file) => file.startsWith('tests/fixtures/security/'))
+    .sort()
+
+  assert.equal(fixtureFiles.includes(fixtureRelativePath), true)
+  assert.deepEqual(
+    scanFiles(fixtureFiles, { root, forbiddenValues: values }),
+    [],
+  )
+
+  const violations = scanFiles(fixtureFiles, {
+    root,
+    forbiddenValues: values,
+    allowedUnsafePaths: [],
+  })
+  assert.deepEqual(
+    violations.map((violation) => violation.path),
+    [fixtureRelativePath],
+  )
 })
