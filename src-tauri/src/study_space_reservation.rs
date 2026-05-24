@@ -5,8 +5,23 @@ const PATH_REDACTION: &str = "[redacted-path]";
 const TOKEN_REDACTION: &str = "[redacted-token]";
 const STUDENT_ID_REDACTION: &str = "[redacted-student-id]";
 
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum StudySpaceAreaKey {
+    CodingLounge,
+    SangsangParkPlus,
+    SangsangBase,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct StudySpaceArea {
+    pub key: StudySpaceAreaKey,
+    pub label_ko: String,
+    pub supported: bool,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
 pub enum StudySpaceErrorCode {
     AuthRequired,
     AuthFailed,
@@ -296,20 +311,20 @@ impl StudySpaceReservationAdapter {
 pub fn study_space_areas() -> Vec<StudySpaceArea> {
     vec![
         StudySpaceArea {
-            key: "coding_lounge".to_string(),
-            label: "코딩라운지 세미나실".to_string(),
+            key: StudySpaceAreaKey::CodingLounge,
+            label_ko: "코딩라운지".into(),
             supported: true,
             note: Some("101–113호".to_string()),
         },
         StudySpaceArea {
-            key: "sangsang_park_plus".to_string(),
-            label: "상상파크 플러스 소모임실".to_string(),
+            key: StudySpaceAreaKey::SangsangParkPlus,
+            label_ko: "상상파크 플러스".into(),
             supported: true,
             note: Some("최대 3시간 정책".to_string()),
         },
         StudySpaceArea {
-            key: "sangsang_base".to_string(),
-            label: "상상베이스".to_string(),
+            key: StudySpaceAreaKey::SangsangBase,
+            label_ko: "상상베이스".into(),
             supported: true,
             note: Some("세미나실/IB 공간".to_string()),
         },
