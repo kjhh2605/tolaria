@@ -27,6 +27,7 @@ mod pi_discovery;
 mod pi_events;
 pub mod search;
 pub mod settings;
+pub mod study_space_reservation;
 pub mod telemetry;
 pub mod vault;
 pub mod vault_list;
@@ -482,6 +483,11 @@ macro_rules! app_invoke_handler {
             commands::save_ai_model_provider_api_key,
             commands::delete_ai_model_provider_api_key,
             commands::test_ai_model_provider,
+            commands::study_space_status,
+            commands::study_space_list_spaces,
+            commands::study_space_check_availability,
+            commands::study_space_create_reservation,
+            commands::study_space_clear_session,
             commands::reload_vault,
             commands::reload_vault_entry,
             commands::sync_vault_asset_scope_for_window,
