@@ -406,7 +406,7 @@ pub fn map_adapter_error(raw_code: Option<&str>, raw_message: &str) -> StudySpac
         _ => StudySpaceErrorCode::UnknownError,
     };
 
-    StudySpaceCommandError::with_details(code, korean_error_message(&code), raw_message)
+    StudySpaceCommandError::with_details(code.clone(), korean_error_message(&code), raw_message)
 }
 
 fn korean_error_message(code: &StudySpaceErrorCode) -> &'static str {
