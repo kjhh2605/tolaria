@@ -408,11 +408,7 @@ fn colrv1_fontconfig_file_path() -> Option<std::path::PathBuf> {
     let cache_dir =
         dirs::cache_dir().or_else(|| dirs::home_dir().map(|home| home.join(".cache")))?;
 
-    Some(
-        cache_dir
-            .join("hs-hub")
-            .join(HS_HUB_COLRV1_FONTCONFIG_FILE),
-    )
+    Some(cache_dir.join("hs-hub").join(HS_HUB_COLRV1_FONTCONFIG_FILE))
 }
 
 #[cfg(all(desktop, target_os = "linux"))]

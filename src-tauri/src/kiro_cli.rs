@@ -285,10 +285,7 @@ mod tests {
             content["mcpServers"]["hs-hub"]["env"]["VAULT_PATHS"],
             serde_json::json!(serde_json::to_string(&vec![vault_path, "/other/vault"]).unwrap())
         );
-        assert_eq!(
-            content["mcpServers"]["hs-hub"]["env"]["WS_UI_PORT"],
-            "9711"
-        );
+        assert_eq!(content["mcpServers"]["hs-hub"]["env"]["WS_UI_PORT"], "9711");
     }
 
     #[test]

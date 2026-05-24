@@ -70,14 +70,11 @@ pub(super) fn read_registered_entry(config_path: &Path) -> Option<Value> {
         .get(OPENCODE_MCP_KEY)
         .and_then(Value::as_object)
         .and_then(|servers| {
-            servers
-                .get(MCP_SERVER_NAME)
-                .cloned()
-                .or_else(|| {
-                    prior_mcp_server_names()
-                        .iter()
-                        .find_map(|server_name| servers.get(server_name).cloned())
-                })
+            servers.get(MCP_SERVER_NAME).cloned().or_else(|| {
+                prior_mcp_server_names()
+                    .iter()
+                    .find_map(|server_name| servers.get(server_name).cloned())
+            })
         })
 }
 
@@ -216,8 +213,14 @@ mod tests {
         let prior_names = prior_mcp_server_names();
         let legacy_name = prior_names[1].as_str();
         let mut servers = Map::new();
-        servers.insert(MCP_SERVER_NAME.to_string(), serde_json::json!({ "type": "local" }));
-        servers.insert(legacy_name.to_string(), serde_json::json!({ "type": "local" }));
+        servers.insert(
+            MCP_SERVER_NAME.to_string(),
+            serde_json::json!({ "type": "local" }),
+        );
+        servers.insert(
+            legacy_name.to_string(),
+            serde_json::json!({ "type": "local" }),
+        );
         servers.insert("other".to_string(), serde_json::json!({ "type": "local" }));
         write_config_json(&config_path, serde_json::json!({ "mcp": servers }));
 

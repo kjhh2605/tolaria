@@ -132,7 +132,10 @@ mod tests {
         assert_eq!(loaded.vaults[0].label, "My Vault");
         assert_eq!(loaded.vaults[0].path, "/Users/hansung/HS-Hub");
         assert_eq!(loaded.vaults[1].label, "Work");
-        assert_eq!(loaded.active_vault.as_deref(), Some("/Users/hansung/HS-Hub"));
+        assert_eq!(
+            loaded.active_vault.as_deref(),
+            Some("/Users/hansung/HS-Hub")
+        );
     }
 
     #[test]

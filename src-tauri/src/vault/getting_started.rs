@@ -511,10 +511,7 @@ Do not modify app configuration files — those are local to each installation.
 /// Clone the public starter vault into the requested path.
 pub fn create_getting_started_vault(target_path: &str) -> Result<String, String> {
     let repo_url = getting_started_repo_url()?;
-    let vault_path = create_getting_started_vault_from_repo(
-        Path::new(target_path),
-        &repo_url,
-    )?;
+    let vault_path = create_getting_started_vault_from_repo(Path::new(target_path), &repo_url)?;
     Ok(vault_path.to_string_lossy().to_string())
 }
 

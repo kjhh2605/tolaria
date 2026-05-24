@@ -699,9 +699,7 @@ fn build_mcp_config_snippet(entry: &serde_json::Value) -> Result<String, String>
 pub fn mcp_config_snippet(vault_path: &str) -> Result<String, String> {
     let _ = vault_path;
     let runtime = find_mcp_runtime().map_err(|e| {
-        format!(
-            "Node.js 18+ or Bun 1+ is required on PATH before HS-Hub can build MCP config: {e}"
-        )
+        format!("Node.js 18+ or Bun 1+ is required on PATH before HS-Hub can build MCP config: {e}")
     })?;
     let server_dir = mcp_server_dir_for_registration()?;
     let index_js = server_dir.join("index.js").to_string_lossy().into_owned();
@@ -1050,9 +1048,7 @@ mod tests {
     #[test]
     fn mcp_server_dir_candidates_prefer_resource_root_before_linux_packages() {
         let dev_path = Path::new("/repo/mcp-server");
-        let resource_roots = vec![PathBuf::from(
-            "/Applications/HS-Hub.app/Contents/Resources",
-        )];
+        let resource_roots = vec![PathBuf::from("/Applications/HS-Hub.app/Contents/Resources")];
         let candidates = mcp_server_dir_candidates(dev_path, &resource_roots);
 
         let resource_dir = PathBuf::from("/Applications/HS-Hub.app/Contents/Resources/mcp-server");
@@ -1583,9 +1579,18 @@ mod tests {
         write_mcp_servers_config(
             &config_path,
             vec![
-                (MCP_SERVER_NAME, serde_json::json!({ "command": "node", "args": ["/index.js"] })),
-                (legacy_name, serde_json::json!({ "command": "node", "args": ["/legacy.js"] })),
-                ("other-server", serde_json::json!({ "command": "other", "args": [] })),
+                (
+                    MCP_SERVER_NAME,
+                    serde_json::json!({ "command": "node", "args": ["/index.js"] }),
+                ),
+                (
+                    legacy_name,
+                    serde_json::json!({ "command": "node", "args": ["/legacy.js"] }),
+                ),
+                (
+                    "other-server",
+                    serde_json::json!({ "command": "other", "args": [] }),
+                ),
             ],
         );
 
