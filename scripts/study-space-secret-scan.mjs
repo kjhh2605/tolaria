@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -56,6 +56,8 @@ export function scanFiles(files, options = {}) {
     if (allowedUnsafePaths.has(relativePath)) continue
 
     const absolutePath = path.join(root, relativePath)
+    if (!existsSync(absolutePath)) continue
+
     const text = readFileSync(absolutePath, 'utf8')
     const fields = scanTextForForbiddenValues(text, forbiddenValues)
     if (fields.length > 0) {
