@@ -887,7 +887,7 @@ fn reservation_summaries_from_bridge(response: &Value) -> Vec<StudySpaceReservat
 fn reservation_time_range(time: &str) -> (String, String) {
     let mut slots = time.split(',').filter(|slot| !slot.is_empty());
     let start = slots.next().unwrap_or("").to_string();
-    let last = slots.last().unwrap_or(start.as_str());
+    let last = slots.next_back().unwrap_or(start.as_str());
     let end = NaiveTime::parse_from_str(last, "%H:%M")
         .ok()
         .map(|time| time.overflowing_add_signed(chrono::Duration::hours(1)).0)
@@ -1071,7 +1071,7 @@ fn is_sensitive_assignment(value: &str) -> bool {
 
 fn is_student_id_like(value: &str) -> bool {
     let digits = value.chars().filter(|ch| ch.is_ascii_digit()).count();
-    digits >= 7 && digits <= 12 && value.chars().all(|ch| ch.is_ascii_digit() || ch == '-')
+    (7..=12).contains(&digits) && value.chars().all(|ch| ch.is_ascii_digit() || ch == '-')
 }
 
 fn collapse_whitespace(input: &str) -> String {
