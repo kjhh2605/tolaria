@@ -43,8 +43,8 @@ test.describe('Dynamic wikilink relationship detection', () => {
   })
 
   test('existing wikilink relationships still render correctly', async ({ page }) => {
-    // Open "Start Laputa App Project" — has Belongs to: [[24q4]], Owner: [[person-luca-rossi]]
-    await openNoteViaQuickOpen(page, 'Start Laputa App')
+    // Open "Start App Project" — has Belongs to: [[24q4]], Owner: [[person-luca-rossi]]
+    await openNoteViaQuickOpen(page, 'Start App')
 
     // Wait for note content to load
     const statusProp = page.locator('[data-testid="editable-property"]').first()

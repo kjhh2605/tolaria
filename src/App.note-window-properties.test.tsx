@@ -56,19 +56,6 @@ vi.mock('./components/Editor', () => ({
   },
 }))
 
-vi.mock('./hooks/useUpdater', () => ({
-  restartApp: vi.fn(),
-  useUpdater: () => ({
-    status: { state: 'idle' },
-    actions: {
-      checkForUpdates: vi.fn(async () => ({ kind: 'up-to-date' })),
-      dismiss: vi.fn(),
-      openReleaseNotes: vi.fn(),
-      startDownload: vi.fn(),
-    },
-  }),
-}))
-
 vi.mock('./utils/ai-chat', async () => {
   const actual = await vi.importActual<typeof import('./utils/ai-chat')>('./utils/ai-chat')
   return {

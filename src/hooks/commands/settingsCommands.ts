@@ -23,7 +23,6 @@ interface SettingsCommandsConfig {
   onCreateEmptyVault?: () => void
   onRemoveActiveVault?: () => void
   onRestoreGettingStarted?: () => void
-  onCheckForUpdates?: () => void
   onInstallMcp?: () => void
   onReloadVault?: () => void
   onRepairVault?: () => void
@@ -43,8 +42,7 @@ function buildPrimarySettingsCommands({
   locale = 'en',
   onOpenSettings,
   onOpenFeedback,
-  onCheckForUpdates,
-}: Pick<SettingsCommandsConfig, 'locale' | 'onOpenSettings' | 'onOpenFeedback' | 'onCheckForUpdates'>): CommandAction[] {
+}: Pick<SettingsCommandsConfig, 'locale' | 'onOpenSettings' | 'onOpenFeedback'>): CommandAction[] {
   const t = createTranslator(locale)
   return [
     {
@@ -75,7 +73,6 @@ function buildPrimarySettingsCommands({
         onOpenFeedback?.()
       },
     },
-    { id: 'check-updates', label: t('command.checkUpdates'), group: 'Settings', keywords: ['update', 'version', 'upgrade', 'release'], enabled: true, execute: () => onCheckForUpdates?.() },
   ]
 }
 
@@ -207,12 +204,12 @@ export function buildSettingsCommands(config: SettingsCommandsConfig): CommandAc
   const {
     mcpStatus, vaultCount, isGettingStartedHidden,
     onOpenSettings, onOpenFeedback, onOpenVault, onCreateEmptyVault, onRemoveActiveVault, onRestoreGettingStarted,
-    onCheckForUpdates, onInstallMcp, onReloadVault, onRepairVault, onToggleGitignoredFilesVisibility,
+    onInstallMcp, onReloadVault, onRepairVault, onToggleGitignoredFilesVisibility,
     locale = 'en', systemLocale = locale, selectedUiLanguage = SYSTEM_UI_LANGUAGE, onSetUiLanguage, onSetThemeMode,
   } = config
 
   return [
-    ...buildPrimarySettingsCommands({ locale, onOpenSettings, onOpenFeedback, onCheckForUpdates }),
+    ...buildPrimarySettingsCommands({ locale, onOpenSettings, onOpenFeedback }),
     ...buildThemeCommands({ locale, onSetThemeMode }),
     ...buildLanguageCommands({
       locale,

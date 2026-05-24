@@ -5,13 +5,9 @@
  */
 
 import { isTauri } from '../mock-tauri'
-import {
-  isRestartRequiredAfterUpdate,
-  RESTART_REQUIRED_FOLDER_PICKER_MESSAGE,
-} from '../lib/appUpdater'
 
 export class NativeFolderPickerBlockedError extends Error {
-  constructor(message = RESTART_REQUIRED_FOLDER_PICKER_MESSAGE) {
+  constructor(message = 'The native folder picker is currently unavailable.') {
     super(message)
     this.name = 'NativeFolderPickerBlockedError'
   }
@@ -87,10 +83,6 @@ export async function pickFolder(title?: string): Promise<string | null> {
   folderPickerRequestInFlight = true
   try {
     if (isTauri()) {
-      if (isRestartRequiredAfterUpdate()) {
-        throw new NativeFolderPickerBlockedError()
-      }
-
       const { open } = await import('@tauri-apps/plugin-dialog')
       const selected = await open({
         directory: true,

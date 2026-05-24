@@ -1,12 +1,12 @@
 ---
 type: Note
 aliases:
-  - "[[Laputa QA Reference]]"
+  - "[[QA Reference]]"
 related_to:
   - "[[25q2-laputa-v2]]"
 ---
 
-# Laputa QA Reference
+# QA Reference
 
 This note anchors the fixture's binary attachment scenario and gives native QA a simple note with an embedded image.
 

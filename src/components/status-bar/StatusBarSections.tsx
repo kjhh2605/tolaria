@@ -74,7 +74,6 @@ interface StatusBarPrimarySectionProps {
   onPullAndPush?: () => void
   onOpenConflictResolver?: () => void
   buildNumber?: string
-  onCheckForUpdates?: () => void
   onRemoveVault?: (path: string) => void
   onReorderVaults?: (orderedPaths: string[]) => void
   onUpdateWorkspaceIdentity?: (path: string, patch: Partial<VaultOption>) => void
@@ -111,37 +110,24 @@ interface StatusBarSecondarySectionProps {
 
 function BuildNumberButton({
   buildNumber,
-  onCheckForUpdates,
   compact,
   locale,
 }: {
   buildNumber?: string
-  onCheckForUpdates?: () => void
   compact: boolean
   locale: AppLocale
 }) {
   const className = compact
-    ? 'h-6 min-w-0 gap-1 rounded-sm px-1 py-0.5 text-[12px] font-medium text-muted-foreground hover:bg-[var(--hover)] hover:text-foreground'
-    : 'h-auto gap-1 rounded-sm px-1 py-0.5 text-[12px] font-medium text-muted-foreground hover:bg-[var(--hover)] hover:text-foreground'
+    ? 'flex h-6 min-w-0 items-center gap-1 rounded-sm px-1 py-0.5 text-[12px] font-medium text-muted-foreground'
+    : 'flex items-center gap-1 rounded-sm px-1 py-0.5 text-[12px] font-medium text-muted-foreground'
 
   return (
-    <ActionTooltip copy={{ label: translate(locale, 'status.update.check') }} side="top">
-      <Button
-        type="button"
-        variant="ghost"
-        size="xs"
-        className={className}
-        onClick={onCheckForUpdates}
-        aria-label={translate(locale, 'status.update.check')}
-        aria-disabled={onCheckForUpdates ? undefined : true}
-        data-testid="status-build-number"
-      >
-        <span style={ICON_STYLE}>
-          <Package size={13} weight="regular" />
-          {compact ? null : buildNumber ?? translate(locale, 'status.build.unknown')}
-        </span>
-      </Button>
-    </ActionTooltip>
+    <span className={className} data-testid="status-build-number">
+      <span style={ICON_STYLE}>
+        <Package size={13} weight="regular" />
+        {compact ? null : buildNumber ?? translate(locale, 'status.build.unknown')}
+      </span>
+    </span>
   )
 }
 
@@ -547,7 +533,6 @@ export function StatusBarPrimarySection({
   onPullAndPush,
   onOpenConflictResolver,
   buildNumber,
-  onCheckForUpdates,
   onRemoveVault,
   onReorderVaults,
   onUpdateWorkspaceIdentity,
@@ -586,7 +571,7 @@ export function StatusBarPrimarySection({
         locale={locale}
       />
       <PrimarySeparator compact={compact} />
-      <BuildNumberButton buildNumber={buildNumber} onCheckForUpdates={onCheckForUpdates} compact={compact} locale={locale} />
+      <BuildNumberButton buildNumber={buildNumber} compact={compact} locale={locale} />
       <StatusBarGitControls
         modifiedCount={modifiedCount}
         vaultPath={vaultPath}

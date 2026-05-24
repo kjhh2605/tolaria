@@ -1,6 +1,5 @@
 pub mod ai_agents;
 pub mod ai_models;
-pub mod app_updater;
 pub mod claude_cli;
 mod claude_invocation;
 mod cli_agent_runtime;
@@ -280,8 +279,6 @@ fn setup_common_plugins(app: &mut tauri::App) -> Result<(), Box<dyn std::error::
 #[cfg(desktop)]
 fn setup_desktop_plugins(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     setup_macos_webview_shortcut_prevention(app)?;
-    app.handle()
-        .plugin(tauri_plugin_updater::Builder::new().build())?;
     app.handle().plugin(tauri_plugin_process::init())?;
     app.handle().plugin(tauri_plugin_opener::init())?;
     #[cfg(not(target_os = "linux"))]
@@ -494,13 +491,11 @@ macro_rules! app_invoke_handler {
             commands::delete_vault_folder,
             commands::batch_archive_notes,
             commands::get_settings,
-            commands::check_for_app_update,
             commands::update_menu_state,
             commands::trigger_menu_command,
             commands::update_current_window_min_size,
             commands::perform_current_window_titlebar_double_click,
             commands::save_settings,
-            commands::download_and_install_app_update,
             commands::load_vault_list,
             commands::save_vault_list,
             commands::git_clone::clone_git_repo,

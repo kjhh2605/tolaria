@@ -1,15 +1,15 @@
 [package]
-name = "tolaria"
+name = "hs-tolaria"
 version = "0.1.0"
-description = "Personal knowledge and life management app"
-authors = ["Luca Rossi"]
+description = "Hansung University student helper, forked from Tolaria"
+authors = ["kjhh2605"]
 license = "AGPL-3.0-or-later"
 repository = ""
 edition = "2021"
 rust-version = "1.77.2"
 
 [lib]
-name = "tolaria_lib"
+name = "hs_tolaria_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
@@ -32,7 +32,6 @@ base64 = "0.22"
 regex = "1"
 dirs = "5"
 tauri-plugin-dialog = "2"
-tauri-plugin-updater = "2.10.0"
 tauri-plugin-process = "2.3.1"
 tauri-plugin-opener = "2"
 tauri-plugin-prevent-default = "4.0.4"

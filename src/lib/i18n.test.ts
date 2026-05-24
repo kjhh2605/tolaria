@@ -11,12 +11,12 @@ import {
 } from './i18n'
 
 describe('i18n', () => {
-  it('uses supported system languages before falling back to English', () => {
+  it('uses supported system languages before falling back to the default locale', () => {
     expect(resolveEffectiveLocale(null, ['zh-CN'])).toBe('zh-CN')
     expect(resolveEffectiveLocale(null, ['zh-TW'])).toBe('zh-TW')
     expect(resolveEffectiveLocale(null, ['es-MX'])).toBe('es-419')
     expect(resolveEffectiveLocale('system', ['fr-FR'])).toBe('fr-FR')
-    expect(resolveEffectiveLocale('system', ['xx-ZZ'])).toBe('en')
+    expect(resolveEffectiveLocale('system', ['xx-ZZ'])).toBe('ko-KR')
   })
 
   it('normalizes current and legacy language preferences', () => {

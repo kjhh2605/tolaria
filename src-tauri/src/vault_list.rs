@@ -4,8 +4,7 @@ use std::path::PathBuf;
 
 use crate::commands::expand_tilde;
 
-const APP_CONFIG_DIR: &str = "com.tolaria.app";
-const LEGACY_APP_CONFIG_DIR: &str = "com.laputa.app";
+const APP_CONFIG_DIR: &str = "dev.kjhh2605.hs-tolaria";
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct VaultEntry {
@@ -42,24 +41,8 @@ fn preferred_app_config_path(file_name: &str) -> Result<PathBuf, String> {
     Ok(app_config_dir()?.join(APP_CONFIG_DIR).join(file_name))
 }
 
-fn resolve_existing_or_preferred_app_config_path(file_name: &str) -> Result<PathBuf, String> {
-    let preferred = preferred_app_config_path(file_name)?;
-    if preferred.exists() {
-        return Ok(preferred);
-    }
-
-    let legacy = app_config_dir()?
-        .join(LEGACY_APP_CONFIG_DIR)
-        .join(file_name);
-    if legacy.exists() {
-        return Ok(legacy);
-    }
-
-    Ok(preferred)
-}
-
 fn vault_list_path() -> Result<PathBuf, String> {
-    resolve_existing_or_preferred_app_config_path("vaults.json")
+    preferred_app_config_path("vaults.json")
 }
 
 fn load_at(path: &PathBuf) -> Result<VaultList, String> {
@@ -196,18 +179,18 @@ mod tests {
         assert!(result.is_ok());
         let path = result.unwrap();
         let path = path.to_str().unwrap();
-        assert!(path.contains("com.tolaria.app") || path.contains("com.laputa.app"));
+        assert!(path.contains("dev.kjhh2605.hs-tolaria"));
     }
 
     #[test]
-    fn preferred_vault_list_path_uses_tolaria_namespace() {
+    fn preferred_vault_list_path_uses_hs_tolaria_namespace() {
         let result = preferred_app_config_path("vaults.json");
         assert!(result.is_ok());
         assert!(result
             .unwrap()
             .to_str()
             .unwrap()
-            .contains("com.tolaria.app"));
+            .contains("dev.kjhh2605.hs-tolaria"));
     }
 
     #[test]

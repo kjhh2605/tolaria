@@ -52,7 +52,6 @@ function makeHandlers(): AppCommandHandlers {
     onPastePlainText: vi.fn(),
     onGoBack: vi.fn(),
     onGoForward: vi.fn(),
-    onCheckForUpdates: vi.fn(),
     onSelectFilter: vi.fn(),
     onOpenVault: vi.fn(),
     onRemoveActiveVault: vi.fn(),
@@ -188,7 +187,6 @@ describe('appCommandDispatcher', () => {
       ctrlKey: false,
       shiftKey: false,
     })
-    expect(getShortcutEventInit(APP_COMMAND_IDS.appCheckForUpdates)).toBeNull()
   })
 
   it('resolves event modifiers through the shared shortcut catalog', () => {

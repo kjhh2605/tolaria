@@ -166,7 +166,7 @@ describe('useCommitFlow', () => {
 
     expect(didHandleCheckpoint).toBe(true)
     expect(setToastMessage).toHaveBeenCalledWith(
-      'Set a Git author before AutoGit can commit. Run git config --global user.name "Your Name" and git config --global user.email you@example.com.',
+      'AutoGit이 커밋하기 전에 Git 작성자를 설정하세요. git config --global user.name "Your Name" 및 git config --global user.email you@example.com을 실행하세요.',
     )
     consoleSpy.mockRestore()
   })
@@ -237,7 +237,7 @@ describe('useCommitFlow', () => {
     expect(loadModifiedFilesForVaultPath).toHaveBeenCalledWith('/vault')
     expect(loadModifiedFilesForVaultPath).toHaveBeenCalledWith('/work')
     expect(setToastMessage).toHaveBeenCalledWith(
-      'Set a Git author before AutoGit can commit. Run git config --global user.name "Your Name" and git config --global user.email you@example.com.',
+      'AutoGit이 커밋하기 전에 Git 작성자를 설정하세요. git config --global user.name "Your Name" 및 git config --global user.email you@example.com을 실행하세요.',
     )
     consoleSpy.mockRestore()
   })
@@ -370,7 +370,7 @@ describe('useCommitFlow', () => {
       await result.current.handleCommitPush('test')
     })
 
-    expect(setToastMessage).toHaveBeenCalledWith('Commit failed: push failed')
+    expect(setToastMessage).toHaveBeenCalledWith('커밋 실패: push failed')
     consoleSpy.mockRestore()
   })
 

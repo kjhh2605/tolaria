@@ -1,13 +1,13 @@
 ---
 type: Project
 aliases:
-  - "[[Laputa App V1]]"
+  - "[[App V1]]"
 belongs_to: "[[25q1]]"
 owner: "[[person-luca-rossi]]"
 status: Done
 ---
 
-# Laputa App V1
+# App V1
 
 The first usable release for daily browsing, quick open, and note-property editing.
 

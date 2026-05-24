@@ -18,7 +18,6 @@
     "core:window:allow-set-title",
     "core:webview:allow-create-webview-window",
     "dialog:default",
-    "updater:default",
     "process:default",
     "opener:default"
   ]

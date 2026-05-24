@@ -4,8 +4,7 @@ use std::path::PathBuf;
 
 use crate::ai_models::{normalize_ai_model_providers, AiModelProvider};
 
-const APP_CONFIG_DIR: &str = "com.tolaria.app";
-const LEGACY_APP_CONFIG_DIR: &str = "com.laputa.app";
+const APP_CONFIG_DIR: &str = "dev.kjhh2605.hs-tolaria";
 const SUPPORTED_DEFAULT_AI_AGENTS: &[&str] =
     &["claude_code", "codex", "opencode", "pi", "gemini", "kiro"];
 pub const DEFAULT_HIDE_GITIGNORED_FILES: bool = true;
@@ -219,24 +218,8 @@ pub(crate) fn preferred_app_config_path(file_name: &str) -> Result<PathBuf, Stri
     Ok(app_config_dir()?.join(APP_CONFIG_DIR).join(file_name))
 }
 
-fn resolve_existing_or_preferred_app_config_path(file_name: &str) -> Result<PathBuf, String> {
-    let preferred = preferred_app_config_path(file_name)?;
-    if preferred.exists() {
-        return Ok(preferred);
-    }
-
-    let legacy = app_config_dir()?
-        .join(LEGACY_APP_CONFIG_DIR)
-        .join(file_name);
-    if legacy.exists() {
-        return Ok(legacy);
-    }
-
-    Ok(preferred)
-}
-
 fn settings_path() -> Result<PathBuf, String> {
-    resolve_existing_or_preferred_app_config_path("settings.json")
+    preferred_app_config_path("settings.json")
 }
 
 fn get_settings_at(path: &PathBuf) -> Result<Settings, String> {
@@ -272,7 +255,7 @@ pub fn save_settings(settings: Settings) -> Result<(), String> {
 }
 
 fn last_vault_file() -> Result<PathBuf, String> {
-    resolve_existing_or_preferred_app_config_path("last-vault.txt")
+    preferred_app_config_path("last-vault.txt")
 }
 
 fn get_last_vault_at(path: &PathBuf) -> Option<String> {
@@ -688,18 +671,18 @@ mod tests {
         assert!(result.is_ok());
         let path = result.unwrap();
         let path = path.to_str().unwrap();
-        assert!(path.contains("com.tolaria.app") || path.contains("com.laputa.app"));
+        assert!(path.contains("dev.kjhh2605.hs-tolaria"));
     }
 
     #[test]
-    fn test_preferred_settings_path_uses_tolaria_namespace() {
+    fn test_preferred_settings_path_uses_hs_tolaria_namespace() {
         let result = preferred_app_config_path("settings.json");
         assert!(result.is_ok());
         assert!(result
             .unwrap()
             .to_str()
             .unwrap()
-            .contains("com.tolaria.app"));
+            .contains("dev.kjhh2605.hs-tolaria"));
     }
 
     #[test]

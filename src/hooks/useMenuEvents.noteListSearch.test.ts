@@ -41,7 +41,6 @@ function makeHandlers(): MenuEventHandlers {
     onPastePlainText: vi.fn(),
     onGoBack: vi.fn(),
     onGoForward: vi.fn(),
-    onCheckForUpdates: vi.fn(),
     onSelectFilter: vi.fn(),
     onOpenVault: vi.fn(),
     onRemoveActiveVault: vi.fn(),

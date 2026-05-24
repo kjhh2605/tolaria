@@ -12,11 +12,6 @@
         "requiresManualNativeAcceleratorQa": true
       }
     },
-    "appCheckForUpdates": {
-      "id": "app-check-for-updates",
-      "route": { "kind": "handler", "handler": "onCheckForUpdates" },
-      "menuOwned": true
-    },
     "fileNewNote": {
       "id": "file-new-note",
       "route": { "kind": "handler", "handler": "onCreateNote" },
@@ -512,8 +507,6 @@
     }
   ],
   "appMenu": [
-    { "kind": "command", "command": "appCheckForUpdates", "label": "Check for Updates..." },
-    { "kind": "separator" },
     { "kind": "command", "command": "appSettings", "label": "Settings..." }
   ],
   "menuStateGroups": {

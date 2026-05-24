@@ -1,6 +1,6 @@
 import EN_TRANSLATIONS from './locales/en.json'
 
-export const DEFAULT_APP_LOCALE = 'en'
+export const DEFAULT_APP_LOCALE = 'ko-KR'
 export const SYSTEM_UI_LANGUAGE = 'system'
 
 export const APP_LOCALES = [

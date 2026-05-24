@@ -37,8 +37,6 @@ vi.mock('../utils/vault-dialog', async (importOriginal) => {
   }
 })
 
-import { NativeFolderPickerBlockedError } from '../utils/vault-dialog'
-
 type MockInvokeOverrides = {
   checkVaultExists?: boolean | ((args: { path?: string }) => boolean)
   createEmptyVault?: (args: { targetPath: string }) => Promise<unknown> | unknown
@@ -431,21 +429,6 @@ describe('useVaultSwitcher', () => {
 
     expect(result.current.allVaults.some(v => v.path === '/Users/luca/MyVault')).toBe(true)
     expect(onToast).toHaveBeenCalledWith('Vault "MyVault" opened')
-  })
-
-  it('shows a clear toast when folder picking is blocked until restart', async () => {
-    const { pickFolder } = await import('../utils/vault-dialog')
-    vi.mocked(pickFolder).mockRejectedValue(new NativeFolderPickerBlockedError())
-
-    const { result } = await renderLoadedVaultSwitcher()
-
-    await act(async () => {
-      await result.current.handleOpenLocalFolder()
-    })
-
-    expect(onToast).toHaveBeenCalledWith(
-      'Tolaria needs a restart before macOS can open another folder picker. Restart to apply the downloaded update and try again.',
-    )
   })
 
   it('creates an empty vault and switches to it', async () => {

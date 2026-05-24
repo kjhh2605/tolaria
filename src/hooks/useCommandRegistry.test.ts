@@ -43,7 +43,6 @@ function makeConfig(overrides: Record<string, unknown> = {}) {
     onGoForward: vi.fn(),
     canGoBack: false,
     canGoForward: false,
-    onCheckForUpdates: vi.fn(),
     onCreateType: vi.fn(),
     ...overrides,
   }

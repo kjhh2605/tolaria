@@ -5,12 +5,6 @@ vi.mock('../mock-tauri', () => ({
   isTauri: vi.fn(() => false),
 }))
 
-vi.mock('../lib/appUpdater', () => ({
-  RESTART_REQUIRED_FOLDER_PICKER_MESSAGE:
-    'Tolaria needs a restart before macOS can open another folder picker. Restart to apply the downloaded update and try again.',
-  isRestartRequiredAfterUpdate: vi.fn(() => false),
-}))
-
 const openMock = vi.fn()
 
 vi.mock('@tauri-apps/plugin-dialog', () => ({
@@ -19,10 +13,6 @@ vi.mock('@tauri-apps/plugin-dialog', () => ({
 
 import { pickFolder } from './vault-dialog'
 import { isTauri } from '../mock-tauri'
-import {
-  isRestartRequiredAfterUpdate,
-  RESTART_REQUIRED_FOLDER_PICKER_MESSAGE,
-} from '../lib/appUpdater'
 
 describe('pickFolder', () => {
   beforeEach(() => {
@@ -63,16 +53,8 @@ describe('pickFolder', () => {
     expect(result).toBe('/Users/test/My Vault')
   })
 
-  it('blocks the native folder picker when a restart is required after update install', async () => {
-    vi.mocked(isTauri).mockReturnValue(true)
-    vi.mocked(isRestartRequiredAfterUpdate).mockReturnValue(true)
-
-    await expect(pickFolder('Select vault')).rejects.toThrow(RESTART_REQUIRED_FOLDER_PICKER_MESSAGE)
-  })
-
   it('normalizes a native single-selection array to its first folder path', async () => {
     vi.mocked(isTauri).mockReturnValue(true)
-    vi.mocked(isRestartRequiredAfterUpdate).mockReturnValue(false)
     openMock.mockResolvedValue(['/Users/test/my-vault'])
 
     const result = await pickFolder('Select vault')
@@ -87,7 +69,6 @@ describe('pickFolder', () => {
 
   it('ignores overlapping native folder picker requests while one is open', async () => {
     vi.mocked(isTauri).mockReturnValue(true)
-    vi.mocked(isRestartRequiredAfterUpdate).mockReturnValue(false)
 
     let resolveOpen: ((path: string) => void) | null = null
     openMock.mockReturnValueOnce(new Promise((resolve) => {
@@ -106,7 +87,6 @@ describe('pickFolder', () => {
 
   it('normalizes native file URLs to filesystem paths', async () => {
     vi.mocked(isTauri).mockReturnValue(true)
-    vi.mocked(isRestartRequiredAfterUpdate).mockReturnValue(false)
     openMock.mockResolvedValue('file:///Users/test/My%20Vault')
 
     const result = await pickFolder('Select vault')

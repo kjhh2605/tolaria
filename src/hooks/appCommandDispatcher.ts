@@ -53,7 +53,6 @@ export interface AppCommandHandlers {
   onToggleTableOfContents?: () => void
   onGoBack?: () => void
   onGoForward?: () => void
-  onCheckForUpdates?: () => void
   onSelectFilter?: (filter: SidebarFilter) => void
   onOpenVault?: () => void
   onRemoveActiveVault?: () => void
@@ -75,7 +74,6 @@ export interface AppCommandHandlers {
 type SimpleHandlerKey = keyof Pick<
   AppCommandHandlers,
   | 'onOpenSettings'
-  | 'onCheckForUpdates'
   | 'onCreateNote'
   | 'onCreateType'
   | 'onQuickOpen'
@@ -120,7 +118,6 @@ type ActiveTabHandlerExecutor = (handlers: AppCommandHandlers, path: string) => 
 
 const SIMPLE_HANDLER_EXECUTORS: readonly [SimpleHandlerKey, SimpleHandlerExecutor][] = [
   ['onOpenSettings', (handlers) => handlers.onOpenSettings()],
-  ['onCheckForUpdates', (handlers) => handlers.onCheckForUpdates?.()],
   ['onCreateNote', (handlers) => handlers.onCreateNote()],
   ['onCreateType', (handlers) => handlers.onCreateType?.()],
   ['onQuickOpen', (handlers) => handlers.onQuickOpen()],

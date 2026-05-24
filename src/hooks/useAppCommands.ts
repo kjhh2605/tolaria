@@ -81,7 +81,6 @@ interface AppCommandsConfig {
   aiFeaturesEnabled?: boolean
   onToggleAIChat?: () => void
   onToggleTableOfContents?: () => void
-  onCheckForUpdates?: () => void
   onRemoveActiveVault?: () => void
   onRestoreGettingStarted?: () => void
   isGettingStartedHidden?: boolean
@@ -195,7 +194,6 @@ type CommandRegistryVaultActions = Pick<
   | 'isGitVault'
   | 'gitRepositories'
   | 'onInitializeGit'
-  | 'onCheckForUpdates'
   | 'onCreateType'
   | 'locale'
   | 'systemLocale'
@@ -326,7 +324,6 @@ function createMenuEventActionHandlers(
   | 'onToggleOrganized'
   | 'onGoBack'
   | 'onGoForward'
-  | 'onCheckForUpdates'
   | 'onSelectFilter'
 > {
   return {
@@ -353,7 +350,6 @@ function createMenuEventActionHandlers(
     onToggleOrganized: config.onToggleOrganized,
     onGoBack: config.onGoBack,
     onGoForward: config.onGoForward,
-    onCheckForUpdates: config.onCheckForUpdates,
     onSelectFilter: selectFilter,
   }
 }
@@ -491,7 +487,6 @@ function createCommandRegistryVaultConfig(
     isGitVault: config.isGitVault,
     gitRepositories: config.gitRepositories,
     onInitializeGit: config.onInitializeGit,
-    onCheckForUpdates: config.onCheckForUpdates,
     onCreateType: config.onCreateType,
     locale: config.locale,
     systemLocale: config.systemLocale,

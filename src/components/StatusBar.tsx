@@ -98,7 +98,6 @@ interface StatusBarProps {
   onOpenFeedback?: () => void
   onOpenDocs?: () => void
   buildNumber?: string
-  onCheckForUpdates?: () => void
   onRemoveVault?: (path: string) => void
   onReorderVaults?: (orderedPaths: string[]) => void
   onUpdateWorkspaceIdentity?: (path: string, patch: Partial<VaultOption>) => void
@@ -156,7 +155,6 @@ function StatusBarPrimaryFromFooter({
   onPullAndPush,
   onOpenConflictResolver,
   buildNumber,
-  onCheckForUpdates,
   onRemoveVault,
   onReorderVaults,
   onUpdateWorkspaceIdentity,
@@ -211,7 +209,6 @@ function StatusBarPrimaryFromFooter({
       onPullAndPush={onPullAndPush}
       onOpenConflictResolver={onOpenConflictResolver}
       buildNumber={buildNumber}
-      onCheckForUpdates={onCheckForUpdates}
       onRemoveVault={onRemoveVault}
       onReorderVaults={onReorderVaults}
       onUpdateWorkspaceIdentity={onUpdateWorkspaceIdentity}
