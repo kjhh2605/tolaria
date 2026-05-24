@@ -13,6 +13,7 @@ import { CommitDialog } from './components/CommitDialog'
 import { PulseView } from './components/PulseView'
 import { StatusBar } from './components/StatusBar'
 import { SettingsPanel } from './components/SettingsPanel'
+import { StudySpaceReservationPage } from './components/StudySpaceReservationPage'
 import { CloneVaultModal } from './components/CloneVaultModal'
 import { FeedbackDialog } from './components/FeedbackDialog'
 import { McpSetupDialog } from './components/McpSetupDialog'
@@ -419,6 +420,7 @@ function App() {
   const explicitOrganizationEnabled = isExplicitOrganizationEnabled(vaultConfig.inbox?.explicitOrganization)
   const effectiveSelection = sanitizeSelectionForOrganization(selection, vaultConfig.inbox?.explicitOrganization)
   const isChangesSelection = effectiveSelection.kind === 'filter' && effectiveSelection.filter === 'changes'
+  const isStudySpaceSelection = effectiveSelection.kind === 'filter' && effectiveSelection.filter === 'study-space'
 
   useSelectionSanitizer({
     effectiveSelection,
@@ -1679,6 +1681,7 @@ function App() {
 
   const noteListModifiedFiles = isChangesSelection ? selectedChangesModifiedFiles : undefined
   const noteListModifiedFilesError = isChangesSelection ? gitSurfaces.changesModifiedFilesError : null
+  const effectiveNoteListVisible = noteListVisible && !isStudySpaceSelection
 
   return (
     <AppPreferencesProvider dateDisplayFormat={dateDisplayFormat}>
@@ -1692,7 +1695,7 @@ function App() {
               <ResizeHandle onResize={layout.handleSidebarResize} />
             </>
           )}
-          {noteListVisible && (
+          {effectiveNoteListVisible && (
             <>
               <div className={`app__note-list${aiActivity.highlightElement === 'notelist' ? ' ai-highlight' : ''}`} style={{ width: layout.noteListWidth }}>
                 {effectiveSelection.kind === 'filter' && effectiveSelection.filter === 'pulse' ? (
@@ -1705,6 +1708,9 @@ function App() {
             </>
           )}
           <div className={`app__editor${aiActivity.highlightElement === 'editor' || aiActivity.highlightElement === 'tab' ? ' ai-highlight' : ''}`}>
+            {isStudySpaceSelection ? (
+              <StudySpaceReservationPage locale={appLocale} onToast={setToastMessage} />
+            ) : (
             <Editor
               tabs={notes.tabs}
               activeTabPath={notes.activeTabPath}
@@ -1764,7 +1770,7 @@ function App() {
               canGoForward={canGoForward}
               onGoBack={handleGoBack}
               onGoForward={handleGoForward}
-              leftPanelsCollapsed={!sidebarVisible && !noteListVisible}
+              leftPanelsCollapsed={!sidebarVisible && !effectiveNoteListVisible}
               onFileCreated={vaultBridge.handleAgentFileCreated}
               onFileModified={vaultBridge.handleAgentFileModified}
               onVaultChanged={vaultBridge.handleAgentVaultChanged}
@@ -1776,6 +1782,7 @@ function App() {
               flushPendingRawContentRef={flushPendingRawContentRef}
               locale={appLocale}
             />
+            )}
           </div>
         </div>
         <RenameDetectedBanner renames={detectedRenames} onUpdate={handleUpdateWikilinks} onDismiss={handleDismissRenames} />

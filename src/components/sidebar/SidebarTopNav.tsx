@@ -1,4 +1,4 @@
-import { Archive, FileText, Tray } from '@phosphor-icons/react'
+import { Archive, CalendarCheck, FileText, Tray } from '@phosphor-icons/react'
 import type { SidebarSelection } from '../../types'
 import { isSelectionActive, NavItem } from '../SidebarParts'
 import { translate, type AppLocale } from '../../lib/i18n'
@@ -60,6 +60,12 @@ export function SidebarTopNav({
         badgeStyle={{ background: 'var(--muted)' }}
         activeBadgeClassName="bg-primary text-primary-foreground"
         onClick={() => onSelect({ kind: 'filter', filter: 'archived' })}
+      />
+      <NavItem
+        icon={CalendarCheck}
+        label={translate(locale, 'sidebar.nav.studySpace')}
+        isActive={isSelectionActive(selection, { kind: 'filter', filter: 'study-space' })}
+        onClick={() => onSelect({ kind: 'filter', filter: 'study-space' })}
       />
     </div>
   )
