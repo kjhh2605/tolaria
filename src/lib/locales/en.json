@@ -655,7 +655,7 @@
   "locale.beLatn": "Belarusian (Latin)",
   "sidebar.nav.studySpace": "Study-space reservation",
   "studySpace.title": "학습공간 예약",
-  "studySpace.description": "Search Hansung University seminar rooms, group study rooms, coding lounge rooms, and Sangsang Park Plus from Tolaria without using the terminal.",
+  "studySpace.description": "Search Hansung University seminar rooms, group study rooms, coding lounge rooms, and Sangsang Park Plus from HS-Hub without using the terminal.",
   "studySpace.hero.badge": "Hansung University live reservation boundary",
   "studySpace.status.loading": "Checking secure credential status…",
   "studySpace.status.ready": "Credentials ready",
@@ -701,8 +701,12 @@
   "studySpace.unit.people": " people",
   "studySpace.confirm.title": "Confirm live reservation",
   "studySpace.confirm.description": "Reserve {room} on {date}, {start}–{end}, for {count} people.",
-  "studySpace.confirm.security": "Tolaria sends only the selected room, date/time, headcount, member names/student numbers, and the temporary authentication token from secure storage. Credentials are not saved in notes or logs.",
+  "studySpace.confirm.security": "HS-Hub sends only the selected room, date/time, headcount, and member names/student numbers to the reservation boundary. Credentials and temporary authentication tokens stay inside secure storage and the native adapter, and are not saved in notes or logs.",
   "studySpace.error.membersIncomplete": "Enter student number and name for every team member before reserving.",
-  "studySpace.success.toast": "학습공간 예약이 완료되었습니다.",
-  "studySpace.success.message": "예약이 완료되었습니다. 예약 번호: {id}"
+  "studySpace.success.toast": "Study-space reservation completed.",
+  "studySpace.success.message": "Reservation completed. Reservation number: {id}",
+  "studySpace.action.saveNote": "Save reservation note",
+  "studySpace.action.savingNote": "Saving note…",
+  "studySpace.action.downloadIcs": "Download .ics",
+  "studySpace.success.noteSaved": "Reservation note saved."
 }

@@ -43,6 +43,12 @@ import {
   type StudySpaceReservationResult,
   type StudySpaceRoom,
 } from '../lib/studySpaceReservation'
+import {
+  buildStudySpaceReservationIcs,
+  buildStudySpaceReservationNote,
+  studySpaceReservationNoteFilename,
+  type StudySpaceReservationArtifactInput,
+} from '../lib/studySpaceReservationArtifacts'
 import { translate, type AppLocale } from '../lib/i18n'
 
 const DEFAULT_AREA = 'coding_lounge'
@@ -134,9 +140,22 @@ function requestFromState({
 interface StudySpaceReservationPageProps {
   locale?: AppLocale
   onToast?: (message: string) => void
+  onCreateReservationNote?: (filename: string, markdown: string) => Promise<void>
 }
 
-export function StudySpaceReservationPage({ locale = 'ko-KR', onToast }: StudySpaceReservationPageProps) {
+function downloadTextFile(filename: string, content: string, type: string): void {
+  const blob = new Blob([content], { type })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateReservationNote }: StudySpaceReservationPageProps) {
   const [areas, setAreas] = useState<StudySpaceArea[]>([])
   const [credentialState, setCredentialState] = useState<StudySpaceCredentialState>('missing')
   const [credentialMessage, setCredentialMessage] = useState('')
@@ -157,6 +176,8 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast }: StudySp
   const [reservationBusy, setReservationBusy] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [success, setSuccess] = useState<StudySpaceReservationResult | null>(null)
+  const [successArtifact, setSuccessArtifact] = useState<StudySpaceReservationArtifactInput | null>(null)
+  const [noteBusy, setNoteBusy] = useState(false)
 
   const selectedArea = areas.find((candidate) => candidate.key === area)
   const selectedDate = parseIsoDate(date)
@@ -253,6 +274,7 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast }: StudySp
     setChecking(true)
     setErrorMessage(null)
     setSuccess(null)
+    setSuccessArtifact(null)
     try {
       const response = await checkStudySpaceAvailability(buildRequest())
       setAvailability(new Map(response.results.map((result) => [roomAvailabilityKey(result.room), result])))
@@ -277,14 +299,16 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast }: StudySp
     setReservationBusy(true)
     setErrorMessage(null)
     try {
+      const selectedRoom = reservingRoom
       const result = await createStudySpaceReservation({
-        ...buildRequest(reservingRoom.id),
-        room_id: reservingRoom.id,
+        ...buildRequest(selectedRoom.id),
+        room_id: selectedRoom.id,
         members: completeMembers,
         dry_run: false,
         confirm: true,
       })
       setSuccess(result)
+      setSuccessArtifact({ result, room: selectedRoom, members: completeMembers })
       onToast?.(translate(locale, 'studySpace.success.toast'))
       setReservingRoom(null)
     } catch (error) {
@@ -294,6 +318,28 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast }: StudySp
       setReservationBusy(false)
     }
   }, [buildRequest, completeMembers, headcount, locale, onToast, reservingRoom])
+
+  const handleCreateReservationNote = useCallback(async () => {
+    if (!successArtifact || !onCreateReservationNote) return
+    setNoteBusy(true)
+    try {
+      await onCreateReservationNote(
+        studySpaceReservationNoteFilename(successArtifact),
+        buildStudySpaceReservationNote(successArtifact),
+      )
+      onToast?.(translate(locale, 'studySpace.success.noteSaved'))
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : String(error))
+    } finally {
+      setNoteBusy(false)
+    }
+  }, [locale, onCreateReservationNote, onToast, successArtifact])
+
+  const handleDownloadIcs = useCallback(() => {
+    if (!successArtifact) return
+    const filename = studySpaceReservationNoteFilename(successArtifact).replace(/\.md$/, '.ics')
+    downloadTextFile(filename, buildStudySpaceReservationIcs(successArtifact), 'text/calendar;charset=utf-8')
+  }, [successArtifact])
 
   return (
     <div className="h-full overflow-auto bg-background" data-testid="study-space-page">
@@ -457,9 +503,21 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast }: StudySp
                   </div>
                 )}
                 {success && (
-                  <div className="mb-4 flex gap-2 rounded-xl border border-green-500/30 bg-green-500/10 p-3 text-sm text-green-700" role="status">
-                    <CheckCircle size={18} className="mt-0.5 shrink-0" />
-                    <span>{translate(locale, 'studySpace.success.message', { id: success.reservation_id ?? '-' })}</span>
+                  <div className="mb-4 space-y-3 rounded-xl border border-green-500/30 bg-green-500/10 p-3 text-sm text-green-700" role="status">
+                    <div className="flex gap-2">
+                      <CheckCircle size={18} className="mt-0.5 shrink-0" />
+                      <span>{translate(locale, 'studySpace.success.message', { id: success.reservation_id ?? '-' })}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2 pl-7">
+                      {onCreateReservationNote && (
+                        <Button type="button" variant="outline" size="sm" onClick={handleCreateReservationNote} disabled={noteBusy}>
+                          {noteBusy ? translate(locale, 'studySpace.action.savingNote') : translate(locale, 'studySpace.action.saveNote')}
+                        </Button>
+                      )}
+                      <Button type="button" variant="outline" size="sm" onClick={handleDownloadIcs}>
+                        {translate(locale, 'studySpace.action.downloadIcs')}
+                      </Button>
+                    </div>
                   </div>
                 )}
                 <div className="overflow-hidden rounded-xl border">

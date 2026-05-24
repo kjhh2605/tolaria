@@ -104,6 +104,7 @@ import {
 } from './lib/vaultAiGuidance'
 import { isActiveVaultUnavailableError } from './utils/vaultErrors'
 import { hasNoteIconValue } from './utils/noteIcon'
+import { slugifyNoteStem } from './utils/noteSlug'
 import { OPEN_AI_CHAT_EVENT } from './utils/aiPromptBridge'
 import {
   INBOX_SELECTION,
@@ -1509,6 +1510,22 @@ function App() {
     return entries
   }, [reloadVaultForCommand, setToastMessage])
 
+  const handleCreateReservationNote = useCallback(async (filename: string, markdown: string) => {
+    if (!resolvedPath) throw new Error('예약 노트를 저장할 볼트가 열려 있지 않습니다.')
+    const safeFilename = slugifyNoteStem(filename.replace(/\.md$/i, '')) || 'study-space-reservation'
+    const relativePath = `reservations/${safeFilename}.md`
+    const absolutePath = `${resolvedPath.replace(/\/$/, '')}/${relativePath}`
+    const target = isTauri() ? invoke : mockInvoke
+    markRecentVaultWrite(absolutePath)
+    await target(isTauri() ? 'create_note_content' : 'save_note_content', {
+      path: absolutePath,
+      content: markdown,
+      vaultPath: resolvedPath,
+    })
+    await vault.reloadVault()
+    await refreshGitModifiedFiles()
+  }, [markRecentVaultWrite, refreshGitModifiedFiles, resolvedPath, vault])
+
   const {
     activeTab,
     defaultNoteWidth,
@@ -1709,7 +1726,7 @@ function App() {
           )}
           <div className={`app__editor${aiActivity.highlightElement === 'editor' || aiActivity.highlightElement === 'tab' ? ' ai-highlight' : ''}`}>
             {isStudySpaceSelection ? (
-              <StudySpaceReservationPage locale={appLocale} onToast={setToastMessage} />
+              <StudySpaceReservationPage locale={appLocale} onToast={setToastMessage} onCreateReservationNote={handleCreateReservationNote} />
             ) : (
             <Editor
               tabs={notes.tabs}

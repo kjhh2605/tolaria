@@ -31,6 +31,25 @@ const room103 = {
   supported: true,
 }
 
+function fillMembers() {
+  const studentInputs = screen.getAllByPlaceholderText('2170000')
+  const nameInputs = screen.getAllByPlaceholderText('팀원 이름')
+  fireEvent.change(studentInputs[0]!, { target: { value: '2170001' } })
+  fireEvent.change(nameInputs[0]!, { target: { value: '김한성' } })
+  fireEvent.change(studentInputs[1]!, { target: { value: '2170002' } })
+  fireEvent.change(nameInputs[1]!, { target: { value: '이상상' } })
+}
+
+async function completeSuccessfulReservation() {
+  await screen.findByText('코딩라운지 103호')
+  fillMembers()
+  fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
+  expect(await screen.findByText('예약 가능')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: '예약' }))
+  fireEvent.click(screen.getByRole('button', { name: '예약 확정' }))
+  expect(await screen.findByText('예약이 완료되었습니다. 예약 번호: R-103')).toBeInTheDocument()
+}
+
 beforeEach(() => {
   vi.clearAllMocks()
   mockStatus.mockResolvedValue({
@@ -111,18 +130,7 @@ describe('StudySpaceReservationPage', () => {
     const onToast = vi.fn()
     render(<StudySpaceReservationPage locale="ko-KR" onToast={onToast} />)
 
-    await screen.findByText('코딩라운지 103호')
-    const studentInputs = screen.getAllByPlaceholderText('2170000')
-    const nameInputs = screen.getAllByPlaceholderText('팀원 이름')
-    fireEvent.change(studentInputs[0]!, { target: { value: '2170001' } })
-    fireEvent.change(nameInputs[0]!, { target: { value: '김한성' } })
-    fireEvent.change(studentInputs[1]!, { target: { value: '2170002' } })
-    fireEvent.change(nameInputs[1]!, { target: { value: '이상상' } })
-
-    fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
-    expect(await screen.findByText('예약 가능')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: '예약' }))
-    fireEvent.click(screen.getByRole('button', { name: '예약 확정' }))
+    await completeSuccessfulReservation()
 
     await waitFor(() => expect(mockReservation).toHaveBeenCalledWith(expect.objectContaining({
       area: 'coding_lounge',
@@ -137,7 +145,20 @@ describe('StudySpaceReservationPage', () => {
         { student_number: '2170002', name: '이상상' },
       ],
     })))
-    expect(await screen.findByText('예약이 완료되었습니다. 예약 번호: R-103')).toBeInTheDocument()
     expect(onToast).toHaveBeenCalledWith('학습공간 예약이 완료되었습니다.')
+  })
+
+  it('saves a sanitized reservation note after a successful booking', async () => {
+    const onCreateReservationNote = vi.fn().mockResolvedValue(undefined)
+    render(<StudySpaceReservationPage locale="ko-KR" onCreateReservationNote={onCreateReservationNote} />)
+
+    await completeSuccessfulReservation()
+    fireEvent.click(screen.getByRole('button', { name: '예약 노트 저장' }))
+
+    await waitFor(() => expect(onCreateReservationNote).toHaveBeenCalledOnce())
+    const [filename, markdown] = onCreateReservationNote.mock.calls[0]!
+    expect(filename).toBe('study-space-2026-05-27-코딩라운지-103호.md')
+    expect(markdown).toContain('| 2170001 | 김한성 |')
+    expect(markdown).not.toMatch(/password|token|cookie/i)
   })
 })

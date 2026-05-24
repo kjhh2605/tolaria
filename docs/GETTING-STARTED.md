@@ -306,6 +306,7 @@ hs-hub/
 | `src-tauri/src/frontmatter/ops.rs` | YAML manipulation — how properties are updated/deleted in files. |
 | `src-tauri/src/git/` | All git operations (clone, commit, pull, push, conflicts, pulse, add-remote). |
 | `src-tauri/src/search.rs` | Keyword search — scans vault files with walkdir. |
+| `src-tauri/src/study_space_reservation.rs` | Hansung study-space reservation command boundary, room catalog, request validation, Korean error normalization, and transient adapter contract. |
 | `src-tauri/src/ai_agents.rs` | CLI-agent request normalization, availability aggregation, adapter dispatch, and Claude event mapping. |
 | `src-tauri/src/cli_agent_runtime.rs` | Shared CLI-agent request shape, prompt wrapping, JSON subprocess lifecycle, version probing, and MCP path helpers. |
 | `src-tauri/src/claude_cli.rs`, `src-tauri/src/codex_cli.rs`, `src-tauri/src/opencode_cli.rs`, `src-tauri/src/pi_cli.rs`, `src-tauri/src/gemini_cli.rs`, `src-tauri/src/kiro_cli.rs` | Per-agent command, config, discovery, and event adapters. |
@@ -322,6 +323,14 @@ hs-hub/
 | `src/components/hs-hubEditorFormattingConfig.ts` | Filters toolbar and slash-menu commands to markdown-roundtrippable actions. |
 | `src/utils/wikilinks.ts` | Wikilink preprocessing pipeline (markdown ↔ BlockNote). |
 | `src/components/RawEditorView.tsx` | CodeMirror 6 raw markdown editor. |
+
+### Study-space reservation
+
+| File | Why it matters |
+|------|---------------|
+| `src/components/StudySpaceReservationPage.tsx` | Korean-first reservation page: search filters, member rows, availability table, confirmation dialog, success artifacts. |
+| `src/lib/studySpaceReservation.ts` | Renderer command wrapper and mock fallback for native reservation commands. |
+| `src/lib/studySpaceReservationArtifacts.ts` | Sanitized Markdown reservation-note and `.ics` calendar export generation. |
 
 ### AI
 
@@ -469,6 +478,13 @@ BASE_URL="http://localhost:5173" npx playwright test tests/smoke/<slug>.spec.ts
 4. **Permission-mode UI and request plumbing**: Edit `src/lib/aiAgentPermissionMode.ts`, `src/components/AiPanel*.tsx`, `src/hooks/useCliAiAgent.ts`, and `src/utils/streamAiAgent.ts`
 5. **Shared CLI runtime behavior**: Edit `src-tauri/src/cli_agent_runtime.rs` for process lifecycle, prompt wrapping, version probing, and common HS-Hub MCP path handling.
 6. **Agent-specific arguments/events**: Edit the per-agent adapter modules (`claude_cli.rs`, `codex_cli.rs`, `opencode_*`, `pi_*`, `gemini_*`, `kiro_*`). Keep Codex Safe on `read-only` + `untrusted` and Codex Power User on active-vault `workspace-write` + `never`, keep Pi, Gemini, and Kiro on transient MCP config, and do not use dangerous permission bypasses unless an ADR explicitly designs a new mode. Pi's transient agent directory must be seeded from the user's existing Pi agent directory before HS-Hub MCP is merged so standalone provider/auth setup keeps working. Gemini Power User intentionally uses Gemini's `yolo` mode per ADR-0103. Kiro receives prompt content over stdin and writes HS-Hub MCP config into `.kiro/settings/mcp.json` in the active vault.
+
+### Work with Hansung study-space reservation
+
+1. Keep live bookings behind the explicit confirmation dialog and pass `confirm: true` only from that dialog path.
+2. Keep credentials in the OS keychain/native adapter boundary. React components, locale files, docs, tests, notes, and calendar exports must not contain real passwords, auth tokens, cookies, or raw MCP payloads.
+3. When changing post-success artifacts, update `src/lib/studySpaceReservationArtifacts.test.ts` and run `node scripts/study-space-secret-scan.mjs`.
+4. Reservation notes must be created through the active-vault Tauri write boundary and stored under `reservations/`; calendar integration remains an explicit local `.ics` download unless a future ADR approves calendar-account integration.
 
 ### Work with external MCP setup
 

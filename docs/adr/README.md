@@ -176,3 +176,4 @@ proposed → active → superseded
 | [0122](0122-scalar-array-frontmatter-properties.md) | Scalar array frontmatter properties | active |
 | [0123](0123-hansung-runtime-identity-boundary.md) | Hansung runtime identity boundary | active |
 | [0124](0124-retire-codescene-codacy-gates.md) | Retire CodeScene and Codacy quality gates | active |
+| [0125](0125-hansung-study-space-reservation-artifacts.md) | Hansung study-space reservation artifacts | active |

@@ -655,7 +655,7 @@
   "locale.beLatn": "벨라루스어 (라틴 문자)",
   "sidebar.nav.studySpace": "학습공간 예약",
   "studySpace.title": "학습공간 예약",
-  "studySpace.description": "터미널 없이 한성대학교 세미나실, 그룹스터디룸, 코딩라운지, 상상파크 플러스 예약 가능 여부를 확인하고 예약합니다.",
+  "studySpace.description": "터미널 없이 HS-Hub에서 한성대학교 세미나실, 그룹스터디룸, 코딩라운지, 상상파크 플러스 공간을 검색하고 예약합니다.",
   "studySpace.hero.badge": "한성대학교 실예약 보안 경계",
   "studySpace.status.loading": "보안 자격증명 상태 확인 중…",
   "studySpace.status.ready": "자격증명 준비됨",
@@ -701,8 +701,12 @@
   "studySpace.unit.people": "명",
   "studySpace.confirm.title": "실제 예약 확인",
   "studySpace.confirm.description": "{date} {start}–{end}, {room}, {count}명 예약을 진행합니다.",
-  "studySpace.confirm.security": "Tolaria는 선택한 공간, 날짜/시간, 인원, 팀원 이름/학번, 보안 저장소에서 얻은 임시 인증 토큰만 전달합니다. 계정 비밀번호는 노트나 로그에 저장하지 않습니다.",
+  "studySpace.confirm.security": "HS-Hub는 선택한 공간, 날짜/시간, 인원, 팀원 이름/학번만 예약 경계로 전달합니다. 계정 비밀번호와 임시 인증 토큰은 보안 저장소와 네이티브 어댑터 안에서만 사용되며 노트나 로그에 저장하지 않습니다.",
   "studySpace.error.membersIncomplete": "예약 전 모든 팀원의 학번과 이름을 입력하세요.",
   "studySpace.success.toast": "학습공간 예약이 완료되었습니다.",
-  "studySpace.success.message": "예약이 완료되었습니다. 예약 번호: {id}"
+  "studySpace.success.message": "예약이 완료되었습니다. 예약 번호: {id}",
+  "studySpace.action.saveNote": "예약 노트 저장",
+  "studySpace.action.savingNote": "노트 저장 중…",
+  "studySpace.action.downloadIcs": ".ics 다운로드",
+  "studySpace.success.noteSaved": "예약 노트를 저장했습니다."
 }
