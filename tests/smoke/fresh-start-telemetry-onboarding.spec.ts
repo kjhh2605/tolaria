@@ -70,7 +70,7 @@ test('accepting telemetry consent on a fresh start opens the vault choice wizard
 
   await page.goto('/', { waitUntil: 'domcontentloaded' })
 
-  await expect(page.getByText('Help improve HS-Hub')).toBeVisible()
+  await expect(page.getByText('HS-Hub 개선에 참여하기')).toBeVisible()
   await page.getByTestId('telemetry-accept').click()
 
   await expect(page.getByTestId('welcome-screen')).toBeVisible()
@@ -102,7 +102,7 @@ test('telemetry consent still leaves the welcome wizard fully keyboard navigable
 
   let dialogHandled = false
   page.once('dialog', async (dialog) => {
-    expect(dialog.message()).toContain('Open vault folder')
+    expect(dialog.message()).toContain('볼트 폴더 열기')
     await dialog.dismiss()
     dialogHandled = true
   })
@@ -127,7 +127,7 @@ for (const action of ['accept', 'decline'] as const) {
 
     await page.goto('/', { waitUntil: 'domcontentloaded' })
 
-    await expect(page.getByText('Help improve HS-Hub')).toBeVisible()
+    await expect(page.getByText('HS-Hub 개선에 참여하기')).toBeVisible()
     await page.getByTestId(`telemetry-${action}`).click()
 
     await expect(page.getByTestId('welcome-screen')).toBeVisible()

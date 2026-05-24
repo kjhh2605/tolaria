@@ -301,19 +301,19 @@ function App() {
       return
     }
 
-    const label = vaultPath.split('/').filter(Boolean).pop() || 'Local Vault'
+    const label = vaultPath.split('/').filter(Boolean).pop() || '로컬 볼트'
     syncVaultSelection(vaultPath, label)
   }, [allVaults, switchVault, syncVaultSelection])
 
   const handleGettingStartedVaultReady = useCallback((vaultPath: string) => {
     rememberVaultChoice(vaultPath)
-    setToastMessage(`Getting Started vault cloned and opened at ${vaultPath}`)
+    setToastMessage(`시작 가이드 볼트를 복제하고 열었습니다: ${vaultPath}`)
   }, [rememberVaultChoice])
 
   const handleOnboardingVaultReady = useCallback((vaultPath: string, source: 'template' | 'empty' | 'existing') => {
     rememberVaultChoice(vaultPath)
     if (source === 'template') {
-      setToastMessage(`Getting Started vault cloned and opened at ${vaultPath}`)
+      setToastMessage(`시작 가이드 볼트를 복제하고 열었습니다: ${vaultPath}`)
     }
   }, [rememberVaultChoice])
   const cloneGettingStartedVault = useGettingStartedClone({

@@ -139,7 +139,7 @@ interface VaultPathInput {
 }
 
 function labelFromPath({ path }: VaultPathInput): string {
-  return path.split('/').pop() || 'Local Vault'
+  return path.split('/').pop() || '로컬 볼트'
 }
 
 function tauriCall<T>(command: string, args: Record<string, unknown>): Promise<T> {

@@ -16,10 +16,10 @@ async function installOnboardingMocks(page: Page, offline: boolean) {
           active_vault: null,
           hidden_defaults: [],
         })
-        ref.get_default_vault_path = () => '/Users/mock/Documents/Getting Started'
+        ref.get_default_vault_path = () => '/Users/mock/Documents/시작 가이드'
         ref.check_vault_exists = (args: { path?: string }) => args.path === createdVaultPath
         ref.create_getting_started_vault = (args: { targetPath?: string | null }) => {
-          if (args.targetPath !== '/Users/mock/Documents/Getting Started') {
+          if (args.targetPath !== '/Users/mock/Documents/시작 가이드') {
             throw new Error(`Unexpected Getting Started target: ${args.targetPath}`)
           }
           createdVaultPath = args.targetPath
@@ -52,7 +52,7 @@ test('offline onboarding disables template cloning and explains clone-later beha
   await expect(page.getByTestId('welcome-create-new')).toBeEnabled()
   await expect(page.getByTestId('welcome-open-folder')).toBeEnabled()
   await expect(page.getByTestId('welcome-create-vault')).toBeDisabled()
-  await expect(page.getByText('Requires internet — clone later. Suggested path: /Users/mock/Documents/Getting Started')).toBeVisible()
+  await expect(page.getByText('인터넷 연결이 필요합니다 — 나중에 복제할 수 있습니다. 권장 위치: /Users/mock/Documents/시작 가이드')).toBeVisible()
 })
 
 test('status bar keeps a Getting Started clone entry available after onboarding', async ({ page }) => {
@@ -63,7 +63,7 @@ test('status bar keeps a Getting Started clone entry available after onboarding'
 
   await page.getByTestId('welcome-create-vault').click()
 
-  await expect(page.getByText('Getting Started vault cloned and opened at /Users/mock/Documents/Getting Started')).toBeVisible()
+  await expect(page.getByText('시작 가이드 볼트를 복제하고 열었습니다: /Users/mock/Documents/시작 가이드')).toBeVisible()
   await expect(page.getByTestId('claude-onboarding-screen')).toBeVisible()
   await page.getByTestId('claude-onboarding-continue').click()
   await expect(page.locator('[data-testid="note-list-container"]')).toBeVisible()
