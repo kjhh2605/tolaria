@@ -1,9 +1,13 @@
-use chrono::{NaiveDate, NaiveTime};
 use serde::{Deserialize, Serialize};
+use std::path::{Path, PathBuf};
 
-const PATH_REDACTION: &str = "[redacted-path]";
-const TOKEN_REDACTION: &str = "[redacted-token]";
-const STUDENT_ID_REDACTION: &str = "[redacted-student-id]";
+const HS_MCP_PACKAGE_ENV: &str = "HS_MCP_PACKAGE_PATH";
+const HS_MCP_MODULE_CANDIDATES: &[&str] = &[
+    "study_space_reservation_mcp",
+    "study_space_reservation",
+    "hs_mcp",
+    "hansung_mcp",
+];
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
@@ -38,37 +42,76 @@ pub enum StudySpaceErrorCode {
     ReservationNotVerified,
     NetworkError,
     SchoolSystemError,
+    AdapterUnavailable,
     UnknownError,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-pub enum StudySpaceCredentialState {
-    Missing,
-    Ready,
-    AuthFailed,
-    KeychainUnavailable,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct StudySpaceCommandError {
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct StudySpaceError {
     pub code: StudySpaceErrorCode,
-    pub message: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub safe_details: Option<String>,
+    pub message_ko: String,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct StudySpaceAdapterStatus {
+    pub adapter_available: bool,
+    pub package_path: Option<String>,
+    pub package_source: Option<String>,
+    pub supported_areas: Vec<StudySpaceArea>,
+    pub credential_ready: bool,
+    pub session_ready: bool,
+    pub error: Option<StudySpaceError>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct StudySpaceRoom {
+    pub area: StudySpaceAreaKey,
+    pub room_id: String,
+    pub label_ko: String,
+    pub capacity_min: u8,
+    pub capacity_max: u8,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct StudySpaceAvailabilityRequest {
+    pub area: StudySpaceAreaKey,
+    pub room_id: Option<String>,
+    pub date: String,
+    pub start_time: String,
+    pub end_time: String,
+    pub headcount: u8,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct StudySpaceTeamMember {
+    pub student_number: String,
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct StudySpaceReservationRequest {
+    pub availability: StudySpaceAvailabilityRequest,
+    #[serde(default = "default_dry_run")]
+    pub dry_run: bool,
+    #[serde(default)]
+    pub confirm: bool,
+    #[serde(default)]
+    pub members: Vec<StudySpaceTeamMember>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct StudySpaceCommandResult<T> {
     pub ok: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<T>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<StudySpaceCommandError>,
+    pub error: Option<StudySpaceError>,
+}
+
+fn default_dry_run() -> bool {
+    true
 }
 
 impl<T> StudySpaceCommandResult<T> {
-    pub fn ok(data: T) -> Self {
+    fn ok(data: T) -> Self {
         Self {
             ok: true,
             data: Some(data),
@@ -76,7 +119,7 @@ impl<T> StudySpaceCommandResult<T> {
         }
     }
 
-    pub fn err(error: StudySpaceCommandError) -> Self {
+    fn err(error: StudySpaceError) -> Self {
         Self {
             ok: false,
             data: None,
@@ -85,610 +128,375 @@ impl<T> StudySpaceCommandResult<T> {
     }
 }
 
-impl StudySpaceCommandError {
-    pub fn new(code: StudySpaceErrorCode, message: impl Into<String>) -> Self {
-        Self {
-            code,
-            message: sanitize_adapter_text(&message.into()),
-            safe_details: None,
-        }
-    }
+pub fn status() -> StudySpaceAdapterStatus {
+    let package = resolve_hs_mcp_package_path();
+    let error = package.is_none().then(|| StudySpaceError {
+        code: StudySpaceErrorCode::AdapterUnavailable,
+        message_ko: "Hs-MCP 예약 어댑터 패키지를 찾을 수 없습니다. 앱 안전 경계는 준비되었지만 실제 예약 호출은 비활성화되었습니다.".into(),
+    });
 
-    pub fn with_details(
-        code: StudySpaceErrorCode,
-        message: impl Into<String>,
-        details: impl Into<String>,
-    ) -> Self {
-        let safe_details = sanitize_adapter_text(&details.into());
-        Self {
-            code,
-            message: sanitize_adapter_text(&message.into()),
-            safe_details: if safe_details.is_empty() {
-                None
-            } else {
-                Some(safe_details)
-            },
-        }
+    StudySpaceAdapterStatus {
+        adapter_available: package.is_some(),
+        package_path: package
+            .as_ref()
+            .map(|resolved| resolved.path.to_string_lossy().into_owned()),
+        package_source: package.map(|resolved| resolved.source),
+        supported_areas: supported_areas(),
+        credential_ready: false,
+        session_ready: false,
+        error,
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct StudySpaceArea {
-    pub key: String,
-    pub label: String,
-    pub supported: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct StudySpaceStatus {
-    pub credential_state: StudySpaceCredentialState,
-    pub credential_message: String,
-    pub supported_areas: Vec<StudySpaceArea>,
-    pub session_clear_available: bool,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct StudySpaceRoom {
-    pub id: String,
-    pub area: String,
-    pub name: String,
-    pub location: String,
-    pub min_capacity: u16,
-    pub max_capacity: u16,
-    pub operating_hours: String,
-    pub supported: bool,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct StudySpaceAvailabilityRequest {
-    pub area: String,
-    pub date: String,
-    pub start_time: String,
-    pub end_time: String,
-    pub headcount: u16,
-    #[serde(default)]
-    pub min_capacity: Option<u16>,
-    #[serde(default)]
-    pub max_capacity: Option<u16>,
-    #[serde(default)]
-    pub room_id: Option<String>,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct StudySpaceAvailability {
-    pub room: StudySpaceRoom,
-    pub available: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub reason_code: Option<StudySpaceErrorCode>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub reason: Option<String>,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct StudySpaceAvailabilityResponse {
-    pub area: String,
-    pub date: String,
-    pub start_time: String,
-    pub end_time: String,
-    pub results: Vec<StudySpaceAvailability>,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct StudySpaceReservationMember {
-    pub name: String,
-    pub student_number: String,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct StudySpaceCreateReservationRequest {
-    #[serde(flatten)]
-    pub availability: StudySpaceAvailabilityRequest,
-    pub room_id: String,
-    #[serde(default)]
-    pub members: Vec<StudySpaceReservationMember>,
-    #[serde(default)]
-    pub dry_run: Option<bool>,
-    #[serde(default)]
-    pub confirm: Option<bool>,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct StudySpaceReservationResult {
-    pub reservation_id: Option<String>,
-    pub verified: bool,
-    pub dry_run: bool,
-    pub room_id: String,
-    pub area: String,
-    pub date: String,
-    pub start_time: String,
-    pub end_time: String,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct StudySpaceReservationSummary {
-    pub reservation_id: Option<String>,
-    pub area: String,
-    pub room_name: String,
-    pub date: String,
-    pub start_time: String,
-    pub end_time: String,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct StudySpaceClearSessionResult {
-    pub cleared: bool,
-    pub message: String,
-}
-
-pub struct StudySpaceReservationAdapter;
-
-impl StudySpaceReservationAdapter {
-    pub fn status() -> StudySpaceStatus {
-        StudySpaceStatus {
-            credential_state: StudySpaceCredentialState::Missing,
-            credential_message: "보안 저장소에 저장된 한성대 학습공간 예약 자격증명이 없습니다."
-                .to_string(),
-            supported_areas: study_space_areas(),
-            session_clear_available: true,
-        }
+pub fn list_spaces(area: StudySpaceAreaKey) -> StudySpaceCommandResult<Vec<StudySpaceRoom>> {
+    if !is_supported_area(area) {
+        return StudySpaceCommandResult::err(error(StudySpaceErrorCode::UnsupportedArea));
     }
 
-    pub fn list_spaces(area: String) -> StudySpaceCommandResult<Vec<StudySpaceRoom>> {
-        match validate_supported_area(&area) {
-            Ok(_) => StudySpaceCommandResult::ok(
-                study_space_rooms()
-                    .into_iter()
-                    .filter(|room| room.area == area)
-                    .collect(),
-            ),
-            Err(error) => StudySpaceCommandResult::err(error),
-        }
+    StudySpaceCommandResult::ok(match area {
+        StudySpaceAreaKey::CodingLounge => (101..=113)
+            .map(|number| StudySpaceRoom {
+                area,
+                room_id: format!("coding_lounge_{number}"),
+                label_ko: format!("코딩라운지 세미나실 {number}호"),
+                capacity_min: 1,
+                capacity_max: 8,
+            })
+            .collect(),
+        StudySpaceAreaKey::SangsangParkPlus => (1..=6)
+            .map(|number| StudySpaceRoom {
+                area,
+                room_id: format!("sangsang_park_plus_{number}"),
+                label_ko: format!("상상파크 플러스 소모임실 {number}"),
+                capacity_min: 1,
+                capacity_max: 6,
+            })
+            .collect(),
+        StudySpaceAreaKey::SangsangBase => vec![StudySpaceRoom {
+            area,
+            room_id: "sangsang_base_seminar".into(),
+            label_ko: "상상베이스 세미나실/IB 공간".into(),
+            capacity_min: 1,
+            capacity_max: 10,
+        }],
+    })
+}
+
+pub fn check_availability(
+    request: StudySpaceAvailabilityRequest,
+) -> StudySpaceCommandResult<StudySpaceAdapterStatus> {
+    if let Err(error) = validate_availability_request(&request) {
+        return StudySpaceCommandResult::err(error);
     }
 
-    pub fn check_availability(
-        request: StudySpaceAvailabilityRequest,
-    ) -> StudySpaceCommandResult<StudySpaceAvailabilityResponse> {
-        if let Err(error) = validate_availability_request(&request) {
-            return StudySpaceCommandResult::err(error);
-        }
-
-        StudySpaceCommandResult::err(adapter_unavailable_error())
+    let current = status();
+    if !current.adapter_available {
+        return StudySpaceCommandResult::err(error(StudySpaceErrorCode::AdapterUnavailable));
     }
 
-    pub fn create_reservation(
-        request: StudySpaceCreateReservationRequest,
-    ) -> StudySpaceCommandResult<StudySpaceReservationResult> {
-        if let Err(error) = validate_availability_request(&request.availability) {
-            return StudySpaceCommandResult::err(error);
-        }
-        if request.room_id.trim().is_empty() {
-            return StudySpaceCommandResult::err(StudySpaceCommandError::new(
-                StudySpaceErrorCode::Unavailable,
-                "예약할 학습공간을 선택해 주세요.",
-            ));
-        }
-        if request
+    StudySpaceCommandResult::ok(current)
+}
+
+pub fn create_reservation(
+    request: StudySpaceReservationRequest,
+) -> StudySpaceCommandResult<StudySpaceAdapterStatus> {
+    if !request.dry_run && !request.confirm {
+        return StudySpaceCommandResult::err(error(StudySpaceErrorCode::ConfirmRequired));
+    }
+    if !request.dry_run
+        && request
             .members
             .iter()
-            .any(|member| member.name.trim().is_empty() || member.student_number.trim().is_empty())
-        {
-            return StudySpaceCommandResult::err(StudySpaceCommandError::new(
-                StudySpaceErrorCode::MemberInfoRequired,
-                "팀원 이름과 학번을 모두 입력해 주세요.",
-            ));
-        }
-
-        let dry_run = request.dry_run.unwrap_or(true);
-        if !dry_run && request.confirm != Some(true) {
-            return StudySpaceCommandResult::err(StudySpaceCommandError::new(
-                StudySpaceErrorCode::ConfirmRequired,
-                "실제 예약은 확인 대화상자에서 confirm=true가 전달되어야 합니다.",
-            ));
-        }
-
-        StudySpaceCommandResult::err(adapter_unavailable_error())
+            .any(|member| member.student_number.trim().is_empty() || member.name.trim().is_empty())
+    {
+        return StudySpaceCommandResult::err(error(StudySpaceErrorCode::MemberInfoRequired));
     }
 
-    pub fn list_my_reservations(
-        area: String,
-    ) -> StudySpaceCommandResult<Vec<StudySpaceReservationSummary>> {
-        match validate_supported_area(&area) {
-            Ok(_) => StudySpaceCommandResult::err(adapter_unavailable_error()),
-            Err(error) => StudySpaceCommandResult::err(error),
-        }
-    }
-
-    pub fn clear_session() -> StudySpaceCommandResult<StudySpaceClearSessionResult> {
-        StudySpaceCommandResult::ok(StudySpaceClearSessionResult {
-            cleared: false,
-            message: "삭제할 임시 학습공간 예약 세션이 없습니다.".to_string(),
-        })
-    }
+    check_availability(request.availability)
 }
 
-pub fn study_space_areas() -> Vec<StudySpaceArea> {
+pub fn clear_session() -> StudySpaceCommandResult<()> {
+    StudySpaceCommandResult::ok(())
+}
+
+fn supported_areas() -> Vec<StudySpaceArea> {
     vec![
         StudySpaceArea {
             key: StudySpaceAreaKey::CodingLounge,
             label_ko: "코딩라운지".into(),
             supported: true,
-            note: Some("101–113호".to_string()),
         },
         StudySpaceArea {
             key: StudySpaceAreaKey::SangsangParkPlus,
             label_ko: "상상파크 플러스".into(),
             supported: true,
-            note: Some("최대 3시간 정책".to_string()),
         },
         StudySpaceArea {
             key: StudySpaceAreaKey::SangsangBase,
             label_ko: "상상베이스".into(),
             supported: true,
-            note: Some("세미나실/IB 공간".to_string()),
-        },
-        StudySpaceArea {
-            key: "industry_academic_seminar".to_string(),
-            label: "산학협력 세미나실".to_string(),
-            supported: false,
-            note: Some("현재 자동 예약 연동 준비 중".to_string()),
-        },
-        StudySpaceArea {
-            key: "library_group_study".to_string(),
-            label: "학술정보관 그룹스터디실".to_string(),
-            supported: false,
-            note: Some("현재 자동 예약 연동 준비 중".to_string()),
         },
     ]
 }
 
-pub fn study_space_rooms() -> Vec<StudySpaceRoom> {
-    let coding_lounge = (101..=113).map(|room| StudySpaceRoom {
-        id: format!("coding_lounge_{room}"),
-        area: "coding_lounge".to_string(),
-        name: format!("코딩라운지 {room}호"),
-        location: "코딩라운지".to_string(),
-        min_capacity: 1,
-        max_capacity: 8,
-        operating_hours: "09:00-22:00".to_string(),
-        supported: true,
-    });
-
-    let other_supported = [
-        StudySpaceRoom {
-            id: "sangsang_park_plus_small_room".to_string(),
-            area: "sangsang_park_plus".to_string(),
-            name: "상상파크 플러스 소모임실".to_string(),
-            location: "상상파크 플러스".to_string(),
-            min_capacity: 1,
-            max_capacity: 6,
-            operating_hours: "09:00-21:00".to_string(),
-            supported: true,
-        },
-        StudySpaceRoom {
-            id: "sangsang_base_seminar".to_string(),
-            area: "sangsang_base".to_string(),
-            name: "상상베이스 세미나실".to_string(),
-            location: "상상베이스".to_string(),
-            min_capacity: 1,
-            max_capacity: 10,
-            operating_hours: "09:00-21:00".to_string(),
-            supported: true,
-        },
-    ];
-
-    coding_lounge.chain(other_supported).collect()
-}
-
-pub fn map_adapter_error(raw_code: Option<&str>, raw_message: &str) -> StudySpaceCommandError {
-    let code = match raw_code
-        .unwrap_or_default()
-        .trim()
-        .to_ascii_uppercase()
-        .as_str()
-    {
-        "AUTH_REQUIRED" => StudySpaceErrorCode::AuthRequired,
-        "AUTH_FAILED" => StudySpaceErrorCode::AuthFailed,
-        "KEYCHAIN_UNAVAILABLE" => StudySpaceErrorCode::KeychainUnavailable,
-        "UNSUPPORTED_AREA" => StudySpaceErrorCode::UnsupportedArea,
-        "INVALID_DATE" => StudySpaceErrorCode::InvalidDate,
-        "INVALID_TIME_RANGE" => StudySpaceErrorCode::InvalidTimeRange,
-        "CAPACITY_TOO_LOW" => StudySpaceErrorCode::CapacityTooLow,
-        "CAPACITY_TOO_HIGH" => StudySpaceErrorCode::CapacityTooHigh,
-        "MEMBER_INFO_REQUIRED" => StudySpaceErrorCode::MemberInfoRequired,
-        "UNAVAILABLE" => StudySpaceErrorCode::Unavailable,
-        "DUPLICATE_RESERVATION" => StudySpaceErrorCode::DuplicateReservation,
-        "CONFIRM_REQUIRED" => StudySpaceErrorCode::ConfirmRequired,
-        "RESERVATION_NOT_VERIFIED" => StudySpaceErrorCode::ReservationNotVerified,
-        "NETWORK_ERROR" => StudySpaceErrorCode::NetworkError,
-        "SCHOOL_SYSTEM_ERROR" => StudySpaceErrorCode::SchoolSystemError,
-        _ => StudySpaceErrorCode::UnknownError,
-    };
-
-    StudySpaceCommandError::with_details(code.clone(), korean_error_message(&code), raw_message)
-}
-
-fn korean_error_message(code: &StudySpaceErrorCode) -> &'static str {
-    match code {
-        StudySpaceErrorCode::AuthRequired => "한성대 학습공간 예약 로그인이 필요합니다.",
-        StudySpaceErrorCode::AuthFailed => "한성대 계정 인증에 실패했습니다.",
-        StudySpaceErrorCode::KeychainUnavailable => "보안 저장소를 사용할 수 없습니다.",
-        StudySpaceErrorCode::UnsupportedArea => "현재 자동 예약 연동이 지원되지 않는 공간입니다.",
-        StudySpaceErrorCode::InvalidDate => "예약 날짜 형식이 올바르지 않습니다.",
-        StudySpaceErrorCode::InvalidTimeRange => "예약 시작/종료 시간이 올바르지 않습니다.",
-        StudySpaceErrorCode::CapacityTooLow => "요청 인원이 공간 최소 인원보다 적습니다.",
-        StudySpaceErrorCode::CapacityTooHigh => "요청 인원이 공간 정원을 초과합니다.",
-        StudySpaceErrorCode::MemberInfoRequired => "예약에 필요한 팀원 정보가 부족합니다.",
-        StudySpaceErrorCode::Unavailable => "선택한 시간에 예약 가능한 공간이 없습니다.",
-        StudySpaceErrorCode::DuplicateReservation => "이미 겹치는 예약이 있습니다.",
-        StudySpaceErrorCode::ConfirmRequired => "실제 예약 전 확인이 필요합니다.",
-        StudySpaceErrorCode::ReservationNotVerified => "예약 내역에서 예약을 확인하지 못했습니다.",
-        StudySpaceErrorCode::NetworkError => "학교 예약 시스템에 연결할 수 없습니다.",
-        StudySpaceErrorCode::SchoolSystemError => "학교 예약 시스템 응답을 처리할 수 없습니다.",
-        StudySpaceErrorCode::UnknownError => "알 수 없는 예약 오류가 발생했습니다.",
-    }
+fn is_supported_area(area: StudySpaceAreaKey) -> bool {
+    supported_areas()
+        .into_iter()
+        .any(|candidate| candidate.key == area && candidate.supported)
 }
 
 fn validate_availability_request(
     request: &StudySpaceAvailabilityRequest,
-) -> Result<(), StudySpaceCommandError> {
-    validate_supported_area(&request.area)?;
-    NaiveDate::parse_from_str(&request.date, "%Y-%m-%d").map_err(|_| {
-        StudySpaceCommandError::new(
-            StudySpaceErrorCode::InvalidDate,
-            "예약 날짜는 YYYY-MM-DD 형식이어야 합니다.",
-        )
-    })?;
-    let start_time = parse_time(&request.start_time)?;
-    let end_time = parse_time(&request.end_time)?;
-    if end_time <= start_time {
-        return Err(StudySpaceCommandError::new(
-            StudySpaceErrorCode::InvalidTimeRange,
-            "종료 시간은 시작 시간보다 늦어야 합니다.",
-        ));
+) -> Result<(), StudySpaceError> {
+    if !is_supported_area(request.area) {
+        return Err(error(StudySpaceErrorCode::UnsupportedArea));
+    }
+    if !valid_iso_date(&request.date) {
+        return Err(error(StudySpaceErrorCode::InvalidDate));
+    }
+    if !valid_time_range(&request.start_time, &request.end_time) {
+        return Err(error(StudySpaceErrorCode::InvalidTimeRange));
     }
     if request.headcount == 0 {
-        return Err(StudySpaceCommandError::new(
-            StudySpaceErrorCode::CapacityTooLow,
-            "예약 인원은 1명 이상이어야 합니다.",
-        ));
-    }
-    if let Some(max_capacity) = request.max_capacity {
-        if request.headcount > max_capacity {
-            return Err(StudySpaceCommandError::new(
-                StudySpaceErrorCode::CapacityTooHigh,
-                "예약 인원이 선택한 최대 정원을 초과합니다.",
-            ));
-        }
+        return Err(error(StudySpaceErrorCode::CapacityTooLow));
     }
     Ok(())
 }
 
-fn parse_time(value: &str) -> Result<NaiveTime, StudySpaceCommandError> {
-    NaiveTime::parse_from_str(value, "%H:%M").map_err(|_| {
-        StudySpaceCommandError::new(
-            StudySpaceErrorCode::InvalidTimeRange,
-            "예약 시간은 HH:MM 형식이어야 합니다.",
-        )
-    })
+fn valid_iso_date(value: &str) -> bool {
+    let bytes = value.as_bytes();
+    bytes.len() == 10
+        && bytes[4] == b'-'
+        && bytes[7] == b'-'
+        && bytes
+            .iter()
+            .enumerate()
+            .all(|(index, byte)| matches!(index, 4 | 7) || byte.is_ascii_digit())
 }
 
-fn validate_supported_area(area: &str) -> Result<(), StudySpaceCommandError> {
-    let normalized_area = area.trim();
-    study_space_areas()
-        .into_iter()
-        .find(|candidate| candidate.key == normalized_area)
-        .map(|candidate| {
-            if candidate.supported {
-                Ok(())
-            } else {
-                Err(StudySpaceCommandError::new(
-                    StudySpaceErrorCode::UnsupportedArea,
-                    "현재 자동 예약 연동이 지원되지 않는 공간입니다.",
-                ))
-            }
-        })
-        .unwrap_or_else(|| {
-            Err(StudySpaceCommandError::new(
-                StudySpaceErrorCode::UnsupportedArea,
-                "현재 자동 예약 연동이 지원되지 않는 공간입니다.",
-            ))
-        })
-}
-
-fn adapter_unavailable_error() -> StudySpaceCommandError {
-    StudySpaceCommandError::new(
-        StudySpaceErrorCode::SchoolSystemError,
-        "학습공간 예약 어댑터가 아직 Hs-MCP 실행 경로에 연결되지 않았습니다.",
-    )
-}
-
-pub fn sanitize_adapter_text(input: &str) -> String {
-    let mut sanitized = input.to_string();
-    for token in input.split_whitespace() {
-        let core = token.trim_matches(|ch: char| "\"'`()[]{}.,;".contains(ch));
-        if is_absolute_path(core) {
-            sanitized = sanitized.replace(core, PATH_REDACTION);
-        }
-        if is_token_like(core) || is_sensitive_assignment(core) {
-            sanitized = sanitized.replace(core, TOKEN_REDACTION);
-        }
-        if is_student_id_like(core) {
-            sanitized = sanitized.replace(core, STUDENT_ID_REDACTION);
-        }
+fn valid_time_range(start: &str, end: &str) -> bool {
+    match (parse_hhmm(start), parse_hhmm(end)) {
+        (Some(start), Some(end)) => start < end,
+        _ => false,
     }
-    collapse_whitespace(&sanitized)
 }
 
-fn is_absolute_path(value: &str) -> bool {
-    (value.starts_with('/') && value.split('/').filter(|part| !part.is_empty()).count() >= 2)
-        || is_windows_absolute_path(value)
+fn parse_hhmm(value: &str) -> Option<u16> {
+    let (hour, minute) = value.split_once(':')?;
+    if hour.len() != 2 || minute.len() != 2 {
+        return None;
+    }
+    let hour: u16 = hour.parse().ok()?;
+    let minute: u16 = minute.parse().ok()?;
+    if hour > 23 || minute > 59 {
+        return None;
+    }
+    Some(hour * 60 + minute)
 }
 
-fn is_windows_absolute_path(value: &str) -> bool {
-    let mut chars = value.chars();
-    matches!((chars.next(), chars.next(), chars.next()), (Some(letter), Some(':'), Some('\\')) if letter.is_ascii_alphabetic())
+fn error(code: StudySpaceErrorCode) -> StudySpaceError {
+    StudySpaceError {
+        message_ko: korean_error_message(code).into(),
+        code,
+    }
 }
 
-fn is_token_like(value: &str) -> bool {
-    [
-        "ghp_",
-        "gho_",
-        "ghr_",
-        "ghs_",
-        "ghu_",
-        "github_pat_",
-        "sk-",
-        "xoxa-",
-        "xoxb-",
-        "xoxp-",
-        "xoxr-",
-        "xoxs-",
-        "session=",
-        "cookie=",
-    ]
-    .iter()
-    .any(|prefix| value.starts_with(prefix))
+fn korean_error_message(code: StudySpaceErrorCode) -> &'static str {
+    match code {
+        StudySpaceErrorCode::AuthRequired => "한성대학교 로그인 정보가 필요합니다.",
+        StudySpaceErrorCode::AuthFailed => {
+            "로그인에 실패했습니다. 학번과 비밀번호를 확인해 주세요."
+        }
+        StudySpaceErrorCode::KeychainUnavailable => "이 기기에서 보안 저장소를 사용할 수 없습니다.",
+        StudySpaceErrorCode::UnsupportedArea => "현재 자동 예약 연동이 지원되지 않는 공간입니다.",
+        StudySpaceErrorCode::InvalidDate => "예약 날짜 형식이 올바르지 않습니다.",
+        StudySpaceErrorCode::InvalidTimeRange => "예약 시작/종료 시간이 올바르지 않습니다.",
+        StudySpaceErrorCode::CapacityTooLow => "예약 인원은 1명 이상이어야 합니다.",
+        StudySpaceErrorCode::CapacityTooHigh => "선택한 공간의 정원을 초과했습니다.",
+        StudySpaceErrorCode::MemberInfoRequired => "실제 예약에는 팀원 이름과 학번이 필요합니다.",
+        StudySpaceErrorCode::Unavailable => "선택한 시간에 예약 가능한 공간이 없습니다.",
+        StudySpaceErrorCode::DuplicateReservation => "이미 같은 시간대 예약이 있습니다.",
+        StudySpaceErrorCode::ConfirmRequired => "실제 예약을 진행하려면 확인이 필요합니다.",
+        StudySpaceErrorCode::ReservationNotVerified => "예약 내역에서 예약을 확인하지 못했습니다.",
+        StudySpaceErrorCode::NetworkError => "학교 예약 시스템에 연결하지 못했습니다.",
+        StudySpaceErrorCode::SchoolSystemError => "학교 예약 시스템 오류가 발생했습니다.",
+        StudySpaceErrorCode::AdapterUnavailable => "예약 어댑터를 사용할 수 없습니다.",
+        StudySpaceErrorCode::UnknownError => "알 수 없는 예약 오류가 발생했습니다.",
+    }
 }
 
-fn is_sensitive_assignment(value: &str) -> bool {
-    let lower = value.to_ascii_lowercase();
-    [
-        "password=",
-        "passwd=",
-        "token=",
-        "secret=",
-        "authorization=",
-        "cookie=",
-        "session=",
-    ]
-    .iter()
-    .any(|prefix| lower.starts_with(prefix))
+#[derive(Debug, Clone)]
+struct ResolvedPackagePath {
+    path: PathBuf,
+    source: String,
 }
 
-fn is_student_id_like(value: &str) -> bool {
-    let digits = value.chars().filter(|ch| ch.is_ascii_digit()).count();
-    digits >= 7 && digits <= 12 && value.chars().all(|ch| ch.is_ascii_digit() || ch == '-')
+fn resolve_hs_mcp_package_path() -> Option<ResolvedPackagePath> {
+    std::env::var_os(HS_MCP_PACKAGE_ENV)
+        .map(PathBuf::from)
+        .and_then(|path| {
+            valid_package_path(&path).then_some(ResolvedPackagePath {
+                path,
+                source: HS_MCP_PACKAGE_ENV.into(),
+            })
+        })
+        .or_else(resolve_local_package_path)
 }
 
-fn collapse_whitespace(input: &str) -> String {
-    input.split_whitespace().collect::<Vec<_>>().join(" ")
+fn resolve_local_package_path() -> Option<ResolvedPackagePath> {
+    package_path_candidates()
+        .into_iter()
+        .find(|path| valid_package_path(path))
+        .map(|path| ResolvedPackagePath {
+            path,
+            source: "repo-local".into(),
+        })
+}
+
+fn package_path_candidates() -> Vec<PathBuf> {
+    let mut candidates = Vec::new();
+    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    if let Some(repo_root) = manifest_dir.parent() {
+        candidates.extend([
+            repo_root.join("hs-mcp"),
+            repo_root.join("Hs-MCP"),
+            repo_root.join("vendor/hs-mcp"),
+            repo_root.join("vendor/Hs-MCP"),
+        ]);
+    }
+    candidates
+}
+
+fn valid_package_path(path: &Path) -> bool {
+    path.is_dir()
+        && (path.join("pyproject.toml").is_file()
+            || HS_MCP_MODULE_CANDIDATES
+                .iter()
+                .any(|module| path.join(module).join("__init__.py").is_file()))
+}
+
+pub fn redact_sensitive_text(input: &str) -> String {
+    input
+        .split_whitespace()
+        .map(redact_sensitive_token)
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+fn redact_sensitive_token(token: &str) -> &str {
+    let lower = token.to_ascii_lowercase();
+    if ["password", "token", "cookie", "session", "authorization"]
+        .iter()
+        .any(|key| lower.contains(key))
+    {
+        "[redacted]"
+    } else {
+        token
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    fn valid_request() -> StudySpaceAvailabilityRequest {
+    fn availability_request() -> StudySpaceAvailabilityRequest {
         StudySpaceAvailabilityRequest {
-            area: "coding_lounge".to_string(),
-            date: "2026-05-27".to_string(),
-            start_time: "13:00".to_string(),
-            end_time: "15:00".to_string(),
+            area: StudySpaceAreaKey::CodingLounge,
+            room_id: Some("coding_lounge_103".into()),
+            date: "2026-05-27".into(),
+            start_time: "13:00".into(),
+            end_time: "15:00".into(),
             headcount: 2,
-            min_capacity: None,
-            max_capacity: Some(8),
-            room_id: Some("coding_lounge_103".to_string()),
         }
     }
 
     #[test]
-    fn status_returns_no_secret_fields_and_supported_catalog() {
-        let status = StudySpaceReservationAdapter::status();
-        assert_eq!(status.credential_state, StudySpaceCredentialState::Missing);
+    fn status_exposes_supported_areas_without_credentials() {
+        let status = status();
         assert!(status
             .supported_areas
             .iter()
-            .any(|area| area.key == "coding_lounge" && area.supported));
-        assert!(status
-            .supported_areas
-            .iter()
-            .any(|area| area.key == "library_group_study" && !area.supported));
+            .any(|area| area.key == StudySpaceAreaKey::CodingLounge));
         let serialized = serde_json::to_string(&status).unwrap();
-        assert!(!serialized.contains("password"));
-        assert!(!serialized.contains("token"));
-        assert!(!serialized.contains("cookie"));
+        assert!(!serialized.to_ascii_lowercase().contains("password"));
+        assert!(!serialized.to_ascii_lowercase().contains("token"));
     }
 
     #[test]
-    fn list_spaces_rejects_unsupported_area() {
-        let result = StudySpaceReservationAdapter::list_spaces("library_group_study".to_string());
-        assert!(!result.ok);
-        assert_eq!(
-            result.error.unwrap().code,
-            StudySpaceErrorCode::UnsupportedArea
-        );
+    fn coding_lounge_catalog_contains_live_qa_room_103() {
+        let rooms = list_spaces(StudySpaceAreaKey::CodingLounge).data.unwrap();
+        assert!(rooms
+            .iter()
+            .any(|room| room.room_id == "coding_lounge_103" && room.label_ko.contains("103호")));
     }
 
     #[test]
-    fn availability_request_rejects_invalid_date_time_and_capacity() {
-        let mut request = valid_request();
-        request.date = "2026/05/27".to_string();
+    fn validates_date_time_and_headcount_before_adapter_call() {
+        let mut request = availability_request();
+        request.end_time = "12:00".into();
         assert_eq!(
-            validate_availability_request(&request).unwrap_err().code,
-            StudySpaceErrorCode::InvalidDate
-        );
-
-        let mut request = valid_request();
-        request.end_time = "13:00".to_string();
-        assert_eq!(
-            validate_availability_request(&request).unwrap_err().code,
+            check_availability(request).error.unwrap().code,
             StudySpaceErrorCode::InvalidTimeRange
         );
 
-        let mut request = valid_request();
-        request.headcount = 9;
+        let mut request = availability_request();
+        request.headcount = 0;
         assert_eq!(
-            validate_availability_request(&request).unwrap_err().code,
-            StudySpaceErrorCode::CapacityTooHigh
+            check_availability(request).error.unwrap().code,
+            StudySpaceErrorCode::CapacityTooLow
         );
     }
 
     #[test]
-    fn actual_reservation_requires_confirm_true() {
-        let request = StudySpaceCreateReservationRequest {
-            availability: valid_request(),
-            room_id: "coding_lounge_103".to_string(),
-            members: vec![StudySpaceReservationMember {
-                name: "홍길동".to_string(),
-                student_number: "2299999".to_string(),
+    fn actual_reservation_requires_confirm_and_member_info() {
+        let request = StudySpaceReservationRequest {
+            availability: availability_request(),
+            dry_run: false,
+            confirm: false,
+            members: vec![StudySpaceTeamMember {
+                student_number: "1234567".into(),
+                name: "홍길동".into(),
             }],
-            dry_run: Some(false),
-            confirm: Some(false),
         };
-        let result = StudySpaceReservationAdapter::create_reservation(request);
-        assert!(!result.ok);
         assert_eq!(
-            result.error.unwrap().code,
+            create_reservation(request).error.unwrap().code,
             StudySpaceErrorCode::ConfirmRequired
         );
-    }
 
-    #[test]
-    fn redaction_removes_paths_tokens_passwords_sessions_and_student_ids() {
-        let input =
-            "failed /Users/demo/secret.txt password=hunter2 session=abc123 token=sk-live 2299999";
-        let output = sanitize_adapter_text(input);
-        assert!(output.contains(PATH_REDACTION));
-        assert!(output.contains(TOKEN_REDACTION));
-        assert!(output.contains(STUDENT_ID_REDACTION));
-        assert!(!output.contains("hunter2"));
-        assert!(!output.contains("abc123"));
-        assert!(!output.contains("sk-live"));
-        assert!(!output.contains("2299999"));
-    }
-
-    #[test]
-    fn raw_adapter_errors_are_mapped_and_redacted() {
-        let error = map_adapter_error(
-            Some("AUTH_FAILED"),
-            "login failed for /Users/demo/raw.json password=hunter2 student 2299999",
+        let request = StudySpaceReservationRequest {
+            availability: availability_request(),
+            dry_run: false,
+            confirm: true,
+            members: vec![StudySpaceTeamMember {
+                student_number: "".into(),
+                name: "홍길동".into(),
+            }],
+        };
+        assert_eq!(
+            create_reservation(request).error.unwrap().code,
+            StudySpaceErrorCode::MemberInfoRequired
         );
-        assert_eq!(error.code, StudySpaceErrorCode::AuthFailed);
-        let details = error.safe_details.unwrap();
-        assert!(details.contains(PATH_REDACTION));
-        assert!(!details.contains("hunter2"));
-        assert!(!details.contains("2299999"));
+    }
+
+    #[test]
+    fn package_path_accepts_python_project_or_module_root() {
+        let temp = tempfile::tempdir().unwrap();
+        assert!(!valid_package_path(temp.path()));
+        std::fs::write(
+            temp.path().join("pyproject.toml"),
+            "[project]\nname='hs-mcp'\n",
+        )
+        .unwrap();
+        assert!(valid_package_path(temp.path()));
+    }
+
+    #[test]
+    fn redacts_sensitive_adapter_diagnostics() {
+        let input = "password=secret token=abc cookie=xyz session=id keep-room-103";
+        let redacted = redact_sensitive_text(input);
+        assert_eq!(
+            redacted,
+            "[redacted] [redacted] [redacted] [redacted] keep-room-103"
+        );
     }
 }
