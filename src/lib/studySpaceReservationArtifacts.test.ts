@@ -43,7 +43,6 @@ describe('studySpaceReservationArtifacts', () => {
     expect(ics).not.toMatch(/password|token|cookie/i)
   })
 
-
   it('keeps generated filenames local even when room names contain URL-like path traversal text', () => {
     const filename = studySpaceReservationNoteFilename({
       ...input,
@@ -67,9 +66,9 @@ describe('studySpaceReservationArtifacts', () => {
     const note = buildStudySpaceReservationNote(hostileInput)
     const ics = buildStudySpaceReservationIcs(hostileInput)
 
-    expect(note).toContain('| 2170001 | 김\|한성\n학생 |')
-    expect(ics).toContain('SUMMARY:학습공간 예약: 룸|A\\, B\\;C')
-    expect(ics).toContain('LOCATION:1층\\n토큰 없음\\; 안전')
+    expect(note).toContain(String.raw`| 2170001 | 김\|한성 학생 |`)
+    expect(ics).toContain(String.raw`SUMMARY:학습공간 예약: 룸|A\, B\;C`)
+    expect(ics).toContain(String.raw`LOCATION:1층\n토큰 없음\; 안전`)
     expect(`${note}\n${ics}`).not.toMatch(/password|session_cookie|access_token|raw_authenticated_payload/i)
   })
 
