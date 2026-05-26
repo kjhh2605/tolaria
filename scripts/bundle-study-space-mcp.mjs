@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Build the Python runtime used by the Hansung study-space reservation bridge.
+ * Build the Python runtime used by the Hansung school-service Python bridges
+ * (Study Space reservation and read-only LMS dashboard).
  *
  * Output: src-tauri/resources/study-space-python/
  * The directory is generated and gitignored, just like resources/mcp-server/.
@@ -67,5 +68,5 @@ run(PYTHON, [
 ])
 
 pruneGeneratedNoise(OUT)
-writeFileSync(MANIFEST, `${JSON.stringify({ package: SPEC, generatedBy: 'scripts/bundle-study-space-mcp.mjs' }, null, 2)}\n`)
-console.log('study-space Hs-MCP runtime bundled → src-tauri/resources/study-space-python/')
+writeFileSync(MANIFEST, `${JSON.stringify({ package: SPEC, generatedBy: 'scripts/bundle-study-space-mcp.mjs', services: ['study-space', 'lms-dashboard'] }, null, 2)}\n`)
+console.log('school-service Hs-MCP runtime bundled → src-tauri/resources/study-space-python/')

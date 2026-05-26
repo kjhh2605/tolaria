@@ -14,6 +14,7 @@ pub mod kiro_cli;
 mod kiro_discovery;
 #[cfg(any(test, all(desktop, target_os = "linux")))]
 mod linux_appimage;
+pub mod lms_dashboard;
 pub mod mcp;
 #[cfg(desktop)]
 pub mod menu;
@@ -530,6 +531,10 @@ macro_rules! app_invoke_handler {
             commands::study_space_create_reservation,
             commands::study_space_list_my_reservations,
             commands::study_space_clear_session,
+            commands::lms_status,
+            commands::lms_login,
+            commands::lms_overview,
+            commands::lms_clear_session,
             commands::list_views,
             commands::save_view_cmd,
             commands::delete_view_cmd,

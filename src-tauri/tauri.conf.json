@@ -61,6 +61,7 @@
     "resources": {
       "resources/mcp-server/**/*": "mcp-server/",
       "resources/agent-docs/**/*": "agent-docs/",
+      "resources/lms-hs-mcp-bridge.py": "lms-hs-mcp-bridge.py",
       "resources/study-space-hs-mcp-bridge.py": "study-space-hs-mcp-bridge.py",
       "resources/study-space-python/**/*": "study-space-python/"
     },
