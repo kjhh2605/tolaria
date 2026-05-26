@@ -782,5 +782,16 @@
   "sidebar.auth.signingIn": "Signing in…",
   "sidebar.auth.clearing": "Clearing…",
   "studySpace.credential.sidebarHint": "Manage sign-in and session clearing from School sign-ins at the bottom of the sidebar.",
-  "lmsDashboard.credential.sidebarHint": "Manage sign-in and session clearing from School sign-ins at the bottom of the sidebar."
+  "lmsDashboard.credential.sidebarHint": "Manage sign-in and session clearing from School sign-ins at the bottom of the sidebar.",
+  "sidebar.auth.account": "School account",
+  "sidebar.auth.ready": "Keychain saved",
+  "sidebar.auth.missing": "Keychain not saved",
+  "sidebar.auth.authFailed": "Login failed",
+  "sidebar.auth.keychainUnavailable": "Keychain unavailable",
+  "sidebar.auth.missingMessage": "Sign in once with your Hansung account for Facilities and LMS. Check each integration on its detail page.",
+  "sidebar.auth.readyMessage": "Your school account session is saved in Keychain. Check each integration on its detail page.",
+  "sidebar.auth.authFailedMessage": "School account login failed. Check your credentials and try again.",
+  "sidebar.auth.keychainUnavailableMessage": "macOS Keychain is unavailable. School integrations cannot save the shared login.",
+  "sidebar.auth.submit": "Sign in school account",
+  "sidebar.auth.clear": "Clear school sign-in"
 }

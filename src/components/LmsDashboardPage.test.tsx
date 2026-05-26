@@ -79,7 +79,8 @@ describe('LmsDashboardPage', () => {
     expect(unsafeButton).toBeDisabled()
   })
 
-  it('points missing LMS sessions to the sidebar sign-in area', () => {
+  it('lets users start the real LMS login from the detail page', () => {
+    const login = vi.fn(() => new Promise<never>(() => {}))
     mockUseLmsDashboard.mockReturnValue(readyState({
       credentialState: 'missing',
       status: {
@@ -89,11 +90,15 @@ describe('LmsDashboardPage', () => {
         session_clear_available: true,
       },
       overview: null,
+      login,
     }))
 
     render(<LmsDashboardPage locale="ko-KR" />)
 
-    expect(screen.getByText('로그인/세션 삭제는 사이드바 하단 학교 로그인에서 관리합니다.')).toBeInTheDocument()
-    expect(screen.queryByPlaceholderText('한성대 비밀번호')).not.toBeInTheDocument()
+    fireEvent.change(screen.getByPlaceholderText('한성대 학번'), { target: { value: '2170001' } })
+    fireEvent.change(screen.getByPlaceholderText('한성대 비밀번호'), { target: { value: 'secret' } })
+    fireEvent.click(screen.getByRole('button', { name: '보안 로그인' }))
+
+    expect(login).toHaveBeenCalledWith({ student_id: '2170001', password: 'secret' })
   })
 })

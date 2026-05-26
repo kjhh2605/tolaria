@@ -782,5 +782,16 @@
   "sidebar.auth.signingIn": "로그인 중…",
   "sidebar.auth.clearing": "삭제 중…",
   "studySpace.credential.sidebarHint": "로그인/세션 삭제는 사이드바 하단 학교 로그인에서 관리합니다.",
-  "lmsDashboard.credential.sidebarHint": "로그인/세션 삭제는 사이드바 하단 학교 로그인에서 관리합니다."
+  "lmsDashboard.credential.sidebarHint": "로그인/세션 삭제는 사이드바 하단 학교 로그인에서 관리합니다.",
+  "sidebar.auth.account": "학교 계정",
+  "sidebar.auth.ready": "키체인 저장됨",
+  "sidebar.auth.missing": "키체인 미저장",
+  "sidebar.auth.authFailed": "로그인 실패",
+  "sidebar.auth.keychainUnavailable": "키체인 사용 불가",
+  "sidebar.auth.missingMessage": "시설예약과 LMS에 사용할 한성대 계정을 한 번만 로그인합니다. 실제 연동 상태는 각 상세페이지에서 확인하세요.",
+  "sidebar.auth.readyMessage": "학교 계정 세션이 키체인에 저장되어 있습니다. 실제 연동 상태는 각 상세페이지에서 확인하세요.",
+  "sidebar.auth.authFailedMessage": "학교 계정 로그인에 실패했습니다. 학번과 비밀번호를 확인한 뒤 다시 시도해 주세요.",
+  "sidebar.auth.keychainUnavailableMessage": "macOS 키체인을 사용할 수 없어 학교 연동 로그인을 저장할 수 없습니다.",
+  "sidebar.auth.submit": "학교 계정 로그인",
+  "sidebar.auth.clear": "학교 로그인 삭제"
 }
