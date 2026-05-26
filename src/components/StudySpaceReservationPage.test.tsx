@@ -207,11 +207,11 @@ describe('StudySpaceReservationPage', () => {
       end_time: '15:00',
       results: [],
     })
-    expect(await screen.findByText('조건에 맞는 학습공간이 없습니다.')).toBeInTheDocument()
+    expect(await screen.findByText('현재 필터에 맞는 공간이 없습니다.')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
     expect(await screen.findByText('이미 예약됨')).toBeInTheDocument()
-    expect(screen.getByRole('alert')).toHaveTextContent('예약 가능한 공간이 없습니다. 시간 또는 인원을 조정해 주세요.')
+    expect(screen.getByRole('alert')).toHaveTextContent('선택한 날짜와 시간에 예약 가능한 공간이 없습니다.')
     expect(screen.getByRole('button', { name: '예약' })).toBeDisabled()
 
     fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
