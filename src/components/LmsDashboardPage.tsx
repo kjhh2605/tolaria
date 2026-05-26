@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo } from 'react'
 import { ArrowSquareOut, BookOpen, Clock, GraduationCap, ShieldCheck, WarningCircle } from '@phosphor-icons/react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { translate, type AppLocale } from '../lib/i18n'
 import { isSafeLmsUrl, type LmsAssignment } from '../lib/lmsDashboard'
 import { trackLmsDashboardOpened, trackLmsOriginalOpened } from '../lib/productAnalytics'
@@ -102,10 +101,8 @@ function AssignmentList({
   )
 }
 
-export function LmsDashboardPage({ locale = 'ko-KR', onToast }: LmsDashboardPageProps) {
-  const { loading, refreshing, status, overview, credentialState, error, lastRefreshedAt, refresh, login, clearSession } = useLmsDashboard()
-  const [studentId, setStudentId] = useState('')
-  const [password, setPassword] = useState('')
+export function LmsDashboardPage({ locale = 'ko-KR' }: LmsDashboardPageProps) {
+  const { loading, refreshing, status, overview, credentialState, error, lastRefreshedAt, refresh } = useLmsDashboard()
 
   useEffect(() => {
     trackLmsDashboardOpened()
@@ -115,14 +112,6 @@ export function LmsDashboardPage({ locale = 'ko-KR', onToast }: LmsDashboardPage
   const todayUrgent = useMemo(() => sortByDueDate(assignments.filter(isTodayUrgent)), [assignments])
   const thisWeek = useMemo(() => sortByDueDate(assignments.filter((assignment) => isThisWeek(assignment) && !isTodayUrgent(assignment))), [assignments])
   const needsDateReview = useMemo(() => assignments.filter((assignment) => !parseDueDate(assignment)), [assignments])
-
-  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    await login({ student_id: studentId, password })
-    setPassword('')
-    onToast?.(translate(locale, 'lmsDashboard.login.success'))
-  }
-
   const handleOpenAssignment = (assignment: LmsAssignment) => {
     if (!isSafeLmsUrl(assignment.url)) return
     trackLmsOriginalOpened('assignment')
@@ -153,16 +142,9 @@ export function LmsDashboardPage({ locale = 'ko-KR', onToast }: LmsDashboardPage
               <Badge variant={credentialState === 'ready' ? 'default' : 'secondary'}>{statusLabel(credentialState, locale)}</Badge>
               {lastRefreshedAt ? <span className="text-sm text-muted-foreground"><Clock className="mr-1 inline h-4 w-4" />{translate(locale, 'lmsDashboard.lastRefreshed')}: {lastRefreshedAt.toLocaleTimeString()}</span> : null}
               <Button type="button" variant="outline" size="sm" onClick={() => void refresh('manual')} disabled={loading || refreshing}>{refreshing ? translate(locale, 'lmsDashboard.action.refreshing') : translate(locale, 'lmsDashboard.action.refresh')}</Button>
-              <Button type="button" variant="ghost" size="sm" onClick={() => void clearSession()} disabled={loading || refreshing}>{translate(locale, 'lmsDashboard.action.clearSession')}</Button>
             </div>
             {error ? <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"><WarningCircle className="mr-1 inline h-4 w-4" />{error.message}</div> : null}
-            {credentialState !== 'ready' ? (
-              <form className="grid gap-3 md:grid-cols-[1fr_1fr_auto]" onSubmit={handleLogin}>
-                <Input value={studentId} onChange={(event) => setStudentId(event.target.value)} placeholder={translate(locale, 'lmsDashboard.login.studentId')} autoComplete="username" />
-                <Input value={password} onChange={(event) => setPassword(event.target.value)} placeholder={translate(locale, 'lmsDashboard.login.password')} type="password" autoComplete="current-password" />
-                <Button type="submit" disabled={refreshing || !studentId.trim() || !password}>{translate(locale, 'lmsDashboard.login.submit')}</Button>
-              </form>
-            ) : null}
+            {credentialState !== 'ready' ? <p className="text-sm text-muted-foreground">{translate(locale, 'lmsDashboard.credential.sidebarHint')}</p> : null}
           </CardContent>
         </Card>
 

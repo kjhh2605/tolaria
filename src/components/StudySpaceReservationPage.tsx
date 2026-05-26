@@ -32,10 +32,8 @@ import {
 } from '@/components/ui/select'
 import {
   checkStudySpaceAvailability,
-  clearStudySpaceSession,
   createStudySpaceReservation,
   getStudySpaceStatus,
-  saveStudySpaceCredentials,
   type StudySpaceArea,
   type StudySpaceAvailability,
   type StudySpaceAvailabilityRequest,
@@ -52,6 +50,7 @@ import {
   type StudySpaceReservationArtifactInput,
 } from '../lib/studySpaceReservationArtifacts'
 import { translate, type AppLocale } from '../lib/i18n'
+import { isSchoolIntegrationAuthEventFor, SCHOOL_INTEGRATION_AUTH_CHANGED } from '../lib/schoolIntegrationEvents'
 
 const DEFAULT_AREA = 'coding_lounge'
 const DEFAULT_START_TIME = '13:00'
@@ -192,9 +191,6 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
   const [areas, setAreas] = useState<StudySpaceArea[]>([])
   const [credentialState, setCredentialState] = useState<StudySpaceCredentialState>('missing')
   const [credentialMessage, setCredentialMessage] = useState('')
-  const [credentialStudentId, setCredentialStudentId] = useState('')
-  const [credentialPassword, setCredentialPassword] = useState('')
-  const [credentialBusy, setCredentialBusy] = useState(false)
   const [area, setArea] = useState(DEFAULT_AREA)
   const [date, setDate] = useState(todayIsoDate)
   const [startTime, setStartTime] = useState(DEFAULT_START_TIME)
@@ -236,28 +232,36 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
     members.filter((member) => member.name.trim() && member.student_number.trim())
   ), [members])
 
-  useEffect(() => {
-    let cancelled = false
+  const refreshCredentialStatus = useCallback(async () => {
     setLoadingStatus(true)
-    getStudySpaceStatus()
-      .then((status) => {
-        if (cancelled) return
-        setAreas(status.supported_areas)
-        setCredentialState(status.credential_state)
-        setCredentialMessage(status.credential_message)
-        if (!status.supported_areas.some((candidate) => candidate.key === area)) {
-          setArea(status.supported_areas.find((candidate) => candidate.supported)?.key ?? DEFAULT_AREA)
-        }
-      })
-      .catch((error) => {
-        if (cancelled) return
-        setErrorMessage(error instanceof Error ? error.message : String(error))
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingStatus(false)
-      })
-    return () => { cancelled = true }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps -- initial adapter status only
+    try {
+      const status = await getStudySpaceStatus()
+      setAreas(status.supported_areas)
+      setCredentialState(status.credential_state)
+      setCredentialMessage(status.credential_message)
+      setArea((currentArea) => (
+        status.supported_areas.some((candidate) => candidate.key === currentArea)
+          ? currentArea
+          : status.supported_areas.find((candidate) => candidate.supported)?.key ?? DEFAULT_AREA
+      ))
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : String(error))
+    } finally {
+      setLoadingStatus(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    void refreshCredentialStatus()
+  }, [refreshCredentialStatus])
+
+  useEffect(() => {
+    const onAuthChanged = (event: Event) => {
+      if (isSchoolIntegrationAuthEventFor(event, 'study-space')) void refreshCredentialStatus()
+    }
+    window.addEventListener(SCHOOL_INTEGRATION_AUTH_CHANGED, onAuthChanged)
+    return () => window.removeEventListener(SCHOOL_INTEGRATION_AUTH_CHANGED, onAuthChanged)
+  }, [refreshCredentialStatus])
 
   useEffect(() => {
     setMembers((current) => ensureMemberCount(current, headcount))
@@ -289,41 +293,6 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
     setMembers((current) => ensureMemberCount(current.filter((_, memberIndex) => memberIndex !== index), Math.max(1, headcount - 1)))
     setHeadcount((current) => Math.max(1, current - 1))
   }, [headcount])
-
-  const handleSaveCredentials = useCallback(async () => {
-    setCredentialBusy(true)
-    setErrorMessage(null)
-    try {
-      const result = await saveStudySpaceCredentials({
-        student_id: credentialStudentId,
-        password: credentialPassword,
-      })
-      setCredentialState(result.credential_state)
-      setCredentialMessage(result.message)
-      setCredentialPassword('')
-      onToast?.(result.message)
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : String(error))
-    } finally {
-      setCredentialBusy(false)
-    }
-  }, [credentialPassword, credentialStudentId, onToast])
-
-  const handleClearCredentials = useCallback(async () => {
-    setCredentialBusy(true)
-    setErrorMessage(null)
-    try {
-      const result = await clearStudySpaceSession()
-      setCredentialState('missing')
-      setCredentialMessage(result.message)
-      setCredentialPassword('')
-      onToast?.(result.message)
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : String(error))
-    } finally {
-      setCredentialBusy(false)
-    }
-  }, [onToast])
 
   const buildRequest = useCallback((roomId?: string | null) => requestFromState({
     area,
@@ -472,36 +441,7 @@ export function StudySpaceReservationPage({ locale = 'ko-KR', onToast, onCreateR
             <div className="mt-1 max-w-xs text-xs leading-5 text-muted-foreground">
               {loadingStatus ? translate(locale, 'studySpace.status.loading') : credentialMessage}
             </div>
-            {credentialState !== 'ready' && (
-              <div className="mt-3 grid gap-2">
-                <Input
-                  value={credentialStudentId}
-                  onChange={(event) => setCredentialStudentId(event.target.value)}
-                  placeholder={translate(locale, 'studySpace.credential.studentId')}
-                  autoComplete="username"
-                />
-                <Input
-                  value={credentialPassword}
-                  onChange={(event) => setCredentialPassword(event.target.value)}
-                  placeholder={translate(locale, 'studySpace.credential.password')}
-                  type="password"
-                  autoComplete="current-password"
-                />
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={handleSaveCredentials}
-                  disabled={credentialBusy || !credentialStudentId.trim() || !credentialPassword}
-                >
-                  {credentialBusy ? translate(locale, 'studySpace.credential.saving') : translate(locale, 'studySpace.credential.save')}
-                </Button>
-              </div>
-            )}
-            {credentialState === 'ready' && (
-              <Button type="button" size="sm" variant="outline" className="mt-3" onClick={handleClearCredentials} disabled={credentialBusy}>
-                {credentialBusy ? translate(locale, 'studySpace.credential.clearing') : translate(locale, 'studySpace.credential.clear')}
-              </Button>
-            )}
+            <div className="mt-2 text-xs text-muted-foreground">{translate(locale, 'studySpace.credential.sidebarHint')}</div>
           </div>
         </section>
 

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { LmsDashboardPage } from './LmsDashboardPage'
 import { useLmsDashboard, type UseLmsDashboardResult } from '../hooks/useLmsDashboard'
@@ -79,8 +79,7 @@ describe('LmsDashboardPage', () => {
     expect(unsafeButton).toBeDisabled()
   })
 
-  it('shows Korean login form without owning periodic polling', async () => {
-    const login = vi.fn(async () => undefined)
+  it('points missing LMS sessions to the sidebar sign-in area', () => {
     mockUseLmsDashboard.mockReturnValue(readyState({
       credentialState: 'missing',
       status: {
@@ -90,14 +89,11 @@ describe('LmsDashboardPage', () => {
         session_clear_available: true,
       },
       overview: null,
-      login,
     }))
 
     render(<LmsDashboardPage locale="ko-KR" />)
-    fireEvent.change(screen.getByPlaceholderText('한성대 학번'), { target: { value: '2212345' } })
-    fireEvent.change(screen.getByPlaceholderText('한성대 비밀번호'), { target: { value: 'secret' } })
-    fireEvent.click(screen.getByRole('button', { name: '보안 로그인' }))
 
-    await waitFor(() => expect(login).toHaveBeenCalledWith({ student_id: '2212345', password: 'secret' }))
+    expect(screen.getByText('로그인/세션 삭제는 사이드바 하단 학교 로그인에서 관리합니다.')).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('한성대 비밀번호')).not.toBeInTheDocument()
   })
 })

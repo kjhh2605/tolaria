@@ -17,6 +17,7 @@ import {
   trackLmsSessionCleared,
   type LmsDashboardRefreshSource,
 } from '../lib/productAnalytics'
+import { isSchoolIntegrationAuthEventFor, SCHOOL_INTEGRATION_AUTH_CHANGED } from '../lib/schoolIntegrationEvents'
 
 interface LmsDashboardState {
   loading: boolean
@@ -115,8 +116,15 @@ export function useLmsDashboard(): UseLmsDashboardResult {
       if (Date.now() - lastFetchMsRef.current < RESUME_REFRESH_GUARD_MS) return
       void refresh('resume')
     }
+    const onAuthChanged = (event: Event) => {
+      if (isSchoolIntegrationAuthEventFor(event, 'lms')) void refresh('manual')
+    }
     window.addEventListener('focus', onFocus)
-    return () => window.removeEventListener('focus', onFocus)
+    window.addEventListener(SCHOOL_INTEGRATION_AUTH_CHANGED, onAuthChanged)
+    return () => {
+      window.removeEventListener('focus', onFocus)
+      window.removeEventListener(SCHOOL_INTEGRATION_AUTH_CHANGED, onAuthChanged)
+    }
   }, [refresh])
 
   return { ...state, refresh, login, clearSession }

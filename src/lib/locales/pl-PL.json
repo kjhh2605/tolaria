@@ -775,5 +775,12 @@
   "lmsDashboard.assignment.noDue": "No due date shown",
   "lmsDashboard.safetyNote": "Read-only: HS-Hub does not submit, edit, quiz, post, or create notes from LMS data in P0.",
   "command.navigation.goStudySpace": "Go to study-space reservation",
-  "command.navigation.goLmsDashboard": "Go to LMS dashboard"
+  "command.navigation.goLmsDashboard": "Go to LMS dashboard",
+  "sidebar.auth.title": "School sign-ins",
+  "sidebar.auth.studySpace": "Facilities",
+  "sidebar.auth.lms": "LMS",
+  "sidebar.auth.signingIn": "Signing in…",
+  "sidebar.auth.clearing": "Clearing…",
+  "studySpace.credential.sidebarHint": "Manage sign-in and session clearing from School sign-ins at the bottom of the sidebar.",
+  "lmsDashboard.credential.sidebarHint": "Manage sign-in and session clearing from School sign-ins at the bottom of the sidebar."
 }

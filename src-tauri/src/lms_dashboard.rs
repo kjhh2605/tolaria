@@ -6,7 +6,7 @@ use std::process::{Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
 
-const LMS_BRIDGE_TIMEOUT: Duration = Duration::from_secs(20);
+const LMS_BRIDGE_TIMEOUT: Duration = Duration::from_secs(60);
 const MAX_COURSES: usize = 20;
 const MAX_ASSIGNMENTS: usize = 60;
 const MAX_BRIDGE_STDOUT_BYTES: usize = 1_000_000;

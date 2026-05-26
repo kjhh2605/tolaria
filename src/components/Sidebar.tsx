@@ -29,6 +29,7 @@ import {
   SidebarTypesLoadingSection,
 } from './sidebar/SidebarLoadingSections'
 import { useSidebarTypeInteractions } from './sidebar/useSidebarTypeInteractions'
+import { SidebarSchoolAuthPanel } from './sidebar/SidebarSchoolAuthPanel'
 import type { AppLocale } from '../lib/i18n'
 import type { FolderFileActions } from '../hooks/useFileActions'
 import type { AllNotesFileVisibility } from '../utils/allNotesFileVisibility'
@@ -649,6 +650,7 @@ export const Sidebar = memo(function Sidebar(props: SidebarProps) {
         canGoForward={props.canGoForward}
       />
       <SidebarRuntimeNavigation props={props} runtime={runtime} />
+      <SidebarSchoolAuthPanel locale={locale} />
       <SidebarInteractionOverlays locale={locale} runtime={runtime} />
     </aside>
   )

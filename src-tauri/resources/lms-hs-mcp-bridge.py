@@ -49,7 +49,7 @@ def safe_lms_url(value: str | None) -> str | None:
 
 
 try:
-    from hs_mcp.lms import HansungLmsClient, LmsTools, lms_session_store
+    from hs_mcp.lms import HansungLmsClient, LmsTools, lms_session_store, parse_lms_assignments
 except Exception as exc:  # pragma: no cover - exercised from Rust/process boundary
     emit(bridge_error("BRIDGE_UNAVAILABLE", f"hs-mcp LMS package is unavailable: {exc}"), 0)
 
@@ -102,19 +102,12 @@ async def handle(request: dict[str, Any]) -> dict[str, Any]:
         if not session:
             return {"ok": True, "logged_in": False, "read_only": True}
 
-        async def assert_session(client: HansungLmsClient) -> dict[str, Any]:
-            await client.assert_logged_in()
-            return {
-                "ok": True,
-                "logged_in": True,
-                "read_only": True,
-                "student_id_masked": mask_student_id(getattr(session, "student_id", None)),
-            }
-
-        try:
-            return await with_client(session, assert_session)
-        except Exception as exc:
-            return bridge_error(getattr(exc, "code", "AUTH_REQUIRED"), str(exc))
+        return {
+            "ok": True,
+            "logged_in": True,
+            "read_only": True,
+            "student_id_masked": mask_student_id(getattr(session, "student_id", None)),
+        }
 
     if op == "login":
         student_id = str(request.get("student_id") or "").strip()
@@ -144,13 +137,26 @@ async def handle(request: dict[str, Any]) -> dict[str, Any]:
         return bridge_error("AUTH_REQUIRED", "한성 e-class 로그인이 필요합니다.")
 
     async def tools_action(client: HansungLmsClient) -> dict[str, Any]:
-        tools = LmsTools(client)
         if op == "overview":
-            raw = await tools.assistant_overview()
-            if not raw.get("ok"):
-                return raw
-            courses = [item for item in (safe_course(course) for course in raw.get("courses", [])) if item]
-            assignments = [item for item in (safe_assignment(assignment) for assignment in raw.get("assignments", [])) if item]
+            courses_raw = [course.model_dump() for course in await client.list_courses()]
+            assignments_raw: list[dict[str, Any]] = []
+            for course in courses_raw:
+                course_id = str(course.get("course_id") or "")
+                if not course_id:
+                    continue
+                response = await client.http.get(f"/mod/assign/index.php?id={course_id}")
+                response.raise_for_status()
+                assignments_raw.extend(
+                    assignment.model_dump()
+                    for assignment in parse_lms_assignments(
+                        response.text,
+                        base_url=client.base_url,
+                        course_id=course_id,
+                        course_name=str(course.get("name") or ""),
+                    )[:5]
+                )
+            courses = [item for item in (safe_course(course) for course in courses_raw) if item]
+            assignments = [item for item in (safe_assignment(assignment) for assignment in assignments_raw) if item]
             return {
                 "ok": True,
                 "read_only": True,

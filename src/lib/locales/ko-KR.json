@@ -775,5 +775,12 @@
   "lmsDashboard.assignment.noDue": "마감 표시 없음",
   "lmsDashboard.safetyNote": "조회 전용입니다. P0에서는 과제 제출/수정, 퀴즈 응시, 게시글 작성, 자동 노트 생성을 지원하지 않습니다.",
   "command.navigation.goStudySpace": "학습공간 예약으로 이동",
-  "command.navigation.goLmsDashboard": "LMS 대시보드로 이동"
+  "command.navigation.goLmsDashboard": "LMS 대시보드로 이동",
+  "sidebar.auth.title": "학교 로그인",
+  "sidebar.auth.studySpace": "시설예약",
+  "sidebar.auth.lms": "LMS",
+  "sidebar.auth.signingIn": "로그인 중…",
+  "sidebar.auth.clearing": "삭제 중…",
+  "studySpace.credential.sidebarHint": "로그인/세션 삭제는 사이드바 하단 학교 로그인에서 관리합니다.",
+  "lmsDashboard.credential.sidebarHint": "로그인/세션 삭제는 사이드바 하단 학교 로그인에서 관리합니다."
 }

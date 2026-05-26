@@ -273,19 +273,12 @@ describe('StudySpaceReservationPage', () => {
     expect(screen.getByRole('dialog')).toHaveTextContent('실제 예약 확인')
   })
 
-  it('logs in through the secure reservation boundary without exposing the password in UI state', async () => {
+  it('points credential management to the sidebar instead of rendering page-owned login fields', async () => {
     render(<StudySpaceReservationPage locale="ko-KR" />)
 
-    fireEvent.change(screen.getByPlaceholderText('한성대 학번'), { target: { value: '2170001' } })
-    fireEvent.change(screen.getByPlaceholderText('한성대 비밀번호'), { target: { value: 'secret-pass' } })
-    fireEvent.click(screen.getByRole('button', { name: '보안 저장소에 로그인' }))
-
-    await waitFor(() => expect(mockSaveCredentials).toHaveBeenCalledWith({
-      student_id: '2170001',
-      password: 'secret-pass',
-    }))
-    expect(await screen.findByText('로그인 성공. 비밀번호는 저장하지 않았고 세션 쿠키만 OS 보안 저장소에 저장했습니다.')).toBeInTheDocument()
-    expect(screen.queryByDisplayValue('secret-pass')).not.toBeInTheDocument()
+    expect(await screen.findByText('로그인/세션 삭제는 사이드바 하단 학교 로그인에서 관리합니다.')).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('한성대 비밀번호')).not.toBeInTheDocument()
+    expect(mockSaveCredentials).not.toHaveBeenCalled()
   })
 
   it('requires Sangsang Park Plus usage details instead of team members before confirming', async () => {
