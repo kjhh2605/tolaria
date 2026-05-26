@@ -1,11 +1,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { SidebarSchoolAuthPanel } from './SidebarSchoolAuthPanel'
-import { clearLmsSession } from '../../lib/lmsDashboard'
+import { clearLmsSession, loginLms } from '../../lib/lmsDashboard'
 import { clearStudySpaceSession, getStudySpaceStatus, saveStudySpaceCredentials } from '../../lib/studySpaceReservation'
 
 vi.mock('../../lib/lmsDashboard', () => ({
   clearLmsSession: vi.fn(),
+  loginLms: vi.fn(),
 }))
 
 vi.mock('../../lib/studySpaceReservation', () => ({
@@ -15,6 +16,7 @@ vi.mock('../../lib/studySpaceReservation', () => ({
 }))
 
 const mockLmsClear = vi.mocked(clearLmsSession)
+const mockLmsLogin = vi.mocked(loginLms)
 const mockStudyStatus = vi.mocked(getStudySpaceStatus)
 const mockStudyLogin = vi.mocked(saveStudySpaceCredentials)
 const mockStudyClear = vi.mocked(clearStudySpaceSession)
@@ -28,12 +30,13 @@ beforeEach(() => {
     session_clear_available: true,
   })
   mockStudyLogin.mockResolvedValue({ credential_state: 'ready', message: '시설예약 로그인 성공' })
+  mockLmsLogin.mockResolvedValue({ credential_state: 'ready', message: 'LMS 로그인 성공' })
   mockStudyClear.mockResolvedValue({ cleared: true, message: '시설예약 세션 삭제' })
   mockLmsClear.mockResolvedValue({ cleared: true, message: 'LMS 세션 삭제' })
 })
 
 describe('SidebarSchoolAuthPanel', () => {
-  it('stores only the shared school account keychain state from the sidebar', async () => {
+  it('stores the shared school account session for study space and LMS from the sidebar', async () => {
     render(<SidebarSchoolAuthPanel locale="ko-KR" />)
 
     expect(screen.getByText('학교 로그인')).toBeInTheDocument()
@@ -47,6 +50,7 @@ describe('SidebarSchoolAuthPanel', () => {
     fireEvent.click(screen.getByRole('button', { name: '학교 계정 로그인' }))
 
     await waitFor(() => expect(mockStudyLogin).toHaveBeenCalledWith({ student_id: '2170001', password: 'school-secret' }))
+    expect(mockLmsLogin).toHaveBeenCalledWith({ student_id: '2170001', password: 'school-secret' })
   })
 
   it('clears the shared school account session from both integrations', async () => {

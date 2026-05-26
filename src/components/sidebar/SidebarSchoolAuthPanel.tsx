@@ -10,7 +10,7 @@ import {
   saveStudySpaceCredentials,
   type StudySpaceCredentialState,
 } from '../../lib/studySpaceReservation'
-import { clearLmsSession } from '../../lib/lmsDashboard'
+import { clearLmsSession, loginLms } from '../../lib/lmsDashboard'
 import { notifySchoolIntegrationAuthChanged } from '../../lib/schoolIntegrationEvents'
 
 type AuthState = StudySpaceCredentialState
@@ -149,8 +149,8 @@ export function SidebarSchoolAuthPanel({ locale = 'en' }: { locale?: AppLocale }
   const loginSchoolAccount = useCallback(() => {
     const credentials = { student_id: schoolAuth.studentId.trim(), password: schoolAuth.password }
     setSchoolAuth((current) => ({ ...current, busy: true, error: null }))
-    void saveStudySpaceCredentials(credentials)
-      .then((studySpaceResult) => {
+    void Promise.all([saveStudySpaceCredentials(credentials), loginLms(credentials)])
+      .then(([studySpaceResult]) => {
         const credentialState = studySpaceResult.credential_state
         setSchoolAuth((current) => ({
           ...current,

@@ -79,13 +79,13 @@ describe('LmsDashboardPage', () => {
     expect(unsafeButton).toBeDisabled()
   })
 
-  it('lets users start the real LMS login from the detail page', () => {
-    const login = vi.fn(() => new Promise<never>(() => {}))
+  it('does not render a separate LMS login form on the detail page', () => {
+    const login = vi.fn(async () => undefined)
     mockUseLmsDashboard.mockReturnValue(readyState({
       credentialState: 'missing',
       status: {
         credential_state: 'missing',
-        credential_message: '한성 e-class 로그인이 필요합니다.',
+        credential_message: '사이드바에서 학교 계정을 먼저 저장해 주세요.',
         read_only: true,
         session_clear_available: true,
       },
@@ -95,10 +95,10 @@ describe('LmsDashboardPage', () => {
 
     render(<LmsDashboardPage locale="ko-KR" />)
 
-    fireEvent.change(screen.getByPlaceholderText('한성대 학번'), { target: { value: '2170001' } })
-    fireEvent.change(screen.getByPlaceholderText('한성대 비밀번호'), { target: { value: 'secret' } })
-    fireEvent.click(screen.getByRole('button', { name: '보안 로그인' }))
-
-    expect(login).toHaveBeenCalledWith({ student_id: '2170001', password: 'secret' })
+    expect(screen.getByText('사이드바에서 학교 계정을 먼저 저장해 주세요.')).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('한성대 학번')).not.toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('한성대 비밀번호')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '보안 로그인' })).not.toBeInTheDocument()
+    expect(login).not.toHaveBeenCalled()
   })
 })
