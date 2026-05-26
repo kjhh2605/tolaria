@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { StudySpaceReservationPage } from './StudySpaceReservationPage'
 import {
   checkStudySpaceAvailability,
@@ -104,9 +104,6 @@ async function completeSuccessfulReservation() {
   expect(await screen.findByText('예약이 완료되었습니다. 예약 번호: R-103')).toBeInTheDocument()
 }
 
-afterEach(() => {
-  vi.useRealTimers()
-})
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -160,30 +157,25 @@ beforeEach(() => {
 })
 
 describe('StudySpaceReservationPage', () => {
-  it('does not poll status, rooms, or availability without an explicit user check', async () => {
-    vi.useFakeTimers()
-    render(<StudySpaceReservationPage locale="ko-KR" />)
+  it('does not schedule polling or load rooms/availability without an explicit user check', async () => {
+    const setIntervalSpy = vi.spyOn(globalThis, 'setInterval')
 
-    await waitFor(() => expect(mockStatus).toHaveBeenCalledOnce())
-    expect(mockRooms).not.toHaveBeenCalled()
-    expect(mockAvailability).not.toHaveBeenCalled()
+    try {
+      render(<StudySpaceReservationPage locale="ko-KR" />)
 
-    await vi.advanceTimersByTimeAsync(60_000)
-
-    expect(mockStatus).toHaveBeenCalledOnce()
-    expect(mockRooms).not.toHaveBeenCalled()
-    expect(mockAvailability).not.toHaveBeenCalled()
+      await waitFor(() => expect(mockStatus).toHaveBeenCalledOnce())
+      expect(setIntervalSpy).not.toHaveBeenCalled()
+      expect(mockRooms).not.toHaveBeenCalled()
+      expect(mockAvailability).not.toHaveBeenCalled()
+    } finally {
+      setIntervalSpy.mockRestore()
+    }
   })
 
   it('shows dashboard loading, empty, unavailable, and success states from explicit actions', async () => {
+    let resolvePendingAvailability: ((value: Awaited<ReturnType<typeof checkStudySpaceAvailability>>) => void) | null = null
     const pendingAvailability = new Promise<Awaited<ReturnType<typeof checkStudySpaceAvailability>>>((resolve) => {
-      setTimeout(() => resolve({
-        area: 'coding_lounge',
-        date: '2026-05-27',
-        start_time: '13:00',
-        end_time: '15:00',
-        results: [],
-      }), 0)
+      resolvePendingAvailability = resolve
     })
     mockAvailability.mockReturnValueOnce(pendingAvailability)
     mockAvailability.mockResolvedValueOnce({
@@ -206,6 +198,13 @@ describe('StudySpaceReservationPage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
     expect(screen.getByText('예약 현황을 확인하는 중입니다…')).toBeInTheDocument()
+    resolvePendingAvailability?.({
+      area: 'coding_lounge',
+      date: '2026-05-27',
+      start_time: '13:00',
+      end_time: '15:00',
+      results: [],
+    })
     expect(await screen.findByText('조건에 맞는 학습공간이 없습니다.')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
