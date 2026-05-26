@@ -199,7 +199,7 @@ describe('StudySpaceReservationPage', () => {
     await waitFor(() => expect(mockStatus).toHaveBeenCalledOnce())
     fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
     await waitFor(() => expect(mockAvailability).toHaveBeenCalledTimes(1))
-    expect(screen.getByText('예약 현황을 확인하는 중입니다…')).toBeInTheDocument()
+    expect(screen.getByText('공간 목록을 불러오는 중…')).toBeInTheDocument()
     resolvePendingAvailability?.({
       area: 'coding_lounge',
       date: '2026-05-27',
