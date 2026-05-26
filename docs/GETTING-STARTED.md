@@ -306,6 +306,7 @@ hs-hub/
 | `src-tauri/src/frontmatter/ops.rs` | YAML manipulation — how properties are updated/deleted in files. |
 | `src-tauri/src/git/` | All git operations (clone, commit, pull, push, conflicts, pulse, add-remote). |
 | `src-tauri/src/search.rs` | Keyword search — scans vault files with walkdir. |
+| `src-tauri/src/lms_dashboard.rs` | Native read-only Hansung LMS command boundary, DTO caps, Korean error normalization, bridge timeout/output caps, redaction, and safe LMS URL allowlisting. |
 | `src-tauri/src/study_space_reservation.rs` | Hansung study-space reservation command boundary, room catalog, request validation, Korean error normalization, and Hs-MCP bridge invocation. |
 | `src-tauri/src/ai_agents.rs` | CLI-agent request normalization, availability aggregation, adapter dispatch, and Claude event mapping. |
 | `src-tauri/src/cli_agent_runtime.rs` | Shared CLI-agent request shape, prompt wrapping, JSON subprocess lifecycle, version probing, and MCP path helpers. |
@@ -328,9 +329,12 @@ hs-hub/
 
 | File | Why it matters |
 |------|---------------|
+| `src/components/LmsDashboardPage.tsx` | Sidebar LMS dashboard for read-only Hansung e-class connection state, urgent assignments, weekly deadlines, manual refresh/logout, and safe original links. |
 | `src/components/StudySpaceReservationPage.tsx` | Korean-first reservation page: search filters, member rows, availability table, confirmation dialog, success artifacts. |
+| `src/lib/lmsDashboard.ts` | Renderer command wrapper and URL/error safety helpers for native LMS dashboard commands. |
 | `src/lib/studySpaceReservation.ts` | Renderer command wrapper and mock fallback for native reservation commands. |
 | `src/lib/studySpaceReservationArtifacts.ts` | Sanitized Markdown reservation-note and `.ics` calendar export generation. |
+| `src-tauri/resources/lms-hs-mcp-bridge.py` | Python stdin/stdout bridge that imports bundled Hs-MCP LMS modules only and returns status/login/overview/session-clear DTOs without exposing an MCP server. |
 | `src-tauri/resources/study-space-hs-mcp-bridge.py` | Python stdin/stdout bridge that imports bundled `hs_mcp`, uses its keyring-backed facility session, checks availability, creates confirmed reservations, and verifies my-reservation history. |
 | `scripts/bundle-study-space-mcp.mjs` | Build-time bundler for the pinned Hs-MCP Python runtime copied into `src-tauri/resources/study-space-python/` before Tauri packaging. |
 
@@ -357,6 +361,7 @@ hs-hub/
 
 | File | Why it matters |
 |------|---------------|
+| `src/hooks/useLmsDashboard.ts` | Renderer hook for LMS page-open/resume/manual refresh behavior without periodic polling. |
 | `src/hooks/useSettings.ts` | App settings (telemetry, release channel, theme mode, UI language, date display format, Git visibility, auto-sync interval, default note width, sidebar type pluralization, default AI agent). |
 | `src/lib/releaseChannel.ts` | Normalizes persisted updater-channel values (`stable` default, optional `alpha`). |
 | `src/lib/appUpdater.ts` | Frontend wrapper for channel-aware updater commands. |
@@ -480,6 +485,16 @@ BASE_URL="http://localhost:5173" npx playwright test tests/smoke/<slug>.spec.ts
 4. **Permission-mode UI and request plumbing**: Edit `src/lib/aiAgentPermissionMode.ts`, `src/components/AiPanel*.tsx`, `src/hooks/useCliAiAgent.ts`, and `src/utils/streamAiAgent.ts`
 5. **Shared CLI runtime behavior**: Edit `src-tauri/src/cli_agent_runtime.rs` for process lifecycle, prompt wrapping, version probing, and common HS-Hub MCP path handling.
 6. **Agent-specific arguments/events**: Edit the per-agent adapter modules (`claude_cli.rs`, `codex_cli.rs`, `opencode_*`, `pi_*`, `gemini_*`, `kiro_*`). Keep Codex Safe on `read-only` + `untrusted` and Codex Power User on active-vault `workspace-write` + `never`, keep Pi, Gemini, and Kiro on transient MCP config, and do not use dangerous permission bypasses unless an ADR explicitly designs a new mode. Pi's transient agent directory must be seeded from the user's existing Pi agent directory before HS-Hub MCP is merged so standalone provider/auth setup keeps working. Gemini Power User intentionally uses Gemini's `yolo` mode per ADR-0103. Kiro receives prompt content over stdin and writes HS-Hub MCP config into `.kiro/settings/mcp.json` in the active vault.
+
+
+### Work with Hansung LMS dashboard
+
+1. Keep the LMS feature read-only unless a future ADR explicitly approves write actions; do not add assignment submission/editing, automatic notes, grades/attendance, or Calendar writes in this boundary.
+2. Use `src/lib/lmsDashboard.ts` and `useLmsDashboard` from the renderer; do not call Hs-MCP or Python directly from React.
+3. Native commands must return `LmsCommandResult` DTOs with Korean-safe errors and no credential, cookie, raw HTML, or raw MCP payload content.
+4. Keep refresh user-visible and bounded: page open, app/window resume, or explicit manual refresh only. Do not add `setInterval`, recursive `setTimeout`, or background polling loops.
+5. Original LMS links must pass the clean `https://learn.hansung.ac.kr` allowlist before opening externally.
+6. When changing the dashboard, run the focused LMS tests plus locale validation.
 
 ### Work with Hansung study-space reservation
 

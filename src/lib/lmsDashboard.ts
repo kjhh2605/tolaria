@@ -141,7 +141,7 @@ export function clearLmsSession(): Promise<LmsClearSessionResult> {
 export function isSafeLmsUrl(value: string): boolean {
   try {
     const url = new URL(value)
-    return url.protocol === 'https:' && url.hostname === 'learn.hansung.ac.kr'
+    return url.protocol === 'https:' && url.hostname === 'learn.hansung.ac.kr' && url.username === '' && url.password === ''
   } catch {
     return false
   }

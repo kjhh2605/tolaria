@@ -773,5 +773,7 @@
   "lmsDashboard.dateReview.empty": "No assignments need date review.",
   "lmsDashboard.assignment.unknownCourse": "Unknown course",
   "lmsDashboard.assignment.noDue": "No due date shown",
-  "lmsDashboard.safetyNote": "Read-only: HS-Hub does not submit, edit, quiz, post, or create notes from LMS data in P0."
+  "lmsDashboard.safetyNote": "Read-only: HS-Hub does not submit, edit, quiz, post, or create notes from LMS data in P0.",
+  "command.navigation.goStudySpace": "Go to study-space reservation",
+  "command.navigation.goLmsDashboard": "Go to LMS dashboard"
 }

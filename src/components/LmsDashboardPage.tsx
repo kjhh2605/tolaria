@@ -111,7 +111,7 @@ export function LmsDashboardPage({ locale = 'ko-KR', onToast }: LmsDashboardPage
     trackLmsDashboardOpened()
   }, [])
 
-  const assignments = overview?.assignments ?? []
+  const assignments = useMemo(() => overview?.assignments ?? [], [overview?.assignments])
   const todayUrgent = useMemo(() => sortByDueDate(assignments.filter(isTodayUrgent)), [assignments])
   const thisWeek = useMemo(() => sortByDueDate(assignments.filter((assignment) => isThisWeek(assignment) && !isTodayUrgent(assignment))), [assignments])
   const needsDateReview = useMemo(() => assignments.filter((assignment) => !parseDueDate(assignment)), [assignments])

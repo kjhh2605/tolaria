@@ -17,6 +17,8 @@ const STATIC_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   'go-archived': 'command.navigation.goArchived',
   'go-changes': 'command.navigation.goChanges',
   'go-pulse': 'command.navigation.goHistory',
+  'go-study-space': 'command.navigation.goStudySpace',
+  'go-lms-dashboard': 'command.navigation.goLmsDashboard',
   'go-back': 'command.navigation.goBack',
   'go-forward': 'command.navigation.goForward',
   'go-inbox': 'command.navigation.goInbox',
