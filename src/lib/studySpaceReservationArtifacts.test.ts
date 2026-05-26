@@ -50,7 +50,8 @@ describe('studySpaceReservationArtifacts', () => {
     })
 
     expect(filename).toBe('study-space-2026-05-27-https-evil-example-secret-room.md')
-    expect(filename).not.toMatch(/[\/]/)
+    expect(filename).not.toContain('/')
+    expect(filename).not.toContain('\\')
     expect(filename).not.toMatch(/^https?:/i)
   })
 
