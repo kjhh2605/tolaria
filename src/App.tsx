@@ -14,6 +14,7 @@ import { PulseView } from './components/PulseView'
 import { StatusBar } from './components/StatusBar'
 import { SettingsPanel } from './components/SettingsPanel'
 import { StudySpaceReservationPage } from './components/StudySpaceReservationPage'
+import { LmsDashboardPage } from './components/LmsDashboardPage'
 import { CloneVaultModal } from './components/CloneVaultModal'
 import { FeedbackDialog } from './components/FeedbackDialog'
 import { McpSetupDialog } from './components/McpSetupDialog'
@@ -422,6 +423,7 @@ function App() {
   const effectiveSelection = sanitizeSelectionForOrganization(selection, vaultConfig.inbox?.explicitOrganization)
   const isChangesSelection = effectiveSelection.kind === 'filter' && effectiveSelection.filter === 'changes'
   const isStudySpaceSelection = effectiveSelection.kind === 'filter' && effectiveSelection.filter === 'study-space'
+  const isLmsDashboardSelection = effectiveSelection.kind === 'filter' && effectiveSelection.filter === 'lms-dashboard'
 
   useSelectionSanitizer({
     effectiveSelection,
@@ -1698,7 +1700,7 @@ function App() {
 
   const noteListModifiedFiles = isChangesSelection ? selectedChangesModifiedFiles : undefined
   const noteListModifiedFilesError = isChangesSelection ? gitSurfaces.changesModifiedFilesError : null
-  const effectiveNoteListVisible = noteListVisible && !isStudySpaceSelection
+  const effectiveNoteListVisible = noteListVisible && !isStudySpaceSelection && !isLmsDashboardSelection
 
   return (
     <AppPreferencesProvider dateDisplayFormat={dateDisplayFormat}>
@@ -1727,6 +1729,8 @@ function App() {
           <div className={`app__editor${aiActivity.highlightElement === 'editor' || aiActivity.highlightElement === 'tab' ? ' ai-highlight' : ''}`}>
             {isStudySpaceSelection ? (
               <StudySpaceReservationPage locale={appLocale} onToast={setToastMessage} onCreateReservationNote={handleCreateReservationNote} />
+            ) : isLmsDashboardSelection ? (
+              <LmsDashboardPage locale={appLocale} onToast={setToastMessage} />
             ) : (
             <Editor
               tabs={notes.tabs}

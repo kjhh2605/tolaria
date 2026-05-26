@@ -558,6 +558,45 @@ export const mockHandlers: Record<string, (args: any) => any> = {
     ok: true,
     data: { cleared: false, message: '삭제할 임시 학습공간 예약 세션이 없습니다.' },
   }),
+
+  lms_status: () => ({
+    ok: true,
+    data: {
+      credential_state: 'ready',
+      credential_message: '한성 e-class 세션이 준비되었습니다. (21***68)',
+      read_only: true,
+      session_clear_available: true,
+      student_id_masked: '21***68',
+    },
+  }),
+  lms_login: () => ({
+    ok: true,
+    data: {
+      credential_state: 'ready',
+      message: '로그인 성공. 비밀번호는 저장하지 않고 LMS 세션만 OS 보안 저장소에 저장했습니다.',
+      student_id_masked: '21***68',
+    },
+  }),
+  lms_overview: () => ({
+    ok: true,
+    data: {
+      read_only: true,
+      summary: { course_count: 2, assignment_count: 3, capped_course_count: 2, capped_assignment_count: 3 },
+      courses: [
+        { course_id: '101', name: '소프트웨어공학', url: 'https://learn.hansung.ac.kr/course/view.php?id=101', progress_text: '진행 중' },
+        { course_id: '202', name: '데이터베이스', url: 'https://learn.hansung.ac.kr/course/view.php?id=202' },
+      ],
+      assignments: [
+        { assignment_id: '1', course_id: '101', course_name: '소프트웨어공학', name: '요구사항 분석 보고서', url: 'https://learn.hansung.ac.kr/mod/assign/view.php?id=1', due_text: '2026-05-26', status_text: '미제출' },
+        { assignment_id: '2', course_id: '202', course_name: '데이터베이스', name: '정규화 과제', url: 'https://learn.hansung.ac.kr/mod/assign/view.php?id=2', due_text: '2026-05-30', status_text: '제출 가능' },
+        { assignment_id: '3', course_id: '202', course_name: '데이터베이스', name: '날짜 확인 필요 과제', url: 'https://learn.hansung.ac.kr/mod/assign/view.php?id=3', due_text: 'LMS 표기 확인 필요' },
+      ],
+    },
+  }),
+  lms_clear_session: () => ({
+    ok: true,
+    data: { cleared: true, message: '저장된 LMS 세션을 삭제했습니다.' },
+  }),
   get_settings: () => ({ ...mockSettings }),
   save_settings: (args: { settings: Settings }) => {
     const s = args.settings

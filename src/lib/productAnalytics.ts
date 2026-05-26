@@ -144,3 +144,42 @@ export function trackAiAgentPermissionModeChanged(agent: AiAgentId, permissionMo
     permission_mode: permissionMode,
   })
 }
+
+type LmsDashboardBucket = '0' | '1_3' | '4_10' | '11_plus'
+export type LmsDashboardRefreshSource = 'open' | 'resume' | 'manual'
+export type LmsDashboardFailureReason = 'auth_required' | 'auth_failed' | 'network' | 'bridge' | 'parse' | 'unknown'
+
+function lmsBucket(count: number): LmsDashboardBucket {
+  if (count <= 0) return '0'
+  if (count <= 3) return '1_3'
+  if (count <= 10) return '4_10'
+  return '11_plus'
+}
+
+export function trackLmsDashboardOpened(): void {
+  trackEvent('lms_dashboard_opened')
+}
+
+export function trackLmsDashboardRefreshTriggered(source: LmsDashboardRefreshSource): void {
+  trackEvent('lms_dashboard_refresh_triggered', { source })
+}
+
+export function trackLmsDashboardRefreshCompleted(overview: { assignments: unknown[]; summary?: { capped_assignment_count?: number } }): void {
+  const assignmentCount = overview.summary?.capped_assignment_count ?? overview.assignments.length
+  trackEvent('lms_dashboard_refresh_completed', {
+    assignment_bucket: lmsBucket(assignmentCount),
+    urgent_bucket: lmsBucket(Math.min(assignmentCount, overview.assignments.length)),
+  })
+}
+
+export function trackLmsDashboardRefreshFailed(reason: LmsDashboardFailureReason): void {
+  trackEvent('lms_dashboard_refresh_failed', { reason })
+}
+
+export function trackLmsOriginalOpened(itemKind: 'course' | 'assignment'): void {
+  trackEvent('lms_original_opened', { item_kind: itemKind })
+}
+
+export function trackLmsSessionCleared(): void {
+  trackEvent('lms_session_cleared')
+}

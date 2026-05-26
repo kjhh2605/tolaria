@@ -226,7 +226,7 @@ export interface PulseCommit {
   deleted: number
 }
 
-export type SidebarFilter = 'all' | 'archived' | 'changes' | 'pulse' | 'inbox' | 'favorites' | 'study-space'
+export type SidebarFilter = 'all' | 'archived' | 'changes' | 'pulse' | 'inbox' | 'favorites' | 'study-space' | 'lms-dashboard'
 
 export type InboxPeriod = 'week' | 'month' | 'quarter' | 'all'
 

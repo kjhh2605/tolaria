@@ -1,4 +1,4 @@
-import { Archive, CalendarCheck, FileText, Tray } from '@phosphor-icons/react'
+import { Archive, CalendarCheck, FileText, GraduationCap, Tray } from '@phosphor-icons/react'
 import type { SidebarSelection } from '../../types'
 import { isSelectionActive, NavItem } from '../SidebarParts'
 import { translate, type AppLocale } from '../../lib/i18n'
@@ -66,6 +66,12 @@ export function SidebarTopNav({
         label={translate(locale, 'sidebar.nav.studySpace')}
         isActive={isSelectionActive(selection, { kind: 'filter', filter: 'study-space' })}
         onClick={() => onSelect({ kind: 'filter', filter: 'study-space' })}
+      />
+      <NavItem
+        icon={GraduationCap}
+        label={translate(locale, 'sidebar.nav.lmsDashboard')}
+        isActive={isSelectionActive(selection, { kind: 'filter', filter: 'lms-dashboard' })}
+        onClick={() => onSelect({ kind: 'filter', filter: 'lms-dashboard' })}
       />
     </div>
   )

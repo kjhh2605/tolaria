@@ -95,6 +95,7 @@ function buildBaseCommands(config: NavigationCommandsConfig): CommandAction[] {
     { id: 'go-changes', label: 'Go to Changes', group: 'Navigation', keywords: ['git', 'modified', 'pending'], enabled: true, execute: () => onSelect({ kind: 'filter', filter: 'changes' }) },
     { id: 'go-pulse', label: 'Go to History', group: 'Navigation', keywords: ['activity', 'history', 'commits', 'git', 'feed'], enabled: true, execute: () => onSelect({ kind: 'filter', filter: 'pulse' }) },
     { id: 'go-study-space', label: '학습공간 예약', group: 'Navigation', keywords: ['study', 'space', 'reservation', 'hansung', 'room', '학습공간', '예약'], enabled: true, execute: () => onSelect({ kind: 'filter', filter: 'study-space' }) },
+    { id: 'go-lms-dashboard', label: 'LMS 대시보드', group: 'Navigation', keywords: ['lms', 'eclass', 'e-class', 'learn', 'hansung', 'assignment', 'deadline', '과제', '마감', '이클래스'], enabled: true, execute: () => onSelect({ kind: 'filter', filter: 'lms-dashboard' }) },
     { id: 'go-back', label: 'Go Back', group: 'Navigation', shortcut: getAppCommandShortcutDisplay(APP_COMMAND_IDS.viewGoBack), keywords: ['previous', 'history', 'back'], enabled: !!canGoBack, execute: () => onGoBack?.() },
     { id: 'go-forward', label: 'Go Forward', group: 'Navigation', shortcut: getAppCommandShortcutDisplay(APP_COMMAND_IDS.viewGoForward), keywords: ['next', 'history', 'forward'], enabled: !!canGoForward, execute: () => onGoForward?.() },
   ]
