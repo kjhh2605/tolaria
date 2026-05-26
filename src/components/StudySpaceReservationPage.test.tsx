@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StudySpaceReservationPage } from './StudySpaceReservationPage'
 import {
   checkStudySpaceAvailability,
@@ -104,6 +104,10 @@ async function completeSuccessfulReservation() {
   expect(await screen.findByText('예약이 완료되었습니다. 예약 번호: R-103')).toBeInTheDocument()
 }
 
+afterEach(() => {
+  vi.useRealTimers()
+})
+
 beforeEach(() => {
   vi.clearAllMocks()
   mockStatus.mockResolvedValue({
@@ -156,6 +160,67 @@ beforeEach(() => {
 })
 
 describe('StudySpaceReservationPage', () => {
+  it('does not poll status, rooms, or availability without an explicit user check', async () => {
+    vi.useFakeTimers()
+    render(<StudySpaceReservationPage locale="ko-KR" />)
+
+    await waitFor(() => expect(mockStatus).toHaveBeenCalledOnce())
+    expect(mockRooms).not.toHaveBeenCalled()
+    expect(mockAvailability).not.toHaveBeenCalled()
+
+    await vi.advanceTimersByTimeAsync(60_000)
+
+    expect(mockStatus).toHaveBeenCalledOnce()
+    expect(mockRooms).not.toHaveBeenCalled()
+    expect(mockAvailability).not.toHaveBeenCalled()
+  })
+
+  it('shows dashboard loading, empty, unavailable, and success states from explicit actions', async () => {
+    const pendingAvailability = new Promise<Awaited<ReturnType<typeof checkStudySpaceAvailability>>>((resolve) => {
+      setTimeout(() => resolve({
+        area: 'coding_lounge',
+        date: '2026-05-27',
+        start_time: '13:00',
+        end_time: '15:00',
+        results: [],
+      }), 0)
+    })
+    mockAvailability.mockReturnValueOnce(pendingAvailability)
+    mockAvailability.mockResolvedValueOnce({
+      area: 'coding_lounge',
+      date: '2026-05-27',
+      start_time: '13:00',
+      end_time: '15:00',
+      results: [{ room: room103, available: false, reason: '이미 예약됨', slots: [] }],
+    })
+    mockAvailability.mockResolvedValueOnce({
+      area: 'coding_lounge',
+      date: '2026-05-27',
+      start_time: '13:00',
+      end_time: '15:00',
+      results: [{ room: room103, available: true, slots: [] }],
+    })
+    render(<StudySpaceReservationPage locale="ko-KR" />)
+
+    expect(screen.getByText('예약 가능 여부를 확인하면 공간별 시간대 현황이 표시됩니다.')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
+    expect(screen.getByText('예약 현황을 확인하는 중입니다…')).toBeInTheDocument()
+    expect(await screen.findByText('조건에 맞는 학습공간이 없습니다.')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
+    expect(await screen.findByText('이미 예약됨')).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('예약 가능한 공간이 없습니다. 시간 또는 인원을 조정해 주세요.')
+    expect(screen.getByRole('button', { name: '예약' })).toBeDisabled()
+
+    fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
+    expect(await screen.findByText('예약 가능')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '예약' }))
+    fireEvent.click(screen.getByRole('button', { name: '예약 확정' }))
+
+    expect(await screen.findByRole('status')).toHaveTextContent('예약이 완료되었습니다. 예약 번호: R-103')
+  })
+
   it('renders Korean reservation controls without loading rooms before the user checks availability', async () => {
     render(<StudySpaceReservationPage locale="ko-KR" />)
 
