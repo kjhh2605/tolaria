@@ -69,4 +69,26 @@ describe('SidebarSchoolAuthPanel', () => {
     await waitFor(() => expect(mockStudyClear).toHaveBeenCalledTimes(1))
     expect(mockLmsClear).toHaveBeenCalledTimes(1)
   })
+
+  it('returns to the login form even if LMS session cleanup is still pending', async () => {
+    mockStudyStatus.mockResolvedValue({
+      credential_state: 'ready',
+      credential_message: '시설예약 저장됨',
+      supported_areas: [],
+      session_clear_available: true,
+    })
+    mockLmsClear.mockReturnValue(new Promise(() => undefined))
+
+    render(<SidebarSchoolAuthPanel locale="ko-KR" />)
+
+    await screen.findByText('키체인 저장됨')
+    fireEvent.click(screen.getByRole('button', { name: '학교 로그인 삭제' }))
+
+    expect(screen.queryByRole('button', { name: '삭제 중…' })).not.toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: '학교 계정 로그인' })).toBeInTheDocument()
+    fireEvent.change(screen.getByPlaceholderText('한성대 학번'), { target: { value: '2170001' } })
+    fireEvent.change(screen.getByPlaceholderText('한성대 비밀번호'), { target: { value: 'school-secret' } })
+    expect(screen.getByRole('button', { name: '학교 계정 로그인' })).toBeEnabled()
+    expect(mockLmsClear).toHaveBeenCalledTimes(1)
+  })
 })

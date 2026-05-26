@@ -58,6 +58,10 @@ function notifyAllSchoolIntegrationsChanged(): void {
   notifySchoolIntegrationAuthChanged('lms')
 }
 
+function settleSilently<T>(promise: Promise<T>): void {
+  void promise.catch(() => undefined)
+}
+
 function SidebarSharedAuthCard({
   state,
   locale,
@@ -173,20 +177,17 @@ export function SidebarSchoolAuthPanel({ locale = 'en' }: { locale?: AppLocale }
   }, [locale, schoolAuth.password, schoolAuth.studentId])
 
   const clearSchoolAccount = useCallback(() => {
-    setSchoolAuth((current) => ({ ...current, busy: true, error: null }))
-    void Promise.all([clearStudySpaceSession(), clearLmsSession()])
-      .then(() => {
-        setSchoolAuth((current) => ({
-          ...current,
-          credentialState: 'missing',
-          message: defaultMessage('missing', locale),
-          password: '',
-          error: null,
-        }))
-        notifyAllSchoolIntegrationsChanged()
-      })
-      .catch((error) => setSchoolAuth((current) => ({ ...current, error: error instanceof Error ? error.message : String(error) })))
-      .finally(() => setSchoolAuth((current) => ({ ...current, busy: false })))
+    setSchoolAuth((current) => ({
+      ...current,
+      busy: false,
+      credentialState: 'missing',
+      message: defaultMessage('missing', locale),
+      password: '',
+      error: null,
+    }))
+    notifyAllSchoolIntegrationsChanged()
+    settleSilently(clearStudySpaceSession().finally(notifyAllSchoolIntegrationsChanged))
+    settleSilently(clearLmsSession().finally(notifyAllSchoolIntegrationsChanged))
   }, [locale])
 
   return (
