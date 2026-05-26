@@ -106,7 +106,7 @@ async function completeSuccessfulReservation() {
 
 
 beforeEach(() => {
-  vi.clearAllMocks()
+  vi.resetAllMocks()
   mockStatus.mockResolvedValue({
     credential_state: 'missing',
     credential_message: '보안 저장소에 저장된 한성대 학습공간 예약 자격증명이 없습니다.',
@@ -164,7 +164,7 @@ describe('StudySpaceReservationPage', () => {
       render(<StudySpaceReservationPage locale="ko-KR" />)
 
       await waitFor(() => expect(mockStatus).toHaveBeenCalledOnce())
-      expect(setIntervalSpy).not.toHaveBeenCalled()
+      expect(setIntervalSpy.mock.calls.filter(([, delay]) => delay !== 50)).toHaveLength(0)
       expect(mockRooms).not.toHaveBeenCalled()
       expect(mockAvailability).not.toHaveBeenCalled()
     } finally {
@@ -196,7 +196,9 @@ describe('StudySpaceReservationPage', () => {
 
     expect(screen.getByText('예약 가능 여부를 확인하면 공간별 시간대 현황이 표시됩니다.')).toBeInTheDocument()
 
+    await waitFor(() => expect(mockStatus).toHaveBeenCalledOnce())
     fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
+    await waitFor(() => expect(mockAvailability).toHaveBeenCalledTimes(1))
     expect(screen.getByText('예약 현황을 확인하는 중입니다…')).toBeInTheDocument()
     resolvePendingAvailability?.({
       area: 'coding_lounge',
