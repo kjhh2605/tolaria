@@ -36,9 +36,11 @@ describe('normalizeExternalUrl', () => {
     expect(isUrlValue('2026')).toBe(false)
   })
 
-  it('rejects malformed or unsupported URLs', () => {
+  it('rejects malformed or unsupported URLs while preserving safe HTTP(S) variants', () => {
     expect(normalizeExternalUrl('https://exa mple.com')).toBeNull()
+    expect(normalizeExternalUrl('HTTPS://example.com/docs?x=1#top')).toBe('HTTPS://example.com/docs?x=1#top')
     expect(normalizeExternalUrl('javascript:alert(1)')).toBeNull()
+    expect(normalizeExternalUrl('data:text/html,alert(1)')).toBeNull()
     expect(normalizeExternalUrl('not a url')).toBeNull()
   })
 })
