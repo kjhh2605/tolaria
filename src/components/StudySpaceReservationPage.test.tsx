@@ -104,8 +104,9 @@ async function completeSuccessfulReservation() {
   expect(await screen.findByText('예약이 완료되었습니다. 예약 번호: R-103')).toBeInTheDocument()
 }
 
+
 beforeEach(() => {
-  vi.clearAllMocks()
+  vi.resetAllMocks()
   mockStatus.mockResolvedValue({
     credential_state: 'missing',
     credential_message: '보안 저장소에 저장된 한성대 학습공간 예약 자격증명이 없습니다.',
@@ -156,6 +157,71 @@ beforeEach(() => {
 })
 
 describe('StudySpaceReservationPage', () => {
+  it('does not schedule polling or load rooms/availability without an explicit user check', async () => {
+    const setIntervalSpy = vi.spyOn(globalThis, 'setInterval')
+
+    try {
+      render(<StudySpaceReservationPage locale="ko-KR" />)
+
+      await waitFor(() => expect(mockStatus).toHaveBeenCalledOnce())
+      expect(setIntervalSpy.mock.calls.filter(([, delay]) => delay !== 50)).toHaveLength(0)
+      expect(mockRooms).not.toHaveBeenCalled()
+      expect(mockAvailability).not.toHaveBeenCalled()
+    } finally {
+      setIntervalSpy.mockRestore()
+    }
+  })
+
+  it('shows dashboard loading, empty, unavailable, and success states from explicit actions', async () => {
+    let resolvePendingAvailability: ((value: Awaited<ReturnType<typeof checkStudySpaceAvailability>>) => void) | null = null
+    const pendingAvailability = new Promise<Awaited<ReturnType<typeof checkStudySpaceAvailability>>>((resolve) => {
+      resolvePendingAvailability = resolve
+    })
+    mockAvailability.mockReturnValueOnce(pendingAvailability)
+    mockAvailability.mockResolvedValueOnce({
+      area: 'coding_lounge',
+      date: '2026-05-27',
+      start_time: '13:00',
+      end_time: '15:00',
+      results: [{ room: room103, available: false, reason: '이미 예약됨', slots: [] }],
+    })
+    mockAvailability.mockResolvedValueOnce({
+      area: 'coding_lounge',
+      date: '2026-05-27',
+      start_time: '13:00',
+      end_time: '15:00',
+      results: [{ room: room103, available: true, slots: [] }],
+    })
+    render(<StudySpaceReservationPage locale="ko-KR" />)
+
+    expect(screen.getByText('예약 가능 여부를 확인하면 공간별 시간대 현황이 표시됩니다.')).toBeInTheDocument()
+
+    await waitFor(() => expect(mockStatus).toHaveBeenCalledOnce())
+    fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
+    await waitFor(() => expect(mockAvailability).toHaveBeenCalledTimes(1))
+    expect(screen.getByText('공간 목록을 불러오는 중…')).toBeInTheDocument()
+    resolvePendingAvailability?.({
+      area: 'coding_lounge',
+      date: '2026-05-27',
+      start_time: '13:00',
+      end_time: '15:00',
+      results: [],
+    })
+    expect(await screen.findByText('현재 필터에 맞는 공간이 없습니다.')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
+    expect(await screen.findByText('이미 예약됨')).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('선택한 날짜와 시간에 예약 가능한 공간이 없습니다.')
+    expect(screen.getByRole('button', { name: '예약' })).toBeDisabled()
+
+    fireEvent.click(screen.getByRole('button', { name: '예약 가능 여부 확인' }))
+    expect(await screen.findByText('예약 가능')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '예약' }))
+    fireEvent.click(screen.getByRole('button', { name: '예약 확정' }))
+
+    expect(await screen.findByRole('status')).toHaveTextContent('예약이 완료되었습니다. 예약 번호: R-103')
+  })
+
   it('renders Korean reservation controls without loading rooms before the user checks availability', async () => {
     render(<StudySpaceReservationPage locale="ko-KR" />)
 

@@ -43,6 +43,36 @@ describe('studySpaceReservationArtifacts', () => {
     expect(ics).not.toMatch(/password|token|cookie/i)
   })
 
+  it('keeps generated filenames local even when room names contain URL-like path traversal text', () => {
+    const filename = studySpaceReservationNoteFilename({
+      ...input,
+      room: { name: 'https://evil.example/../../secret room', location: '상상관' },
+    })
+
+    expect(filename).toBe('study-space-2026-05-27-https-evil-example-secret-room.md')
+    expect(filename).not.toContain('/')
+    expect(filename).not.toContain('\\')
+    expect(filename).not.toMatch(/^https?:/i)
+  })
+
+  it('escapes Markdown and ICS separators while keeping artifacts free of credential labels', () => {
+    const hostileInput = {
+      ...input,
+      room: { name: '룸|A, B;C', location: '1층\n토큰 없음; 안전' },
+      members: [
+        { student_number: '21 700|01', name: '김|한성\n학생' },
+      ],
+    }
+
+    const note = buildStudySpaceReservationNote(hostileInput)
+    const ics = buildStudySpaceReservationIcs(hostileInput)
+
+    expect(note).toContain(String.raw`| 2170001 | 김\|한성 학생 |`)
+    expect(ics).toContain(String.raw`SUMMARY:학습공간 예약: 룸|A\, B\;C`)
+    expect(ics).toContain(String.raw`LOCATION:1층\n토큰 없음\; 안전`)
+    expect(`${note}\n${ics}`).not.toMatch(/password|session_cookie|access_token|raw_authenticated_payload/i)
+  })
+
   it('creates a stable markdown filename', () => {
     expect(studySpaceReservationNoteFilename(input)).toBe('study-space-2026-05-27-코딩라운지-103호.md')
   })
