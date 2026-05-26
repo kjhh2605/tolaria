@@ -442,6 +442,7 @@ fn wait_with_timeout(
     mut child: std::process::Child,
     timeout: Duration,
 ) -> Result<std::process::Output, LmsCommandError> {
+    drop(child.stdin.take());
     let start = Instant::now();
     loop {
         match child.try_wait() {
@@ -728,5 +729,28 @@ mod tests {
         assert!(details.contains(PATH_REDACTION));
         assert!(!details.contains("fixture-secret"));
         assert!(!details.contains("2299999"));
+    }
+
+    #[test]
+    fn timeout_wait_closes_bridge_stdin_before_waiting() {
+        let mut child = Command::new("sh")
+            .arg("-c")
+            .arg("cat >/dev/null; printf '{\"ok\":true}'")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child
+            .stdin
+            .as_mut()
+            .unwrap()
+            .write_all(br#"{"op":"status"}"#)
+            .unwrap();
+
+        let output = wait_with_timeout(child, Duration::from_secs(1)).unwrap();
+
+        assert!(output.status.success());
+        assert_eq!(String::from_utf8_lossy(&output.stdout), r#"{"ok":true}"#);
     }
 }
