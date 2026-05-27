@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 import sys
+from datetime import date
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -15,8 +17,11 @@ MAX_ASSIGNMENTS = 60
 
 def add_bundled_runtime_to_path() -> None:
     runtime = Path(__file__).resolve().parent / "study-space-python"
-    if runtime.is_dir():
-        sys.path.insert(0, str(runtime))
+    if runtime.is_dir() and str(runtime) not in sys.path:
+        # Keep the bundled runtime behind the Python stdlib so top-level packages
+        # bundled by dependencies (for example keyring.backends.macOS.http) cannot
+        # shadow stdlib packages such as http.client during httpx imports.
+        sys.path.append(str(runtime))
 
 
 add_bundled_runtime_to_path()
@@ -74,6 +79,25 @@ def safe_course(course: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
+def normalized_due_date(value: Any) -> str | None:
+    if not value:
+        return None
+    text = " ".join(str(value).split())
+    patterns = [
+        r"(?P<year>\d{4})[-./](?P<month>\d{1,2})[-./](?P<day>\d{1,2})",
+        r"(?P<year>\d{4})\s*년\s*(?P<month>\d{1,2})\s*월\s*(?P<day>\d{1,2})\s*일",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, text)
+        if not match:
+            continue
+        try:
+            return date(int(match.group("year")), int(match.group("month")), int(match.group("day"))).isoformat()
+        except ValueError:
+            return None
+    return None
+
+
 def safe_assignment(assignment: dict[str, Any]) -> dict[str, Any] | None:
     url = safe_lms_url(assignment.get("url"))
     if not url:
@@ -86,7 +110,7 @@ def safe_assignment(assignment: dict[str, Any]) -> dict[str, Any] | None:
         "url": url,
         "due_text": assignment.get("due_text"),
         "status_text": assignment.get("status_text"),
-        "due_date": assignment.get("due_date"),
+        "due_date": assignment.get("due_date") or normalized_due_date(assignment.get("due_text")),
     }
 
 
@@ -153,10 +177,18 @@ async def handle(request: dict[str, Any]) -> dict[str, Any]:
                         base_url=client.base_url,
                         course_id=course_id,
                         course_name=str(course.get("name") or ""),
-                    )[:5]
+                    )
                 )
             courses = [item for item in (safe_course(course) for course in courses_raw) if item]
             assignments = [item for item in (safe_assignment(assignment) for assignment in assignments_raw) if item]
+            assignments.sort(
+                key=lambda item: (
+                    item.get("due_date") is None,
+                    item.get("due_date") or "9999-12-31",
+                    item.get("due_text") or "",
+                    item.get("name") or "",
+                )
+            )
             return {
                 "ok": True,
                 "read_only": True,
@@ -175,9 +207,14 @@ async def handle(request: dict[str, Any]) -> dict[str, Any]:
 def main() -> None:
     try:
         request = json.loads(sys.stdin.read() or "{}")
+        response = asyncio.run(handle(request))
+        emit(response, 0)
     except json.JSONDecodeError as exc:
         emit(bridge_error("PARSE_ERROR", str(exc)), 0)
-    emit(asyncio.run(handle(request)), 0)
+    except SystemExit:
+        raise
+    except Exception as exc:
+        emit(bridge_error(getattr(exc, "code", "UNKNOWN_ERROR"), str(exc)), 0)
 
 
 if __name__ == "__main__":
