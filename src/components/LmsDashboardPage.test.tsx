@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LmsDashboardPage } from './LmsDashboardPage'
 import { useLmsDashboard, type UseLmsDashboardResult } from '../hooks/useLmsDashboard'
 import { openExternalUrl } from '../utils/url'
@@ -53,7 +53,13 @@ function readyState(overrides: Partial<UseLmsDashboardResult> = {}): UseLmsDashb
 
 beforeEach(() => {
   vi.clearAllMocks()
+  vi.useFakeTimers()
+  vi.setSystemTime(new Date('2026-05-27T09:00:00+09:00'))
   mockUseLmsDashboard.mockReturnValue(readyState())
+})
+
+afterEach(() => {
+  vi.useRealTimers()
 })
 
 describe('LmsDashboardPage', () => {
@@ -100,5 +106,32 @@ describe('LmsDashboardPage', () => {
     expect(screen.queryByPlaceholderText('한성대 비밀번호')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '보안 로그인' })).not.toBeInTheDocument()
     expect(login).not.toHaveBeenCalled()
+  })
+
+  it('classifies common LMS Korean and numeric date-time formats without guessing ambiguous ranges', () => {
+    mockUseLmsDashboard.mockReturnValue(readyState({
+      overview: {
+        read_only: true,
+        summary: { course_count: 1, assignment_count: 4, capped_course_count: 1, capped_assignment_count: 4 },
+        courses: [],
+        assignments: [
+          { assignment_id: 'korean-year', course_id: 'c1', course_name: '소프트웨어공학', name: '한국어 연도 마감', url: 'https://learn.hansung.ac.kr/mod/assign/view.php?id=11', due_text: '2026년 5월 30일 23:59' },
+          { assignment_id: 'dotted-weekday', course_id: 'c1', course_name: '소프트웨어공학', name: '점 날짜 요일 마감', url: 'https://learn.hansung.ac.kr/mod/assign/view.php?id=12', due_text: '2026.05.30(토) 23:59' },
+          { assignment_id: 'numeric-time', course_id: 'c1', course_name: '소프트웨어공학', name: '숫자 시간 마감', url: 'https://learn.hansung.ac.kr/mod/assign/view.php?id=13', due_text: '2026-05-30 23:59' },
+          { assignment_id: 'ambiguous-range', course_id: 'c1', course_name: '소프트웨어공학', name: '기간형 문구', url: 'https://learn.hansung.ac.kr/mod/assign/view.php?id=14', due_text: '2026년 5월 28일 ~ 2026년 5월 30일' },
+        ],
+      },
+    }))
+
+    render(<LmsDashboardPage locale="ko-KR" />)
+
+    const weekSection = screen.getByText('이번 주 마감').closest('[data-slot="card"]')
+    expect(weekSection).toHaveTextContent('한국어 연도 마감')
+    expect(weekSection).toHaveTextContent('점 날짜 요일 마감')
+    expect(weekSection).toHaveTextContent('숫자 시간 마감')
+    expect(weekSection).not.toHaveTextContent('기간형 문구')
+
+    const reviewSection = screen.getByText('날짜 형식 확인 필요').closest('[data-slot="card"]')
+    expect(reviewSection).toHaveTextContent('기간형 문구')
   })
 })

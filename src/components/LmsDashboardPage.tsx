@@ -26,14 +26,36 @@ function todayDate(): Date {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate())
 }
 
+function dateFromParts(year: number, month: number, day: number): Date | null {
+  const date = new Date(year, month - 1, day)
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null
+  return date
+}
+
+function looksLikeDateRange(raw: string): boolean {
+  return /(?:~|～|부터|까지)/.test(raw)
+}
+
+function parseDateText(raw: string): Date | null {
+  if (!raw.trim() || looksLikeDateRange(raw)) return null
+
+  const koreanWithYear = /(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일/.exec(raw)
+  if (koreanWithYear) {
+    return dateFromParts(Number(koreanWithYear[1]), Number(koreanWithYear[2]), Number(koreanWithYear[3]))
+  }
+
+  const numeric = /(\d{4})[-./](\d{1,2})[-./](\d{1,2})/.exec(raw)
+  if (numeric) return dateFromParts(Number(numeric[1]), Number(numeric[2]), Number(numeric[3]))
+
+  const koreanWithoutYear = /(\d{1,2})\s*월\s*(\d{1,2})\s*일/.exec(raw)
+  if (!koreanWithoutYear) return null
+  return dateFromParts(new Date().getFullYear(), Number(koreanWithoutYear[1]), Number(koreanWithoutYear[2]))
+}
+
 function parseDueDate(assignment: LmsAssignment): Date | null {
-  const raw = assignment.due_date ?? assignment.due_text ?? ''
-  const iso = /(\d{4})[-.](\d{1,2})[-.](\d{1,2})/.exec(raw)
-  if (iso) return new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]))
-  const korean = /(\d{1,2})\s*월\s*(\d{1,2})\s*일/.exec(raw)
-  if (!korean) return null
-  const currentYear = new Date().getFullYear()
-  return new Date(currentYear, Number(korean[1]) - 1, Number(korean[2]))
+  const dueDate = assignment.due_date ? parseDateText(assignment.due_date) : null
+  if (dueDate) return dueDate
+  return assignment.due_text ? parseDateText(assignment.due_text) : null
 }
 
 function daysFromToday(date: Date): number {
